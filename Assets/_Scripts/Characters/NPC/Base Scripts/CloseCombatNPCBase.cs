@@ -37,7 +37,8 @@ public class CloseCombatNPCBase : MonoBehaviour, IDamageble, INPCMovable, IMulti
     [field: SerializeField] public float RunSpeed { get; set; } = 4f;
     [field: SerializeField] public float JumpHeight { get; set; } = 12f;
     [field: SerializeField, Tooltip("Layers at which NPC will be considered as grounded")] public LayerMask GroundMask { get; set; }
-    [field: SerializeField, Range(0, 1), Tooltip("0 - looking left, 1 - looking right")] public int LookingSideIndex { get; set; }
+    [field: SerializeField, Tooltip("Used to verify NPC looking direction and flip it if neccessary")] public bool LookingRight { get; set; }
+    [field: SerializeField, Tooltip("Verifies NPC initial looking side")] public bool IsInitiallyLookingRight { get; set; }
     #endregion
 
     #region Verification variables
@@ -50,9 +51,10 @@ public class CloseCombatNPCBase : MonoBehaviour, IDamageble, INPCMovable, IMulti
     [Header("Movement CheckPoints")]
     [SerializeField] private Transform _groundCheckPoint;
     [SerializeField] private Transform _jumpCheckPoint;
+    [SerializeField] private Transform _obstaclePoint;
 
     Coroutine aggresiveTimerCoroutine;
-    RaycastHit2D hitWalkCheck, hitJumpCheck;
+    RaycastHit2D hitWalkCheck, hitJumpCheck, obstacleCheck;
     [Header("Gizmos")]
     [SerializeField] private bool DrawGroundCheckGizmos;
 
@@ -135,7 +137,7 @@ public class CloseCombatNPCBase : MonoBehaviour, IDamageble, INPCMovable, IMulti
             if (movableStats.Value.WalkSpeed.HasValue) WalkSpeed = movableStats.Value.WalkSpeed.Value;
             if (movableStats.Value.RunSpeed.HasValue) RunSpeed = movableStats.Value.RunSpeed.Value;
             if (movableStats.Value.JumpHeight.HasValue) JumpHeight = movableStats.Value.JumpHeight.Value;
-            if (movableStats.Value.LookingSideIndex.HasValue) LookingSideIndex = movableStats.Value.LookingSideIndex.Value;
+            //if (movableStats.Value.LookingSideIndex.HasValue) LookingSideIndex = movableStats.Value.LookingSideIndex.Value;
         }
     }
 
@@ -149,6 +151,7 @@ public class CloseCombatNPCBase : MonoBehaviour, IDamageble, INPCMovable, IMulti
     #endregion
 
     #region Awake, Start, Update, FixedUpdate
+
     protected virtual void Start()
     {
         AnimationState = GetComponent<AnimationStateHandler>();
@@ -281,23 +284,43 @@ public class CloseCombatNPCBase : MonoBehaviour, IDamageble, INPCMovable, IMulti
 
     public virtual void NPCMove(float moveSpeed) // ++++
     {
-        if (transform.eulerAngles.y >= 0)
-            transform.Translate(Vector2.left * Time.deltaTime * moveSpeed);
-        else
-            transform.Translate(Vector2.right * Time.deltaTime * moveSpeed);
+        if (!IsInitiallyLookingRight)
+        {
+            if (transform.eulerAngles.y >= 0)
+                transform.Translate(Vector2.left * Time.deltaTime * moveSpeed);
+            else
+                transform.Translate(Vector2.right * Time.deltaTime * moveSpeed);
+        }
     }
 
-    public virtual void FlipSides(int sideIndex) // ++++
+    public virtual void FlipSides(bool lookingRight) // ++++
     {
-        if (sideIndex == 0)
+        if (IsInitiallyLookingRight)
         {
-            LookingSideIndex = 1;
-            transform.eulerAngles = new Vector3(0f, 180f, 0f);
+            if (LookingRight)
+            {
+                LookingRight = false;
+                transform.eulerAngles = new Vector3(0f, 180f, 0f);
+            }
+            else
+            {
+                LookingRight = true;
+                transform.eulerAngles = new Vector3(0f, 0f, 0f);
+            }
         }
-        else
+
+        if (!IsInitiallyLookingRight)
         {
-            LookingSideIndex = 0;
-            transform.eulerAngles = new Vector3(0f, 0f, 0f);
+            if (!LookingRight)
+            {
+                LookingRight = true;
+                transform.eulerAngles = new Vector3(0f, 180f, 0f);
+            }
+            else
+            {
+                LookingRight = false;
+                transform.eulerAngles = new Vector3(0f, 0f, 0f);
+            }
         }
     }
 
@@ -314,9 +337,18 @@ public class CloseCombatNPCBase : MonoBehaviour, IDamageble, INPCMovable, IMulti
         if (!hitWalkCheck) {
             if (IsJumping == false) {
                 if (hitJumpCheck) NPCJump();
-                else FlipSides(LookingSideIndex);
+                else FlipSides(LookingRight);
             }     
         } if (hitWalkCheck && IsJumping) IsJumping = false;
+    }
+
+    public virtual bool ObstacleCheck()
+    {
+        if (_obstaclePoint != null)
+        {
+            return obstacleCheck = Physics2D.Raycast(_obstaclePoint.position, LookingRight ? Vector2.right : Vector2.left, 0.25f, GroundMask);
+        }
+        else return false;
     }
     protected virtual void NPCJump() // ++++
     {
@@ -338,20 +370,14 @@ public class CloseCombatNPCBase : MonoBehaviour, IDamageble, INPCMovable, IMulti
 
             if (WaypointL.transform.position.x > transform.position.x && WaypointR.transform.position.x > transform.position.x)
             {
-                if (LookingSideIndex == 1)
-                {
-                    FlipSides(LookingSideIndex);
-                }
+                if (LookingRight) FlipSides(LookingRight);
                 PreviousWaypoint = WaypointR;
                 return WaypointL;
             }
 
             else if (WaypointL.transform.position.x < transform.position.x && WaypointR.transform.position.x < transform.position.x)
             {
-                if (LookingSideIndex == 0)
-                {
-                    FlipSides(LookingSideIndex);
-                }
+                if (!LookingRight) FlipSides(LookingRight);
                 PreviousWaypoint = WaypointL;
                 return WaypointR;
             }
@@ -449,6 +475,12 @@ public class CloseCombatNPCBase : MonoBehaviour, IDamageble, INPCMovable, IMulti
                 if (hitJumpCheck) Gizmos.color = Color.green;
                 else Gizmos.color = Color.red;
                 Gizmos.DrawRay(_jumpCheckPoint.position, Vector2.down * 1);
+            }
+            if(_obstaclePoint != null)
+            {
+                if (obstacleCheck) Gizmos.color = Color.green;
+                else Gizmos.color = Color.red;
+                Gizmos.DrawRay(_obstaclePoint.position, LookingRight ? Vector2.right * 0.25f : Vector2.left * 0.25f);
             }
         }
     }

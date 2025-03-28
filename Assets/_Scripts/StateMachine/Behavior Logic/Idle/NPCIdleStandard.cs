@@ -19,6 +19,8 @@ public class NPCIdleStandard : NPCIdleSOBase
         if (!npc.IsAgrresive) npc.AnimationState.ChangeAnimationState(_standardIdleAnimName);
         else npc.AnimationState.ChangeAnimationState(_aggroedIdleAnimName);
 
+        npc.ReturningWaypoint = npc.NeedToReturn();
+
         if (_idleCoroutine == null)
             _idleCoroutine = npc.StartCoroutine(Idle()); // Start the idling coroutine
     }
@@ -68,7 +70,7 @@ public class NPCIdleStandard : NPCIdleSOBase
         if (npc.IdlingAtWaypoint)
         {
             npc.IdlingAtWaypoint = false;
-            npc.FlipSides(npc.LookingSideIndex);
+            npc.FlipSides(npc.LookingRight);
         }
 
         if (npc.ReturningWaypoint != null)

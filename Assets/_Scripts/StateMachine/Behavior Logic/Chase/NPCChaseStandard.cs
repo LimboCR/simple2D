@@ -28,10 +28,7 @@ public class NPCChaseStandard : NPCChaseSOBase
     {
         base.DoFrameUpdateLogic();
 
-        if (npc.combatNav.CurrentTarget == null)
-        {
-            npc.StateMachine.ChangeState(npc.IdleState); // Stop chasing if unreachable
-        }
+        if (npc.combatNav.CurrentTarget == null) npc.StateMachine.ChangeState(npc.IdleState); // Stop chasing if unreachable
 
         if (npc.combatNav.AbleToAttack)
             npc.StateMachine.ChangeState(npc.AttackState);
@@ -59,10 +56,10 @@ public class NPCChaseStandard : NPCChaseSOBase
         if (npc.combatNav.CurrentTarget == null) return;
         npc.NPCMove(npc.RunSpeed);
 
-        if (npc.combatNav.CurrentTarget.gameObject.transform.position.x > npc.transform.position.x)
-            npc.FlipSides(0);
-        else
-            npc.FlipSides(1);
+        if (npc.combatNav.CurrentTarget.gameObject.transform.position.x > npc.transform.position.x && !npc.LookingRight)
+            npc.FlipSides(npc.LookingRight);
+        else if(npc.combatNav.CurrentTarget.gameObject.transform.position.x < npc.transform.position.x && npc.LookingRight)
+            npc.FlipSides(npc.LookingRight);
 
         npc.GroundCheck();
 

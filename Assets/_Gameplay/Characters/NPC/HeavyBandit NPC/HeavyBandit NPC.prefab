@@ -182,7 +182,7 @@ Transform:
   m_GameObject: {fileID: 3117596444794899105}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.25, y: 0.75, z: 0}
+  m_LocalPosition: {x: 0.114, y: 0.75, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -282,7 +282,7 @@ Transform:
   m_GameObject: {fileID: 6856811781469667558}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -2.089, y: 0.106, z: 0}
+  m_LocalPosition: {x: -3.314, y: 0.106, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -432,7 +432,7 @@ Rigidbody2D:
   m_Mass: 1
   m_LinearDamping: 0
   m_AngularDamping: 0.05
-  m_GravityScale: 1
+  m_GravityScale: 3
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -551,11 +551,12 @@ MonoBehaviour:
   <RegenRate>k__BackingField: 2
   <WalkSpeed>k__BackingField: 3
   <RunSpeed>k__BackingField: 5
-  <JumpHeight>k__BackingField: 16
+  <JumpHeight>k__BackingField: 15
   <GroundMask>k__BackingField:
     serializedVersion: 2
     m_Bits: 8
-  <LookingSideIndex>k__BackingField: 0
+  <LookingRight>k__BackingField: 0
+  <IsInitiallyLookingRight>k__BackingField: 0
   ActiveState: 0
   IsJumping: 0
   IsAgrresive: 0

@@ -17,7 +17,6 @@ public class NPCIdleSOBase : ScriptableObject
     public virtual void DoEnterLogic()
     {
         npc.ActiveState = CloseCombatNPCBase.NPCStateCheck.Idle;
-        npc.ReturningWaypoint = npc.NeedToReturn();
     }
     public virtual void DoExitLogic() 
     { 

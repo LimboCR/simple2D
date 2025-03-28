@@ -35,6 +35,11 @@ public class NPCAttackStandard : NPCAttackSOBase
 
         if (npc.combatNav.CurrentTarget != null && !npc.combatNav.AbleToAttack)
             npc.StateMachine.ChangeState(npc.ChaseState);
+
+        if (npc.combatNav.CurrentTarget.gameObject.transform.position.x > npc.transform.position.x && !npc.LookingRight)
+            npc.FlipSides(npc.LookingRight);
+        else if (npc.combatNav.CurrentTarget.gameObject.transform.position.x < npc.transform.position.x && npc.LookingRight)
+            npc.FlipSides(npc.LookingRight);
     }
 
     public override void DoPhysicsUpdateLogic()
