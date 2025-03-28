@@ -96,7 +96,7 @@ public class CloseCombatNPCBase : MonoBehaviour, IDamageble, INPCMovable, IMulti
 
     #endregion
 
-    #region SOStates Varibales
+    #region SO States Varibales
 
     [Space]
     [Header("NPC States Assigner")]
@@ -238,7 +238,7 @@ public class CloseCombatNPCBase : MonoBehaviour, IDamageble, INPCMovable, IMulti
         {
             AwaitHurtState();
 
-            if (IsAgrresive && aggresiveTimerCoroutine == null)
+            if (gameObject.activeSelf && IsAgrresive && aggresiveTimerCoroutine == null)
                 aggresiveTimerCoroutine = StartCoroutine(AggresiveTimer());
         }
     }
