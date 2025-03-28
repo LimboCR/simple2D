@@ -238,6 +238,20 @@ public class NewPlayerController : MonoBehaviour
         SkillAttackCooldown = false;
     }
 
+    #region Save, Load, Reset
+
+    public void Save(ref PlayerSaveData data)
+    {
+        data.Position = transform.position;
+    }
+
+    public void Load(PlayerSaveData data)
+    {
+        transform.position = data.Position;
+    }
+
+    #endregion
+
     private void OnDrawGizmosSelected()
     {
         #region Ground Ray Check
@@ -281,4 +295,10 @@ public class NewPlayerController : MonoBehaviour
         }
         #endregion
     }
+}
+
+[System.Serializable]
+public struct PlayerSaveData
+{
+    public Vector3 Position;
 }

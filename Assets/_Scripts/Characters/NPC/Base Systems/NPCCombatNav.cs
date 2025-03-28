@@ -263,7 +263,8 @@ public class NPCCombatNav : MonoBehaviour
                     {
                         if (_currentTarget != null) _currentTarget = ChooseClosestTarget();
                     }
-                    else _keepTargetValidCoroutine = StartCoroutine(KeepTargetValid());
+                    else if (this.gameObject.activeSelf)
+                        _keepTargetValidCoroutine = StartCoroutine(KeepTargetValid());
                 }
                 break;
 

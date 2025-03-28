@@ -7,11 +7,9 @@ public class GlobalEventsManager: MonoBehaviour
     public static UnityEvent<int> OnEnemyKilled = new UnityEvent<int>();
 
     public static UnityEvent<int> OnPlayerHealthChanged = new UnityEvent<int>();
-
     public static UnityEvent<int> OnPlayerCoinsChanged = new UnityEvent<int>();
 
     public static UnityEvent<GameStates> OnStateChange = new UnityEvent<GameStates>();
-
     public static UnityEvent<GameStates> GameStateListener = new UnityEvent<GameStates>();
 
     public static void SendEnemyKilled(int remainingCount)
