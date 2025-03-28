@@ -1,26 +1,39 @@
 using UnityEditor;
 using UnityEngine;
-using System.IO;
 using System.Collections.Generic;
+using UnityEngine.UIElements;
 public class SpawnSettingsWindow : EditorWindow
 {
+    #region Window data
     //Refernece to the using script
     private static SpawnPointHandler _spawnPointReference;
 
     //Setting up the scrolls
     private Vector2 _scrollPosition;
     private Vector2 _descriptionScrollPosition;
-    //
 
+    //Full editor window variables
+    private List<SpawnPointHandler> selectedSpawnPoints = new();
+    private bool _hasDifferentNPCs = false;
+    private bool _allEmpty = true;
+    //private bool _openedEditor;
+    private string _npcName;
+    private Texture2D _npcPreview;
+
+    private bool _onSelectionChanged;
+    #endregion
+
+    #region NPCS and their Variables 
     //NPC Fetching & Selection
     private GameObject _selectedNPC;
-    private List<GameObject> _npcPrefabs = new List<GameObject>();
-    private Dictionary<GameObject, Texture2D> _npcSprites = new Dictionary<GameObject, Texture2D>();
+    private readonly List<GameObject> _npcPrefabs = new List<GameObject>();
+    private readonly Dictionary<GameObject, Texture2D> _npcSprites = new Dictionary<GameObject, Texture2D>();
     
     //Additional data in editor
     private bool _enableWaypoints;
     private int _setNPCTeam;
     private NPCType _npcType;
+    #endregion
 
     #region New Health Settings
     private bool _healthScriptOverride;
@@ -42,17 +55,31 @@ public class SpawnSettingsWindow : EditorWindow
 
     private bool _fetchedActualData;
 
-    [MenuItem("Window/Spawn Settings")]
+    //[MenuItem("Custom tools/Spawn Point Settings")]
     public static void OpenWindow(SpawnPointHandler spawnPoint)
     {
-        SpawnSettingsWindow window = GetWindow<SpawnSettingsWindow>("Spawn Settings");
+        SpawnSettingsWindow window = GetWindow<SpawnSettingsWindow>("Direct Spawn Settings");
         _spawnPointReference = spawnPoint;
         window.Show();
+    }
+
+    [MenuItem("Custom Tools/Spawn Points Window")]
+    public static void ShowWindow()
+    {
+        SpawnSettingsWindow window = GetWindow<SpawnSettingsWindow>("Spawn Points Editor");
+        window.Show();
+        //GetWindow<SpawnPointSettingsWindow>("Spawn Point Editor", EditorStyles.boldLabel);
     }
 
     private void OnEnable()
     {
         LoadNPCPrefabs();
+        Selection.selectionChanged += DetectSelectedSpawnPoints;
+    }
+
+    private void OnDisable()
+    {
+        Selection.selectionChanged -= DetectSelectedSpawnPoints;
     }
 
     private void LoadNPCPrefabs()
@@ -102,15 +129,68 @@ public class SpawnSettingsWindow : EditorWindow
                 _jumpHeight = movableData.JumpHeight;
             }
         }
-        _enableWaypoints = _spawnPointReference.InstantiateWaypoints;
+        //_enableWaypoints = _spawnPointReference.InstantiateWaypoints;
+    }
+
+    private void DetectSelectedSpawnPoints()
+    {
+        selectedSpawnPoints.Clear();
+        _fetchedActualData = false;
+        _hasDifferentNPCs = false;
+        _allEmpty = true;
+
+        Object[] objects = Selection.objects;
+        HashSet<GameObject> uniqueNPCs = new();
+
+        foreach (Object obj in objects)
+        {
+            GameObject go = obj as GameObject;
+            if(go != null)
+            {
+                SpawnPointHandler sph = go.GetComponent<SpawnPointHandler>();
+                if(sph!= null)
+                {
+                    selectedSpawnPoints.Add(sph);
+                    uniqueNPCs.Add(sph.npc);
+
+                    if(sph.npc != null) _allEmpty = false;
+                }
+            }
+        }
+
+        if(uniqueNPCs.Count > 1)
+        {
+            _hasDifferentNPCs = true;
+            _npcPreview = null;
+            _selectedNPC = null;
+            _npcName = "Multiple Values";
+        }
+        else if (selectedSpawnPoints.Count > 0 && !_hasDifferentNPCs)
+        {
+            //_npcPreview = GetNPCSprite(selectedSpawnPoints[0].npc);
+            _selectedNPC = selectedSpawnPoints[0].npc;
+        }
+        else
+        {
+            _npcName = "None";
+            _npcPreview = null;
+            _selectedNPC = null;
+        }
     }
 
     private void OnGUI()
     {
-        #region NPC Selection Scroll
+        EditorGUILayout.BeginHorizontal("box", GUILayout.Height(20));
         EditorGUILayout.LabelField("NPC Selection", EditorStyles.boldLabel);
-        _scrollPosition = EditorGUILayout.BeginScrollView(_scrollPosition, GUILayout.Height(200));
+        EditorGUILayout.EndHorizontal();
 
+        #region NPC Selection Scroll
+        GUILayout.BeginHorizontal("box", GUILayout.MaxWidth(400), GUILayout.ExpandWidth(true));
+        GUILayout.Label("NPC List");
+        if (GUILayout.Button(EditorGUIUtility.IconContent("d_Refresh"), GUILayout.Width(25), GUILayout.Height(25))) LoadNPCPrefabs();
+        GUILayout.EndHorizontal();
+
+        _scrollPosition = EditorGUILayout.BeginScrollView(_scrollPosition, GUILayout.Height(200));
         GUILayout.BeginHorizontal(GUILayout.MaxWidth(400), GUILayout.MaxHeight(400));
 
         foreach (GameObject npc in _npcPrefabs)
@@ -145,13 +225,20 @@ public class SpawnSettingsWindow : EditorWindow
         EditorGUILayout.EndScrollView();
         #endregion
 
-        //GUILayout.FlexibleSpace();
+        GUILayout.Space(5f);
+        GUILayout.BeginHorizontal("box", GUILayout.MaxWidth(400), GUILayout.ExpandWidth(true));
+        GUILayout.Label("Selected Spawn point(s) data");
+        if (GUILayout.Button(EditorGUIUtility.IconContent("d_Refresh"), GUILayout.Width(25), GUILayout.Height(25)))
+            DetectSelectedSpawnPoints();
+        GUILayout.EndHorizontal();
 
+        _descriptionScrollPosition = EditorGUILayout.BeginScrollView(_descriptionScrollPosition);
         if (_selectedNPC != null)
         {
+            #region Fetches Actual NPC data and preview
             if (!_fetchedActualData) FetchSelectedNPCData();
-            _descriptionScrollPosition = EditorGUILayout.BeginScrollView(_descriptionScrollPosition);
             GUILayout.BeginVertical("box", GUILayout.MaxWidth(400), GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
+            
             // Show NPC Texture
             GUILayout.BeginHorizontal(GUILayout.MaxHeight(100));
             if (_npcSprites[_selectedNPC] != null)
@@ -162,7 +249,6 @@ public class SpawnSettingsWindow : EditorWindow
             {
                 GUILayout.Label("No Preview", "box", GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true), GUILayout.MaxWidth(100), GUILayout.MaxHeight(100));
             }
-
             //
             GUILayout.BeginVertical();
             GUILayout.Space(4);
@@ -170,11 +256,10 @@ public class SpawnSettingsWindow : EditorWindow
                 GUILayout.MaxWidth(300), GUILayout.MaxHeight(100), GUILayout.ExpandWidth(true));
             GUILayout.EndVertical();
             ///
-
             GUILayout.EndHorizontal();
+            #endregion
 
             GUILayout.Space(15);
-
             #region Details Regarding NPC
             GUILayout.BeginHorizontal("box");
             GUILayout.BeginVertical();
@@ -223,37 +308,61 @@ public class SpawnSettingsWindow : EditorWindow
             GUILayout.EndVertical();
             GUILayout.EndHorizontal();
             GUILayout.EndVertical();
-            GUILayout.EndScrollView();
+
             #endregion
 
+            #region Attach NPC to Spawn Point(s)
             GUILayout.Space(20);
             EditorGUILayout.LabelField("Selected NPC: " + _selectedNPC.name, EditorStyles.boldLabel);
             if (GUILayout.Button("Set NPC to Spawn"))
             {
-                _spawnPointReference.npc = _selectedNPC;
-                _spawnPointReference.NPCTeam = _setNPCTeam;
-                _spawnPointReference.InstantiateWaypoints = _enableWaypoints;
-
-                if (_healthScriptOverride)
+                foreach(SpawnPointHandler sph in selectedSpawnPoints)
                 {
-                    _spawnPointReference.HealthScriptOverride = true;
-                    _spawnPointReference.NPCMaxHealth = _newMaxHealth;
-                    _spawnPointReference.NPCRegenRate = _newRegenRate;
-                    _spawnPointReference.NPCRegenDelay = _newRegenDelay;
-                }
-                else _spawnPointReference.HealthScriptOverride = false;
+                    sph.npc = _selectedNPC;
+                    sph.NPCTeam = _setNPCTeam;
+                    sph.InstantiateWaypoints = _enableWaypoints;
 
-                if (_iNPCMovableOverride)
-                {
-                    _spawnPointReference.INPCMovableOverride = true;
-                    _spawnPointReference.WalkSpeed = _walkSpeed;
-                    _spawnPointReference.RunSpeed = _runSpeed;
-                    _spawnPointReference.JumpHeight = _jumpHeight;
+                    if (_healthScriptOverride)
+                    {
+                        sph.HealthScriptOverride = true;
+                        sph.NPCMaxHealth = _newMaxHealth;
+                        sph.NPCRegenRate = _newRegenRate;
+                        sph.NPCRegenDelay = _newRegenDelay;
+                    }
+                    else sph.HealthScriptOverride = false;
+
+                    if (_iNPCMovableOverride)
+                    {
+                        sph.INPCMovableOverride = true;
+                        sph.WalkSpeed = _walkSpeed;
+                        sph.RunSpeed = _runSpeed;
+                        _spawnPointReference.JumpHeight = _jumpHeight;
+                    }
+                    else sph.INPCMovableOverride = false;
                 }
-                else _spawnPointReference.INPCMovableOverride = false;
                 Debug.Log("Selected NPC: " + _selectedNPC.name);
             }
+            #endregion
         }
-        else _fetchedActualData = false;
+        else
+        {
+            _fetchedActualData = false;
+            GUILayout.BeginVertical("box", GUILayout.MaxWidth(400), GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
+            // Show NPC Texture
+            GUILayout.BeginHorizontal(GUILayout.MaxHeight(100));
+            GUILayout.Label(_npcName, "box", GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true), GUILayout.MaxWidth(100), GUILayout.MaxHeight(100));
+
+            //
+            GUILayout.BeginVertical();
+            GUILayout.Space(4);
+            GUILayout.TextArea("Spawn points have different NPCs set to them or none NPCs at all",
+            GUILayout.MaxWidth(300), GUILayout.MaxHeight(100), GUILayout.ExpandWidth(true));
+            GUILayout.EndVertical();
+            ///
+
+            GUILayout.EndHorizontal();
+            GUILayout.EndVertical();
+        }
+        GUILayout.EndScrollView();
     }
 }
