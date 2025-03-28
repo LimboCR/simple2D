@@ -27,6 +27,12 @@ public class NPCWalkStandard : NPCWalkSOBase
         base.DoFrameUpdateLogic();
 
         npc.GroundCheck();
+        npc.IsHitObstacle = npc.ObstacleCheck();
+
+        if (npc.IsHitObstacle && !npc.IsJumping)
+            npc.StateMachine.ChangeState(npc.IdleState);
+
+
         npc.NPCMove(npc.WalkSpeed);
 
         if (npc.IsJumping) npc.AnimationState.ChangeAnimationState(_jumpAnimationName);

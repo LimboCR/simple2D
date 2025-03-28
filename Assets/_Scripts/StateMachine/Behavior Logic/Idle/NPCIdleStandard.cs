@@ -67,6 +67,12 @@ public class NPCIdleStandard : NPCIdleSOBase
             yield return null;
         }
 
+        if (npc.IsHitObstacle)
+        {
+            npc.IsHitObstacle = false;
+            npc.FlipSides(npc.LookingRight);
+        }
+
         if (npc.IdlingAtWaypoint)
         {
             npc.IdlingAtWaypoint = false;

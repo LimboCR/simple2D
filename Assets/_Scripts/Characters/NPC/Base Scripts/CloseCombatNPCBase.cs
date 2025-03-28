@@ -47,6 +47,7 @@ public class CloseCombatNPCBase : MonoBehaviour, IDamageble, INPCMovable, IMulti
     [Tooltip("Does not effect anything, just for visual response")] public NPCStateCheck ActiveState;
     [Tooltip("Automatic")] public bool IsJumping = false;
     [Tooltip("Automatic")] public bool IsAgrresive = false;
+    [Tooltip("Automatic")] public bool IsHitObstacle = false;
 
     [Header("Movement CheckPoints")]
     [SerializeField] private Transform _groundCheckPoint;
