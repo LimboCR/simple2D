@@ -169,6 +169,19 @@ public class CloseCombatNPCBase : MonoBehaviour, IDamageble, INPCMovable, IMulti
         _npcRB = GetComponent<Rigidbody2D>();
         combatNav = GetComponent<NPCCombatNav>();
 
+        if (CharacterTeam == 0)
+        {
+            this.gameObject.tag = "Friendly";
+            this.gameObject.layer = LayerMask.NameToLayer("Friendly");
+            combatNav.ModifyCombatLayers(LayerMask.GetMask("Friendly", "Player", "Ground", "WaypointsAndNav"), LayerMask.NameToLayer("Enemy"));
+        }
+        else if (CharacterTeam == 1)
+        {
+            this.gameObject.tag = "Enemy";
+            this.gameObject.layer = LayerMask.NameToLayer("Enemy");
+            combatNav.ModifyCombatLayers(LayerMask.GetMask("Enemy", "Ground", "WaypointsAndNav"), LayerMask.GetMask("Friendly", "Player"));
+        }
+
         NPCIdleBaseInstance = Instantiate(NPCIdleBase);
         NPCWalkBaseInstance = Instantiate(NPCWalkBase);
         NPCRunBaseInstance = Instantiate(NPCRunBase);
@@ -190,19 +203,6 @@ public class CloseCombatNPCBase : MonoBehaviour, IDamageble, INPCMovable, IMulti
         HurtState = new NPCHurtState(this, StateMachine);
 
         //NPCTeam = CharacterTeam;
-
-        if (CharacterTeam == 0)
-        {
-            this.gameObject.tag = "Friendly";
-            this.gameObject.layer = LayerMask.NameToLayer("Friendly");
-            combatNav.ModifyCombatLayers(LayerMask.GetMask("Ground", "WaypointsAndNav", "Friendly", "Player"));
-        }
-        else if (CharacterTeam == 1)
-        {
-            this.gameObject.tag = "Enemy";
-            this.gameObject.layer = LayerMask.NameToLayer("Enemy");
-            combatNav.ModifyCombatLayers(LayerMask.GetMask("Enemy", "WaypointsAndNav", "Ground"));
-        }
         
         CurrentHealth = MaxHealth;
         Alive = true;

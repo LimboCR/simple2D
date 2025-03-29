@@ -1,0 +1,31 @@
+<engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <Style src="project://database/Assets/UXML/GameManagerStyles.uss?fileID=7433441132597879392&amp;guid=89e907c2e45db3c419e4c92e6c746975&amp;type=3#GameManagerStyles" />
+    <engine:VisualElement class="section" style="flex-grow: 1; height: 25px; -unity-background-scale-mode: stretch-to-fill; -unity-background-image-tint-color: rgb(255, 255, 255); margin-top: 10px; background-color: rgba(0, 0, 0, 0);">
+        <engine:Label text="GameManager V1" style="-unity-font-style: bold; background-color: rgba(255, 255, 255, 0); font-size: 18px; color: rgb(119, 127, 224); padding-top: 0; margin-top: 0;" />
+    </engine:VisualElement>
+    <engine:VisualElement class="section" style="flex-grow: 1; border-top-width: 0; border-right-width: 0; border-bottom-width: 0; border-left-width: 0; padding-top: 10px;">
+        <engine:Label text="Game State &amp; Single References" style="-unity-font-style: bold; font-size: 15px; padding-left: 4px;" />
+        <engine:VisualElement name="NPCListContainer" style="flex-grow: 1; flex-shrink: 1; flex-direction: column; flex-wrap: nowrap; flex-basis: auto; opacity: 1; height: auto; width: auto; padding-top: 0; padding-bottom: 0; margin-top: 0; margin-bottom: 0;">
+            <engine:EnumField label="Game State" value="Center" type="UnityEngine.TextAlignment, UnityEngine.TextRenderingModule" binding-path="currentGameState" class="obj-u2b" />
+            <editor:ObjectField label="Player Game Object" binding-path="_player" class="obj-u2b" />
+        </engine:VisualElement>
+    </engine:VisualElement>
+    <engine:VisualElement class="section" style="flex-grow: 1; border-top-width: 0; border-right-width: 0; border-bottom-width: 0; border-left-width: 0; padding-top: 10px;">
+        <engine:Label text="All Layers" style="-unity-font-style: bold; font-size: 15px; padding-left: 4px;" />
+        <engine:VisualElement name="LayersContainer" style="flex-grow: 1; flex-shrink: 1; flex-direction: row; flex-wrap: nowrap; flex-basis: auto; opacity: 1; height: auto;">
+            <editor:LayerMaskField label="All Layer Masks" binding-path="AllInGameLayers" />
+        </engine:VisualElement>
+    </engine:VisualElement>
+    <engine:VisualElement class="section" style="flex-grow: 1; border-top-width: 0; border-right-width: 0; border-bottom-width: 0; border-left-width: 0; padding-top: 10px;">
+        <engine:Label text="NPC References" style="-unity-font-style: bold; font-size: 15px; padding-left: 4px;" />
+        <engine:VisualElement name="NPCListContainer" style="flex-grow: 1; flex-shrink: 1; flex-direction: column; flex-wrap: nowrap; flex-basis: auto; opacity: 1; height: auto; width: auto;">
+            <editor:PropertyField label="Enemies At Scene" name="NPCsAtScene" style="width: 400px;" />
+        </engine:VisualElement>
+    </engine:VisualElement>
+    <engine:VisualElement class="section" style="flex-grow: 1; border-top-width: 0; border-right-width: 0; border-bottom-width: 0; border-left-width: 0; padding-top: 10px;">
+        <engine:Label text="Spawn Points Reference" style="-unity-font-style: bold; font-size: 15px; padding-left: 4px;" />
+        <engine:VisualElement name="NPCListContainer" style="flex-grow: 1; flex-shrink: 1; flex-direction: column; flex-wrap: nowrap; flex-basis: auto; opacity: 1; height: auto; width: auto;">
+            <editor:PropertyField label="Spawn Points" name="SpawnPointsRef" style="width: 400px;" />
+        </engine:VisualElement>
+    </engine:VisualElement>
+</engine:UXML>
