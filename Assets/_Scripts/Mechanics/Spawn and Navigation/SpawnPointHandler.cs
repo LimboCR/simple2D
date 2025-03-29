@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using static SafeInstantiation;
+using static GlobalEventsManager;
 
 //[RequireComponent(typeof(Messanger))]
 public class SpawnPointHandler : MonoBehaviour
@@ -43,6 +44,16 @@ public class SpawnPointHandler : MonoBehaviour
     [HideInInspector] public int LookingSideIndex;
 
     void Awake()
+    {
+        SendSpawnPoint(gameObject);
+    }
+
+    private void OnDestroy()
+    {
+        RemoveSpawnPoint(gameObject);
+    }
+
+    void Start()
     {
         if (_instantiateOnStart)
         {

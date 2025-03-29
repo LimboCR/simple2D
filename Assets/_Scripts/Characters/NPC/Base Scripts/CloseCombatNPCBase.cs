@@ -1,6 +1,7 @@
 using System.Collections;
 using UnityEngine;
 using static SafeInstantiation;
+using static GlobalEventsManager;
 
 [RequireComponent(typeof(Rigidbody2D), typeof(AnimationStateHandler), typeof(NPCCombatNav))]
 public class CloseCombatNPCBase : MonoBehaviour, IDamageble, INPCMovable, IMultiCharacterData
@@ -152,6 +153,15 @@ public class CloseCombatNPCBase : MonoBehaviour, IDamageble, INPCMovable, IMulti
     #endregion
 
     #region Awake, Start, Update, FixedUpdate
+    private void Awake()
+    {
+        SendEnemySpawn(gameObject);
+    }
+
+    private void OnDestroy()
+    {
+        SendEnemyRemove(gameObject);
+    }
 
     protected virtual void Start()
     {

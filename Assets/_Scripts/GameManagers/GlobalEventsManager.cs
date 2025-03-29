@@ -12,6 +12,12 @@ public class GlobalEventsManager: MonoBehaviour
     public static UnityEvent<GameStates> OnStateChange = new UnityEvent<GameStates>();
     public static UnityEvent<GameStates> GameStateListener = new UnityEvent<GameStates>();
 
+    public static UnityEvent<GameObject> OnEnemySpawn = new();
+    public static UnityEvent<GameObject> OnEnemyRemove = new();
+
+    public static UnityEvent<GameObject> OnSpawnAdd = new();
+    public static UnityEvent<GameObject> OnSpawnRemove = new();
+
     public static void SendEnemyKilled(int remainingCount)
     {
         OnEnemyKilled.Invoke(remainingCount);
@@ -35,5 +41,25 @@ public class GlobalEventsManager: MonoBehaviour
     public static void BroadcastActualGameState(GameStates state)
     {
         GameStateListener.Invoke(state);
+    }
+
+    public static void SendEnemySpawn(GameObject enemy)
+    {
+        OnEnemySpawn.Invoke(enemy);
+    }
+
+    public static void SendEnemyRemove(GameObject enemy)
+    {
+        OnEnemyRemove.Invoke(enemy);
+    }
+
+    public static void SendSpawnPoint(GameObject spawnPoint)
+    {
+        OnSpawnAdd.Invoke(spawnPoint);
+    }
+
+    public static void RemoveSpawnPoint(GameObject spawnPoint)
+    {
+        OnSpawnRemove.Invoke(spawnPoint);
     }
 }
