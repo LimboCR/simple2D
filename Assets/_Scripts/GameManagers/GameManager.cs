@@ -20,7 +20,6 @@ public class GameManager : MonoBehaviour
     }
 
     [Header("GameStates")]
-    public bool isGameActive = true;
     [SerializeField] private GameStates currentGameState;
     [SerializeField] private NewPlayerController _player;
     public NewPlayerController Player
@@ -35,8 +34,10 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public List<GameObject> EnemyAtScene = new();
+    [SerializeField] public List<GameObject> EnemyAtScene = new();
     public List<GameObject> SpawnPoints = new();
+
+    public static LayerMask AllInGameLayers;
 
     private void Awake()
     {

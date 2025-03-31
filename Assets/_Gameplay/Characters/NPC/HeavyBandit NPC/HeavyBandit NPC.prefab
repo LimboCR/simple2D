@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7399379815878140561}
   - component: {fileID: 2159646828733155737}
-  m_Layer: 0
+  m_Layer: 14
   m_Name: TriggerCollider 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -88,7 +88,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4660061398056605503}
   - component: {fileID: 3471308354750019785}
-  m_Layer: 0
+  m_Layer: 14
   m_Name: TriggerCollider 0
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -166,7 +166,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4394993216922983820}
   - component: {fileID: 4102314293673942243}
-  m_Layer: 0
+  m_Layer: 14
   m_Name: AttackZoneCollider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -233,7 +233,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7823909945799066513}
-  m_Layer: 0
+  m_Layer: 14
   m_Name: GroundCheckPoints
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -266,7 +266,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8737489342167286293}
-  m_Layer: 0
+  m_Layer: 14
   m_Name: JumpCheckPoint
   m_TagString: Untagged
   m_Icon: {fileID: 3443629218296621865, guid: 0000000000000000d000000000000000, type: 0}
@@ -297,7 +297,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4840618348898921311}
-  m_Layer: 0
+  m_Layer: 14
   m_Name: NPCCollidersParrent
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -560,8 +560,10 @@ MonoBehaviour:
   ActiveState: 0
   IsJumping: 0
   IsAgrresive: 0
+  IsHitObstacle: 0
   _groundCheckPoint: {fileID: 5974785012869239255}
   _jumpCheckPoint: {fileID: 8737489342167286293}
+  _obstaclePoint: {fileID: 0}
   DrawGroundCheckGizmos: 0
   WaypointL: {fileID: 0}
   WaypointR: {fileID: 0}
@@ -627,7 +629,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5974785012869239255}
-  m_Layer: 0
+  m_Layer: 14
   m_Name: CheckGroundAbove
   m_TagString: Untagged
   m_Icon: {fileID: 1206586993520771344, guid: 0000000000000000d000000000000000, type: 0}

@@ -7,7 +7,7 @@ public class NPCColliderCreator : MonoBehaviour
 {
     [Header("===Colliders settings===")]
     [Header("Layermask To Ignore")]
-    [SerializeField] public LayerMask _excludeLayers;
+    //[SerializeField] public LayerMask _excludeLayers;
 
     [Header("Single colliders presets")]
     [SerializeField] private Vector2 _attackZoneOffset;
@@ -50,7 +50,7 @@ public class NPCColliderCreator : MonoBehaviour
         // Create Chase Zone Collider
         if (_squareTriggerZones.Count > 0)
         {
-            _excludeLayers |= gameObject.layer;
+            //_excludeLayers |= gameObject.layer;
             int counter = 0;
             foreach (var zones in _squareTriggerZones)
             {
@@ -60,7 +60,7 @@ public class NPCColliderCreator : MonoBehaviour
                     BoxCollider2D referenceCollider = reference.AddComponent<BoxCollider2D>();
 
                     referenceCollider.isTrigger = true;
-                    referenceCollider.excludeLayers = _excludeLayers;
+                    referenceCollider.excludeLayers = LayerMask.NameToLayer("Everything");
                     referenceCollider.offset = zones.ColliderOffset;
                     referenceCollider.size = zones.ColliderSize;
 
@@ -89,7 +89,7 @@ public class NPCColliderCreator : MonoBehaviour
         GameObject attakcColReference = InstantiateEmpty("AttackZoneCollider", new World(newPosition), _collidersParrent.transform);
 
         _attackZoneCollider = attakcColReference.AddComponent<CircleCollider2D>();
-        _attackZoneCollider.excludeLayers = _excludeLayers;
+        //_attackZoneCollider.excludeLayers = _excludeLayers;
         _attackZoneCollider.isTrigger = true;
         _attackZoneCollider.radius = _attackRange;
     }

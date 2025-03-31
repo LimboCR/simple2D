@@ -78,7 +78,11 @@ public class NPCCombatNav : MonoBehaviour
             foreach (Collider2D target in _hitTargets)
             {
                 if (target.CompareTag("Dead"))
+                {
                     _hitTargets.Remove(target);
+                    break;
+                }
+                    
             }
         }
 
@@ -87,7 +91,11 @@ public class NPCCombatNav : MonoBehaviour
             foreach (Collider2D target in _potentialTargets)
             {
                 if (target.CompareTag("Dead"))
+                {
                     _potentialTargets.Remove(target);
+                    break;
+                }
+                    
             }
         }
     }
@@ -292,12 +300,18 @@ public class NPCCombatNav : MonoBehaviour
         set { _visbilityZoneCollider = value; }
     }
 
-    public void ModifyCombatLayers(LayerMask layersToExclude)
+    public void ModifyCombatLayers(LayerMask layersToExclude, LayerMask layersToInclude)
     {
-        if(layersToExclude == _attackZoneCollider.excludeLayers) return;
+        Debug.Log($"Adding Layers {layersToInclude} to {gameObject.name}");
 
+        _attackZoneCollider.includeLayers = layersToInclude;
         _attackZoneCollider.excludeLayers = layersToExclude;
-        foreach(Collider2D col in _runtimeCollidersRef) col.excludeLayers = layersToExclude;
+
+        foreach (Collider2D col in _runtimeCollidersRef)
+        {
+            col.includeLayers = layersToInclude;
+            col.excludeLayers = layersToExclude;
+        }
     }
 
     #endregion
