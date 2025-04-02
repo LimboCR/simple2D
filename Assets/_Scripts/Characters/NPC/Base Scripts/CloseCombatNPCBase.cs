@@ -265,7 +265,6 @@ public class CloseCombatNPCBase : MonoBehaviour, IDamageble, INPCMovable, IMulti
     public virtual void TakeDamage(int amount) // ++++
     {
         if (!Alive) return;
-        Debug.Log($"|TakingDamageLog| {gameObject.name} took {amount} damage");
         TakingDamage = true;
         GotDamagedCounter += 1;
         CurrentHealth -= amount;
@@ -273,7 +272,6 @@ public class CloseCombatNPCBase : MonoBehaviour, IDamageble, INPCMovable, IMulti
         if (CurrentHealth <= 0)
         {
             Alive = false;
-            Debug.Log($"|DeathLog| {gameObject.name} died");
             if (ActiveState != NPCStateCheck.Dead) Die();
         }        
     }

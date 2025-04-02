@@ -1,12 +1,14 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
-public class NewPlayerController : MonoBehaviour
+public class NewPlayerController : MonoBehaviour, IDamageble
 {
     public AnimationStateHandler AnimationState;
-    public PlayerHealth PlayerHP;
+    //public PlayerHealth PlayerHP;
     public Rigidbody2D PlayerRb { get; private set; }
 
+    #region Movement Stats
     [Header("Movement Settings")]
     [SerializeField] private float _moveSpeed;
     [SerializeField] private float _jumpHeight;
@@ -21,11 +23,25 @@ public class NewPlayerController : MonoBehaviour
     public float JumpHeight =>_jumpHeight;
     public float RollSpeed => _rollSpeed;
     public bool FacingRight => _facingRight;
+    #endregion
+
+    #region IDamagable Variables
+    public int MaxHealth { get; set; }
+    public int CurrentHealth { get; set; }
+    public float RegenDelay { get; set; }
+    public int RegenRate { get; set; }
+    public bool Alive { get; set; }
+    public bool TakingDamage { get; set; }
+    public int GotDamagedCounter { get; set; }
+
+    [Range(0, 10)] public int ProbabilityToGetHurtAnimation = 10;
+    #endregion
 
     [Space]
     [Header("Do not touch")]
-    [SerializeField] public float Movement;
+    [HideInInspector] public float Movement;
 
+    #region GroundVariables
     [Space]
     [Header("Ground check")]
     [SerializeField] public bool IsGrounded;
@@ -35,7 +51,9 @@ public class NewPlayerController : MonoBehaviour
     public Transform groundCheckPoint2;
     public Transform groundCheckPoint3;
     RaycastHit2D groundRay1, groundRay2, groundRay3;
+    #endregion
 
+    #region WallSlide Vars
     [Space]
     [Header("===Wall Slide===")]
     [Header("Layer Mask")]
@@ -52,19 +70,23 @@ public class NewPlayerController : MonoBehaviour
     RaycastHit2D wallRayRU, wallRayRM, wallRayRD;
     bool wallCheckpointsAssigned;
     Vector2 sideForLeft = Vector2.left, sideForRight = Vector2.right;
+    #endregion
 
+    #region Attack vars
     [Space]
     [Header("Attack Staff")]
     public bool HaveAttacked;
     public bool SkillAttackCooldown;
     public bool IsBlocking;
     //[SerializeField] private float elapsedTime = 0f;
+    #endregion
 
     #region StateMachine Variables
 
     [Space]
     [Header("State Lockers")]
     public bool LockMovement;
+    public bool LockStateChange;
     public PlayerStateMachine StateMachine { get; set; }
     public PlayerIdleState IdleState { get; set; }
     public PlayerRunState RunState { get; set; }
@@ -79,11 +101,12 @@ public class NewPlayerController : MonoBehaviour
 
     #endregion
 
+    #region Awake, Start, Update...
     private void Awake()
     {
         AnimationState = GetComponent<AnimationStateHandler>();
         PlayerRb = GetComponent<Rigidbody2D>();
-        PlayerHP = GetComponent<PlayerHealth>();
+        //PlayerHP = GetComponent<PlayerHealth>();
 
         StateMachine = new PlayerStateMachine();
         IdleState = new PlayerIdleState(this, StateMachine);
@@ -97,62 +120,71 @@ public class NewPlayerController : MonoBehaviour
         HurtState = new PlayerHurtState(this, StateMachine);
         WallSlideState = new PlayerWallSlideState(this, StateMachine);
 
-        PlayerHP.currentHealth = PlayerHP.maxHealth;
-        PlayerHP.alive = true;
+        //PlayerHP.currentHealth = PlayerHP.maxHealth;
+        //PlayerHP.alive = true;
     }
 
     private void Start()
     {
         StateMachine.Initialize(IdleState);
 
-        GlobalEventsManager.SendPlayerHealthChanged(PlayerHP.currentHealth);
+        GlobalEventsManager.SendPlayerHealthChanged(CurrentHealth);
     }
 
     private void Update()
     {
-        StateMachine.CurrentPlayerState.FrameUpdate();
+        if (Alive)
+        {
+            StateMachine.CurrentPlayerState.FrameUpdate();
 
-        IsPlayerGrounded();
+            IsPlayerGrounded();
 
-        if(IsJumping || IsFalling || !IsGrounded) CheckWallSlide();
+            if (IsJumping || IsFalling || !IsGrounded) CheckWallSlide();
 
-        HandleLogic();
-        FlipSidesHandler();
+            HandleLogic();
+            FlipSidesHandler();
+        }
     }
 
     private void FixedUpdate()
     {
-        StateMachine.CurrentPlayerState.PhysicsUpdate();
-        if(!LockMovement) transform.position += new Vector3(Movement, 0.0f, 0.0f) * Time.fixedDeltaTime * MoveSpeed;
+        if (Alive)
+        {
+            StateMachine.CurrentPlayerState.PhysicsUpdate();
+            if (!LockMovement) transform.position += new Vector3(Movement, 0.0f, 0.0f) * Time.fixedDeltaTime * MoveSpeed;
+        }
     }
+    #endregion
 
     private void HandleLogic()
     {
-        Movement = Input.GetAxis("Horizontal");
+        if (Alive)
+        {
+            Movement = Input.GetAxis("Horizontal");
 
-        if (_facingRight)
-        {
-            sideForLeft = Vector2.left;
-            sideForRight = Vector2.right;
-        }
-        else if (!_facingRight)
-        {
-            sideForLeft = Vector2.right;
-            sideForRight = Vector2.left;
-        }
+            if (_facingRight)
+            {
+                sideForLeft = Vector2.left;
+                sideForRight = Vector2.right;
+            }
+            else if (!_facingRight)
+            {
+                sideForLeft = Vector2.right;
+                sideForRight = Vector2.left;
+            }
 
-        if (Input.GetKey(KeyCode.Space) && !IsBlocking && !IsRolling && !IsJumping && IsGrounded)
-        {
-            IsBlocking = true;
-            StateMachine.ChangeState(BlockState);
-        }
+            if (Input.GetKey(KeyCode.Space) && !IsBlocking && !IsRolling && !IsJumping && IsGrounded)
+            {
+                IsBlocking = true;
+                StateMachine.ChangeState(BlockState);
+            }
 
-        if(WallSlideLeft || WallSlideRight)
-        {
-            StateMachine.ChangeState(WallSlideState);
+            if (WallSlideLeft || WallSlideRight)
+                StateMachine.ChangeState(WallSlideState);
         }
     }
 
+    #region Movement & Checks Logic
     private void FlipSidesHandler()
     {
         if (Movement < 0f && _facingRight)
@@ -208,6 +240,36 @@ public class NewPlayerController : MonoBehaviour
         else WallSlideRight = false;
     }
 
+    #endregion
+
+    #region Health Logic
+    public void TakeDamage(int amount)
+    {
+        CurrentHealth -= amount;
+
+        if(Random.Range(0, 10) > ProbabilityToGetHurtAnimation)
+        {
+            StateMachine.ChangeState(HurtState);
+        }
+        if (CurrentHealth <= 0)
+        {
+            Alive = false;
+            Die();
+        }
+    }
+
+    public void Die()
+    {
+        AnimationState.ChangeAnimationState("HeroKnight_Death");
+    }
+
+    public void SetInitialIDamageble(SafeInstantiation.HealthStats? healthStats)
+    {
+
+    }
+    #endregion
+
+    #region Combat Logic
     public IEnumerator ComboAttackTimer()
     {
         float waitTime = 2f;
@@ -237,6 +299,7 @@ public class NewPlayerController : MonoBehaviour
         }
         SkillAttackCooldown = false;
     }
+    #endregion
 
     #region Save, Load, Reset
 

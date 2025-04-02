@@ -336,7 +336,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   AnimationState: {fileID: 0}
-  PlayerHP: {fileID: 0}
   _moveSpeed: 8
   _jumpHeight: 15
   _rollSpeed: 10
@@ -346,6 +345,7 @@ MonoBehaviour:
   WallSlideLeft: 0
   WallSlideRight: 0
   IsFalling: 0
+  ProbabilityToGetHurtAnimation: 10
   Movement: 0
   IsGrounded: 0
   _groundMask:
@@ -367,6 +367,7 @@ MonoBehaviour:
   SkillAttackCooldown: 0
   IsBlocking: 0
   LockMovement: 0
+  LockStateChange: 0
 --- !u!114 &8149778319111358371
 MonoBehaviour:
   m_ObjectHideFlags: 0

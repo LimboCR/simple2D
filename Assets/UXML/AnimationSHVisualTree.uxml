@@ -1,0 +1,18 @@
+<engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <Style src="project://database/Assets/AnimationSHUSS.uss?fileID=7433441132597879392&amp;guid=2f36eabcf7bfce8499e8e6e1359585f6&amp;type=3#AnimationSHUSS[UNSUPPORTED_IN_UI_BUILDER]" />
+    <engine:VisualElement name="Container_1" class="section" style="flex-grow: 1;">
+        <engine:VisualElement style="flex-grow: 1;">
+            <engine:Label text="Runtime Animations Data" class="section-titles" />
+            <engine:VisualElement style="flex-grow: 1; padding-bottom: 0; margin-bottom: 0; margin-top: 0;">
+                <engine:TextField label="Current State" placeholder-text="filler text" binding-path="CurrentState" style="padding-bottom: 3px;" />
+                <engine:TextField label="Previous State" placeholder-text="filler text" binding-path="PreviousState" />
+            </engine:VisualElement>
+        </engine:VisualElement>
+    </engine:VisualElement>
+    <engine:VisualElement name="Container_2" class="section" style="flex-grow: 1;">
+        <engine:VisualElement style="flex-grow: 1;">
+            <engine:Label text="Animations Dictionary" class="section-titles" />
+            <editor:PropertyField name="AnimationEntriesList" binding-path="AnimationsDictionary" />
+        </engine:VisualElement>
+    </engine:VisualElement>
+</engine:UXML>
