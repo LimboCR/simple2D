@@ -9,6 +9,7 @@ TagManager:
   - Dead
   - PlayerTrigger
   - Coin
+  - ItemSlotImage
   layers:
   - Default
   - TransparentFX

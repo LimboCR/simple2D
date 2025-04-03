@@ -79,6 +79,9 @@ public class NewPlayerController : MonoBehaviour, IDamageble
     public bool HaveAttacked;
     public bool SkillAttackCooldown;
     public bool IsBlocking;
+
+    public float SkillCooldownTimer = 5f;
+    public float SkillCooldownElapsedTime = 0f;
     //[SerializeField] private float elapsedTime = 0f;
     #endregion
 
@@ -294,17 +297,20 @@ public class NewPlayerController : MonoBehaviour, IDamageble
 
     public IEnumerator SkillAttackCooldownTimer()
     {
-        float waitTime = 5f;
-        float elapsedTime = 0f;
+        float waitTime = SkillCooldownTimer;
+        SkillCooldownElapsedTime = 0f;
 
         SkillAttackCooldown = true;
+        GlobalEventsManager.SendPlayerSkillCooldownStatus(SkillAttackCooldown);
 
-        while (elapsedTime < waitTime)
+        while (SkillCooldownElapsedTime < waitTime)
         {
-            elapsedTime += Time.deltaTime;
+            SkillCooldownElapsedTime += Time.deltaTime;
             yield return null;
         }
+
         SkillAttackCooldown = false;
+        GlobalEventsManager.SendPlayerSkillCooldownStatus(SkillAttackCooldown);
     }
     #endregion
 

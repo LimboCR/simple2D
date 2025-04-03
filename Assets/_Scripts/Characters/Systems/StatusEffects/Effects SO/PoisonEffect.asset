@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f1d005d9a3829fd4c83bbe764016ec7d, type: 3}
   m_Name: PoisonEffect
   m_EditorClassIdentifier: 
-  duration: 5
-  poisonDamage: 3
+  duration: 8
+  poisonDamage: 1.5
   tickInterval: 2

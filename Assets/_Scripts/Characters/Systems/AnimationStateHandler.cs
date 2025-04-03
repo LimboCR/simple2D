@@ -18,13 +18,14 @@ public class AnimationStateHandler : MonoBehaviour
 
     void Awake()
     {
+        _animator = GetComponent<Animator>();
+
         CharacterAnimations = new Dictionary<string, string>();
         foreach (var entry in AnimationsDictionary)
         {
             if (!CharacterAnimations.ContainsKey(entry.Key))
                 CharacterAnimations.Add(entry.Key, entry.AnimationName);
         }
-        _animator = GetComponent<Animator>();
     }
 
     public bool IsAnimationFinished(string animationName, float animTimeFloat = 1.0f)
