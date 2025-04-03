@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class NewPlayerController : MonoBehaviour, IDamageble
 {
@@ -26,10 +27,10 @@ public class NewPlayerController : MonoBehaviour, IDamageble
     #endregion
 
     #region IDamagable Variables
-    public int MaxHealth { get; set; }
-    public int CurrentHealth { get; set; }
+    [field: SerializeField] public float MaxHealth { get; set; }
+    public float CurrentHealth { get; set; }
     public float RegenDelay { get; set; }
-    public int RegenRate { get; set; }
+    public float RegenRate { get; set; }
     public bool Alive { get; set; }
     public bool TakingDamage { get; set; }
     public int GotDamagedCounter { get; set; }
@@ -120,8 +121,8 @@ public class NewPlayerController : MonoBehaviour, IDamageble
         HurtState = new PlayerHurtState(this, StateMachine);
         WallSlideState = new PlayerWallSlideState(this, StateMachine);
 
-        //PlayerHP.currentHealth = PlayerHP.maxHealth;
-        //PlayerHP.alive = true;
+        CurrentHealth = MaxHealth;
+        Alive = true;
     }
 
     private void Start()
@@ -143,6 +144,11 @@ public class NewPlayerController : MonoBehaviour, IDamageble
 
             HandleLogic();
             FlipSidesHandler();
+        }
+
+        if (Keyboard.current.slashKey.wasPressedThisFrame)
+        {
+            TakeDamage(Random.Range(1f, 10f));
         }
     }
 
@@ -243,11 +249,12 @@ public class NewPlayerController : MonoBehaviour, IDamageble
     #endregion
 
     #region Health Logic
-    public void TakeDamage(int amount)
+    public void TakeDamage(float amount)
     {
         CurrentHealth -= amount;
+        GlobalEventsManager.SendPlayerTookDamage(amount);
 
-        if(Random.Range(0, 10) > ProbabilityToGetHurtAnimation)
+        if (Random.Range(0, 10) > ProbabilityToGetHurtAnimation)
         {
             StateMachine.ChangeState(HurtState);
         }

@@ -4,13 +4,14 @@ using UnityEngine.Events;
 
 public class GlobalEventsManager: MonoBehaviour
 {
-    public static UnityEvent<int> OnEnemyKilled = new UnityEvent<int>();
+    public static UnityEvent<int> OnEnemyKilled = new();
 
-    public static UnityEvent<int> OnPlayerHealthChanged = new UnityEvent<int>();
-    public static UnityEvent<int> OnPlayerCoinsChanged = new UnityEvent<int>();
+    public static UnityEvent<float> OnPlayerHealthChanged = new();
+    public static UnityEvent<float> OnPlayerTakeDamage = new();
+    public static UnityEvent<int> OnPlayerCoinsChanged = new();
 
-    public static UnityEvent<GameStates> OnStateChange = new UnityEvent<GameStates>();
-    public static UnityEvent<GameStates> GameStateListener = new UnityEvent<GameStates>();
+    public static UnityEvent<GameStates> OnStateChange = new();
+    public static UnityEvent<GameStates> GameStateListener = new();
 
     public static UnityEvent<GameObject> OnEnemySpawn = new();
     public static UnityEvent<GameObject> OnEnemyRemove = new();
@@ -23,9 +24,14 @@ public class GlobalEventsManager: MonoBehaviour
         OnEnemyKilled.Invoke(remainingCount);
     }
 
-    public static void SendPlayerHealthChanged(int currentHealth)
+    public static void SendPlayerHealthChanged(float currentHealth)
     {
         OnPlayerHealthChanged.Invoke(currentHealth);
+    }
+
+    public static void SendPlayerTookDamage(float amount)
+    {
+        OnPlayerTakeDamage.Invoke(amount);
     }
 
     public static void SendCoinsChanged(int currentCoins)

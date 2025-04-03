@@ -23,10 +23,10 @@ public class CloseCombatNPCBase : MonoBehaviour, IDamageble, INPCMovable, IMulti
 
     #region NPC IDamagable variables
     // Health
-    [field: SerializeField] public int MaxHealth { get; set; } = 100;
-    [field: SerializeField] public int CurrentHealth { get; set; }
+    [field: SerializeField] public float MaxHealth { get; set; } = 100;
+    [field: SerializeField] public float CurrentHealth { get; set; }
     [field: SerializeField] public float RegenDelay { get; set; } = 3f;
-    [field: SerializeField] public int RegenRate { get; set; } = 1;
+    [field: SerializeField] public float RegenRate { get; set; } = 1;
     public bool Alive { get; set; }
     public bool TakingDamage { get; set; }
     public int GotDamagedCounter { get; set; }
@@ -262,7 +262,7 @@ public class CloseCombatNPCBase : MonoBehaviour, IDamageble, INPCMovable, IMulti
     #endregion
 
     #region Health / Die Functions
-    public virtual void TakeDamage(int amount) // ++++
+    public virtual void TakeDamage(float amount) // ++++
     {
         if (!Alive) return;
         TakingDamage = true;

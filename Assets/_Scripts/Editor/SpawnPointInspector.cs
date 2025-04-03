@@ -41,8 +41,8 @@ public class SpawnPointInspector : Editor
             if (_showIDamagebleDropdown)
             {
                 EditorGUI.indentLevel++; // Indent for better UI hierarchy
-                EditorGUILayout.IntField("MaxHealth: ", spawnPoint.NPCMaxHealth, GUILayout.MaxWidth(80), GUILayout.ExpandWidth(true));
-                EditorGUILayout.IntField("RegenRate: ", spawnPoint.NPCRegenRate, GUILayout.MaxWidth(80), GUILayout.ExpandWidth(true)); ;
+                EditorGUILayout.FloatField("MaxHealth: ", spawnPoint.NPCMaxHealth, GUILayout.MaxWidth(80), GUILayout.ExpandWidth(true));
+                EditorGUILayout.FloatField("RegenRate: ", spawnPoint.NPCRegenRate, GUILayout.MaxWidth(80), GUILayout.ExpandWidth(true)); ;
                 EditorGUILayout.FloatField("RegenDelay: ", spawnPoint.NPCRegenDelay, GUILayout.MaxWidth(80), GUILayout.ExpandWidth(true));
                 EditorGUI.indentLevel--;
             }

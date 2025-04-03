@@ -39,8 +39,8 @@ public class SpawnSettingsWindow : EditorWindow
     private bool _healthScriptOverride;
     private bool _healthDataDropdown;
 
-    private int _newMaxHealth;
-    private int _newRegenRate;
+    private float _newMaxHealth;
+    private float _newRegenRate;
     private float _newRegenDelay;
     #endregion
 
@@ -279,8 +279,8 @@ public class SpawnSettingsWindow : EditorWindow
                 if (_healthDataDropdown)
                 {
                     EditorGUI.indentLevel++; // Indent for better UI hierarchy
-                    EditorGUILayout.IntField("MaxHealth: ", _newMaxHealth, GUILayout.MaxWidth(80), GUILayout.ExpandWidth(true));
-                    EditorGUILayout.IntField("RegenRate: ", _newRegenRate, GUILayout.MaxWidth(80), GUILayout.ExpandWidth(true)); ;
+                    EditorGUILayout.FloatField("MaxHealth: ", _newMaxHealth, GUILayout.MaxWidth(80), GUILayout.ExpandWidth(true));
+                    EditorGUILayout.FloatField("RegenRate: ", _newRegenRate, GUILayout.MaxWidth(80), GUILayout.ExpandWidth(true)); ;
                     EditorGUILayout.FloatField("RegenDelay: ", _newRegenDelay, GUILayout.MaxWidth(80), GUILayout.ExpandWidth(true));
                     EditorGUI.indentLevel--;
                 }

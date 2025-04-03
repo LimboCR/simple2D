@@ -32,8 +32,8 @@ public class SpawnPointHandler : MonoBehaviour
 
     // To show ui if custom health settings are set to NPC
     [HideInInspector] public bool HealthScriptOverride;
-    [HideInInspector] public int NPCMaxHealth;
-    [HideInInspector] public int NPCRegenRate;
+    [HideInInspector] public float NPCMaxHealth;
+    [HideInInspector] public float NPCRegenRate;
     [HideInInspector] public float NPCRegenDelay;
 
     //To show if custom movable stats provided

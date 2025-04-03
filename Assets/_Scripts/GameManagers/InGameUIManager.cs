@@ -9,7 +9,7 @@ public class InGameUIManager : MonoBehaviour
 
     [Space]
     [Header("Stats variables")]
-    [SerializeField] private int _health = 0;
+    [SerializeField] private float _health = 0;
     [SerializeField] private int _coinsAmount = 0;
 
     private void Awake()
@@ -24,7 +24,7 @@ public class InGameUIManager : MonoBehaviour
         
     }
 
-    private void HelthStatsDisplay(int currentHealth)
+    private void HelthStatsDisplay(float currentHealth)
     {
         _health = currentHealth;
         _healthText.text = _health.ToString();
