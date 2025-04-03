@@ -6,7 +6,7 @@ using UnityEngine.InputSystem;
 public class NewPlayerController : MonoBehaviour, IDamageble
 {
     public AnimationStateHandler AnimationState;
-    //public PlayerHealth PlayerHP;
+    public StatusEffectHandler StatusEffectManager;
     public Rigidbody2D PlayerRb { get; private set; }
 
     #region Movement Stats
@@ -107,7 +107,7 @@ public class NewPlayerController : MonoBehaviour, IDamageble
     {
         AnimationState = GetComponent<AnimationStateHandler>();
         PlayerRb = GetComponent<Rigidbody2D>();
-        //PlayerHP = GetComponent<PlayerHealth>();
+        StatusEffectManager = GetComponent<StatusEffectHandler>();
 
         StateMachine = new PlayerStateMachine();
         IdleState = new PlayerIdleState(this, StateMachine);
