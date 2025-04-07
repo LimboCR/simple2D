@@ -16,6 +16,7 @@ public class HealthBarUI : MonoBehaviour
     private void Awake()
     {
         OnPlayerTakeDamage.AddListener(DisplayTookDamage);
+        OnPlayerHeal.AddListener(DisplayHealing);
 
         _currentHealth = maxHealth;
         _healthBarFillImage.fillAmount = 1f;
@@ -26,10 +27,16 @@ public class HealthBarUI : MonoBehaviour
     {
         _currentHealth -= amount;
 
-        HealthUpdateAnimated();
+        HealthTakeDamageDisplay();
     }
 
-    private void HealthUpdateAnimated()
+    public void DisplayHealing(float amount)
+    {
+        _currentHealth += amount;
+        HealthHealingDisplay();
+    }
+
+    private void HealthTakeDamageDisplay()
     {
         float ratio = _currentHealth / maxHealth;
 
@@ -37,6 +44,18 @@ public class HealthBarUI : MonoBehaviour
         sequence.Append(_healthBarFillImage.DOFillAmount(ratio, 0.25f)).SetEase(Ease.InOutSine);
         sequence.AppendInterval(_trailDelay);
         sequence.Append(_healthBarTrailingFillImage.DOFillAmount(ratio, 0.3f)).SetEase(Ease.InOutSine);
+
+        sequence.Play();
+    }
+
+    private void HealthHealingDisplay()
+    {
+        float ratio = _currentHealth / maxHealth;
+
+        Sequence sequence = DOTween.Sequence();
+        sequence.Append(_healthBarTrailingFillImage.DOFillAmount(ratio, 0.25f)).SetEase(Ease.InOutSine);
+        sequence.AppendInterval(_trailDelay);
+        sequence.Append(_healthBarFillImage.DOFillAmount(ratio, 0.3f)).SetEase(Ease.InOutSine);
 
         sequence.Play();
     }

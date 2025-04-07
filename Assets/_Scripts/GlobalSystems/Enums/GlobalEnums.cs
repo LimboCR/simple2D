@@ -5,7 +5,7 @@ public class GlobalEnums
 
 public enum NPCType
 {
-    Combat,
+    CloseCombat,
     Peacful,
     Trader
 }

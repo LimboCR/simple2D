@@ -10,7 +10,7 @@ public class NPCCombatNav : MonoBehaviour
     [SerializeField] private List<Collider2D> _runtimeCollidersRef;
     [SerializeField] private CircleCollider2D _attackZoneCollider;
     [SerializeField] private BoxCollider2D _visbilityZoneCollider;
-    [SerializeField] private float _attackRange = 1f;
+    [SerializeField] private float _attackRange;
 
     [Header("Layermask To Ignore")]
     [SerializeField] private LayerMask _excludeLayers;

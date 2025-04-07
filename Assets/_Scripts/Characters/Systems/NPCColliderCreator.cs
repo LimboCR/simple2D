@@ -138,7 +138,7 @@ public class NPCColliderCreator : MonoBehaviour
     {
         switch (NPCTypeSelector)
         {
-            case NPCType.Combat:
+            case NPCType.CloseCombat:
                 AssignCollidersToCombatNPC();
                 break;
 

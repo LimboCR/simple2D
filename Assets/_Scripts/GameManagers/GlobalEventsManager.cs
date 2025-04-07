@@ -8,6 +8,7 @@ public class GlobalEventsManager: MonoBehaviour
 
     public static UnityEvent<float> OnPlayerHealthChanged = new();
     public static UnityEvent<float> OnPlayerTakeDamage = new();
+    public static UnityEvent<float> OnPlayerHeal = new();
     public static UnityEvent<int> OnPlayerCoinsChanged = new();
     public static UnityEvent<bool> OnPlayerSkillAttackCooldown = new();
 
@@ -33,6 +34,10 @@ public class GlobalEventsManager: MonoBehaviour
     public static void SendPlayerTookDamage(float amount)
     {
         OnPlayerTakeDamage.Invoke(amount);
+    }
+    public static void SendPlayerHeal(float amount)
+    {
+        OnPlayerHeal.Invoke(amount);
     }
 
     public static void SendPlayerSkillCooldownStatus(bool isInCooldown)

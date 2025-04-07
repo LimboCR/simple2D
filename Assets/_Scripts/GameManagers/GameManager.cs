@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using static GlobalEventsManager;
 
 public class GameManager : MonoBehaviour
 {
@@ -48,11 +49,8 @@ public class GameManager : MonoBehaviour
         }
         else Destroy(gameObject);
 
-        GlobalEventsManager.OnStateChange.AddListener(ChangeGameState);
-        GlobalEventsManager.OnEnemySpawn.AddListener(AddEnemyAtScene);
-        GlobalEventsManager.OnEnemyRemove.AddListener(RemoveEnemyAtScene);
-        GlobalEventsManager.OnSpawnAdd.AddListener(AddSpawnPointAtScene);
-        GlobalEventsManager.OnSpawnRemove.AddListener(RemoveSpawnPointAtScene);
+        EventSubscriber();
+        
 
         Player = FindAnyObjectByType<NewPlayerController>();
     }
@@ -69,10 +67,30 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    #region Static Getters
+
+    public GameObject GetPlayerGameObject()
+    {
+        if (Player != null) return Player.gameObject;
+        return null;
+    }
+
+    #endregion
+
+    #region Event Based Actions
+
+    private void EventSubscriber()
+    {
+        OnStateChange.AddListener(ChangeGameState);
+        OnEnemySpawn.AddListener(AddEnemyAtScene);
+        OnEnemyRemove.AddListener(RemoveEnemyAtScene);
+        OnSpawnAdd.AddListener(AddSpawnPointAtScene);
+        OnSpawnRemove.AddListener(RemoveSpawnPointAtScene);
+    }
     private void ChangeGameState(GameStates state)
     {
         currentGameState = state;
-        GlobalEventsManager.BroadcastActualGameState(currentGameState);
+        BroadcastActualGameState(currentGameState);
     }
 
     private void AddEnemyAtScene(GameObject enemy)
@@ -93,6 +111,8 @@ public class GameManager : MonoBehaviour
     {
         SpawnPoints.Remove(spawnPoint);
     }
+
+    #endregion
 }
 
 public enum GameStates

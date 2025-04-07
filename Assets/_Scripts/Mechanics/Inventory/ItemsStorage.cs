@@ -3,14 +3,24 @@ using UnityEngine;
 
 public class ItemsStorage : MonoBehaviour
 {
-    public static List<ItemBase> InventoryItems;
-    public static Dictionary<string, ItemBase> ItemsDictionary;
+    public static ItemsStorage Instance { get; private set; }
+
+    [SerializeField] public List<ItemBase> InventoryItems;
+    public Dictionary<string, ItemBase> ItemsDictionary;
 
     private void Awake()
     {
-        if(InventoryItems != null)
+        if (Instance != null && Instance != this)
         {
-            foreach(var item in InventoryItems)
+            Destroy(gameObject);
+            return;
+        }
+        Instance = this;
+
+        ItemsDictionary = new();
+        if (InventoryItems != null && InventoryItems.Count>0)
+        {
+            foreach(ItemBase item in InventoryItems)
             {
                 ItemsDictionary.Add(item.ItemKey, item);
             }

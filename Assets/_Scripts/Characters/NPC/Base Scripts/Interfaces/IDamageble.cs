@@ -12,6 +12,7 @@ public interface IDamageble
     int GotDamagedCounter { get; set; }
 
     void TakeDamage(float amount);
+    void TakeHealing(float amount);
     void Die();
     void SetInitialIDamageble(SafeInstantiation.HealthStats? healthStats);
 }

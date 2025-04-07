@@ -2,9 +2,10 @@ using System.Collections;
 using UnityEngine;
 using static SafeInstantiation;
 using static GlobalEventsManager;
+using System.Collections.Generic;
 
 [RequireComponent(typeof(Rigidbody2D), typeof(AnimationStateHandler), typeof(NPCCombatNav))]
-public class CloseCombatNPCBase : MonoBehaviour, IDamageble, INPCMovable, IMultiCharacterData
+public abstract class CloseCombatNPCBase : NPCBase, IDamageble, INPCMovable
 {
     #region Required Scripts
     [Header("Required")]
@@ -15,10 +16,10 @@ public class CloseCombatNPCBase : MonoBehaviour, IDamageble, INPCMovable, IMulti
     #endregion
 
     #region MultiCharacterData
-    [Header("Character Data")]
-    [field: SerializeField] public string CharacterName { get; set; }
-    [field: SerializeField] public NPCType NPCType { get; set; }
-    [field: SerializeField] public int CharacterTeam { get; set; }
+    //[Header("Character Data")]
+    //[field: SerializeField] public string CharacterName { get; set; }
+    //[field: SerializeField] public NPCType NPCType { get; set; }
+    //[field: SerializeField] public int CharacterTeam { get; set; }
     #endregion
 
     #region NPC IDamagable variables
@@ -30,6 +31,15 @@ public class CloseCombatNPCBase : MonoBehaviour, IDamageble, INPCMovable, IMulti
     public bool Alive { get; set; }
     public bool TakingDamage { get; set; }
     public int GotDamagedCounter { get; set; }
+    #endregion
+
+    #region Droppable Loot
+    [Space]
+    [Header("Droppable Loot")]
+    [SerializeField] protected List<GameObject> _droppableLoot = new();
+    [SerializeField] protected float _dropForce = 2f;
+    [SerializeField] protected bool _isLootDropped = false;
+
     #endregion
 
     #region NPC INPCMovable variables
@@ -143,7 +153,7 @@ public class CloseCombatNPCBase : MonoBehaviour, IDamageble, INPCMovable, IMulti
         }
     }
 
-    public virtual void SetInitialMultiCharData(CharacterData? characterData)
+    public override void SetInitialMultiCharData(CharacterData? characterData)
     {
         if (characterData.HasValue)
         {
@@ -152,7 +162,7 @@ public class CloseCombatNPCBase : MonoBehaviour, IDamageble, INPCMovable, IMulti
     }
     #endregion
 
-    #region Awake, Start, Update, FixedUpdate
+    #region Awake, Start, Update, FixedUpdate and Required Functions
     private void Awake()
     {
         SendEnemySpawn(gameObject);
@@ -169,19 +179,34 @@ public class CloseCombatNPCBase : MonoBehaviour, IDamageble, INPCMovable, IMulti
         _npcRB = GetComponent<Rigidbody2D>();
         combatNav = GetComponent<NPCCombatNav>();
 
+        NPCTeamSetup();
+        StateMachineInitializer();
+
+        CurrentHealth = MaxHealth;
+        Alive = true;
+
+        if (WaypointL != null || WaypointR != null)
+            WaypointsAssigned = true;
+    }
+
+    protected virtual void NPCTeamSetup()
+    {
         if (CharacterTeam == 0)
         {
             this.gameObject.tag = "Friendly";
             this.gameObject.layer = LayerMask.NameToLayer("Friendly");
-            combatNav.ModifyCombatLayers(LayerMask.GetMask("Friendly", "Player", "Ground", "WaypointsAndNav"), LayerMask.NameToLayer("Enemy"));
+            combatNav.ModifyCombatLayers(LayerMask.GetMask("Friendly", "Player", "Ground", "WaypointsAndNav", "Default", "Platform", "Items"), LayerMask.NameToLayer("Enemy"));
         }
         else if (CharacterTeam == 1)
         {
             this.gameObject.tag = "Enemy";
             this.gameObject.layer = LayerMask.NameToLayer("Enemy");
-            combatNav.ModifyCombatLayers(LayerMask.GetMask("Enemy", "Ground", "WaypointsAndNav"), LayerMask.GetMask("Friendly", "Player"));
+            combatNav.ModifyCombatLayers(LayerMask.GetMask("Enemy", "Ground", "WaypointsAndNav", "Default", "Platform", "Items"), LayerMask.GetMask("Friendly", "Player"));
         }
+    }
 
+    protected virtual void StateMachineInitializer()
+    {
         NPCIdleBaseInstance = Instantiate(NPCIdleBase);
         NPCWalkBaseInstance = Instantiate(NPCWalkBase);
         NPCRunBaseInstance = Instantiate(NPCRunBase);
@@ -202,11 +227,6 @@ public class CloseCombatNPCBase : MonoBehaviour, IDamageble, INPCMovable, IMulti
         ReturnState = new NPCReturnState(this, StateMachine);
         HurtState = new NPCHurtState(this, StateMachine);
 
-        //NPCTeam = CharacterTeam;
-        
-        CurrentHealth = MaxHealth;
-        Alive = true;
-
         NPCIdleBaseInstance.Initialize(gameObject, this);
         NPCWalkBaseInstance.Initialize(gameObject, this);
         NPCRunBaseInstance.Initialize(gameObject, this);
@@ -217,9 +237,6 @@ public class CloseCombatNPCBase : MonoBehaviour, IDamageble, INPCMovable, IMulti
         NPCDeadBaseInstance.Initialize(gameObject, this);
 
         StateMachine.Initialize(IdleState);
-
-        if (WaypointL != null || WaypointR != null)
-            WaypointsAssigned = true;
     }
 
     protected virtual void Update()
@@ -276,6 +293,11 @@ public class CloseCombatNPCBase : MonoBehaviour, IDamageble, INPCMovable, IMulti
         }        
     }
 
+    public void TakeHealing(float amount)
+    {
+        CurrentHealth += amount;
+    }
+
     public virtual void Die() // ++++
     {
         StateMachine.ChangeState(DeadState);
@@ -284,7 +306,28 @@ public class CloseCombatNPCBase : MonoBehaviour, IDamageble, INPCMovable, IMulti
         gameObject.name = $"Dead {gameObject.name}";
         gameObject.tag = "Dead";
 
+        if(_isLootDropped == false) DropLootOnDeath();
+
         Destroy(gameObject, 15f); // Cleanup
+    }
+
+    protected virtual void DropLootOnDeath()
+    {
+        if(_droppableLoot.Count > 0)
+        {
+            foreach(GameObject loot in _droppableLoot)
+            {
+                Vector3 spawnPos = transform.position + new Vector3(0, 0.3f, 0);
+                GameObject drop = Instantiate(loot, spawnPos, Quaternion.identity);
+
+                Vector2 randomDir = Random.insideUnitCircle.normalized + Vector2.up * 0.5f;
+                randomDir.Normalize();
+
+                if (drop.TryGetComponent<Rigidbody2D>(out Rigidbody2D rb))
+                    rb.AddForce(randomDir * _dropForce, ForceMode2D.Impulse);
+            }
+            _isLootDropped = true;
+        }
     }
 
     #endregion
@@ -440,7 +483,7 @@ public class CloseCombatNPCBase : MonoBehaviour, IDamageble, INPCMovable, IMulti
 
     #region Animation Triggers
 
-    private void AnimationTriggerrEvent(AnimationTriggerType triggerType)
+    protected virtual void AnimationTriggerrEvent(AnimationTriggerType triggerType)
     {
         StateMachine.CurrentNPCState.AnimationTriggerEvent(triggerType);
     }
@@ -493,5 +536,7 @@ public class CloseCombatNPCBase : MonoBehaviour, IDamageble, INPCMovable, IMulti
             }
         }
     }
+
+    
     #endregion
 }

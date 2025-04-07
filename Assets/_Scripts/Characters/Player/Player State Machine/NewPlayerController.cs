@@ -28,7 +28,7 @@ public class NewPlayerController : MonoBehaviour, IDamageble
 
     #region IDamagable Variables
     [field: SerializeField] public float MaxHealth { get; set; }
-    public float CurrentHealth { get; set; }
+    [field: SerializeField] public float CurrentHealth { get; set; }
     public float RegenDelay { get; set; }
     public float RegenRate { get; set; }
     public bool Alive { get; set; }
@@ -268,6 +268,16 @@ public class NewPlayerController : MonoBehaviour, IDamageble
         }
     }
 
+    public void TakeHealing(float amount)
+    {
+        if (CurrentHealth < MaxHealth)
+        {
+            CurrentHealth += amount;
+            GlobalEventsManager.SendPlayerHeal(amount);
+        }
+        else if (CurrentHealth > MaxHealth) CurrentHealth = MaxHealth;
+    }
+
     public void Die()
     {
         AnimationState.ChangeAnimationState("HeroKnight_Death");
@@ -280,6 +290,11 @@ public class NewPlayerController : MonoBehaviour, IDamageble
     #endregion
 
     #region Combat Logic
+
+    public void Attack()
+    {
+
+    }
     public IEnumerator ComboAttackTimer()
     {
         float waitTime = 2f;
@@ -371,6 +386,8 @@ public class NewPlayerController : MonoBehaviour, IDamageble
         }
         #endregion
     }
+
+    
 }
 
 [System.Serializable]

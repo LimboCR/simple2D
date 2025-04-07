@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "PoisonEffect", menuName = "Status Effects/Poison")]
+[CreateAssetMenu(fileName = "PoisonEffect", menuName = "Status Effects/Legacy/Poison")]
 public class PoisonEffectSO : StatusEffectSO
 {
     [SerializeField] private float poisonDamage = 3f;

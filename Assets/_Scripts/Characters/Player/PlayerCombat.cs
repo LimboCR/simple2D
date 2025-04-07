@@ -17,15 +17,15 @@ public class PlayerCombat : MonoBehaviour
     public float WeaponAttackRadius { get { return _weaponAttackRadius; } set { _weaponAttackRadius = value; } }
 
 
-    public void CombatAttack(int inflictDamage = 5)
+    public void CombatAttack(float inflictDamage = 5)
     {
         Collider2D[] hitTargets = Physics2D.OverlapCircleAll(AttackPoint.position, WeaponAttackRadius, _attackableLayers);
 
         foreach (Collider2D target in hitTargets)
         {
-            if (target.TryGetComponent(out Health targetHealth))
+            if (target.TryGetComponent<IDamageble>(out IDamageble npc))
             {
-                targetHealth.TakeDamage(Damage);
+                npc.TakeDamage(inflictDamage);
             }
         }
     }

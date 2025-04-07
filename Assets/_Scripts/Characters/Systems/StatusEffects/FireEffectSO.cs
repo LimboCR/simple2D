@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "FireEffect", menuName = "Status Effects/Fire")]
+[CreateAssetMenu(fileName = "FireEffect", menuName = "Status Effects/Legacy/Fire")]
 public class FireEffectSO : StatusEffectSO
 {
     [SerializeField] private float tickDamage = 5f;

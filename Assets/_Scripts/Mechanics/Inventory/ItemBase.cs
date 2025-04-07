@@ -1,7 +1,8 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public abstract class ItemBase
+[CreateAssetMenu(fileName = "Inventory Item", menuName = "Inventory System/Create Item")]
+public class ItemBase : ScriptableObject
 {
     [Tooltip("Each items key must be unique")]public string ItemKey;
     public string ItemName;
