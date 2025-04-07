@@ -8,6 +8,8 @@ using static GlobalEventsManager;
 
 public class InGameUIManager : MonoBehaviour
 {
+    public static InGameUIManager Instance;
+
     [Header("UI TextMeshPro References \n--(currently manual)--")]
     [SerializeField] private TMP_Text _healthText;
     [SerializeField] private TMP_Text _coinsText;
@@ -30,12 +32,17 @@ public class InGameUIManager : MonoBehaviour
     private NewPlayerController Player;
 
     [Space]
-    [Header("Player Test Usable Inventory")]
+    [Header("Test Player HUD")]
     public GameObject InventoryPanel;
     public List<GameObject> InventorySlotImages;
     List<GameObject> inventorySlots;
 
     public TMP_InputField CommandLine;
+
+    [Header("StatusEffect Display")]
+    [SerializeField] private GameObject _statusEffectsPanel;
+    [SerializeField] private List<GameObject> _statusEffectsImages;
+    [SerializeField] private GameObject _statusEffectImagePrefab;
 
     private GameManager _gameManager;
 
@@ -44,6 +51,13 @@ public class InGameUIManager : MonoBehaviour
 
     private void Awake()
     {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        Instance = this;
+
         GettersAndFinders();
         EventSubscriber();
         FetchQuickItemsSlots();
@@ -163,7 +177,7 @@ public class InGameUIManager : MonoBehaviour
 
     #endregion
 
-    #region
+    #region TimeDisplay
 
     public void TimeDisplay()
     {
@@ -195,6 +209,26 @@ public class InGameUIManager : MonoBehaviour
     private void IsPlayerSkillCooldown(bool info)
     {
         IsSkillAtCooldown = info;
+    }
+
+    public GameObject DisplayStatusEffect(StatusEffectDescription effectDescription)
+    {
+        GameObject newStatusEffect = Instantiate(_statusEffectImagePrefab, _statusEffectsPanel.transform);
+        if(effectDescription.EffectDescription != null && newStatusEffect.TryGetComponent<Image>(out Image img))
+        {
+            img.sprite = effectDescription.EffectIcon;
+        }
+        _statusEffectsImages.Add(newStatusEffect);
+        return newStatusEffect;
+    }
+
+    public void RemoveStatusEffectImage(GameObject effectImage)
+    {
+        if (_statusEffectsImages.Contains(effectImage))
+        {
+            _statusEffectsImages.Remove(effectImage);
+            Destroy(effectImage);
+        }
     }
 
     #endregion

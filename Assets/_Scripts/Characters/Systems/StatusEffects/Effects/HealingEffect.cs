@@ -6,16 +6,37 @@ public class HealingEffect : StatusEffectBase
     private float tickInterval;
     private float timeSinceLastTick = 0;
 
-    public HealingEffect(GameObject target, float duration, float tickHeal, float tickInterval)
+    private bool descriptionDisplayed = false;
+    private StatusEffectDescription description;
+    private GameObject StatusEffectImage;
+
+    public HealingEffect(GameObject target, float duration, float tickHeal, float tickInterval, StatusEffectDescription? description = null)
         : base(target, duration)
     {
         this.tickHeal = tickHeal;
         this.tickInterval = tickInterval;
+        this.description = description;
+    }
+
+    public override void RemoveEffect()
+    {
+        base.RemoveEffect();
+        if (descriptionDisplayed)
+        {
+            InGameUIManager.Instance.RemoveStatusEffectImage(StatusEffectImage);
+            descriptionDisplayed = false;
+        }
     }
 
     public override void UpdateEffect(float deltaTime)
     {
         base.UpdateEffect(deltaTime);
+        if (target.CompareTag("Player") && description != null && !descriptionDisplayed)
+        {
+            descriptionDisplayed = true;
+            StatusEffectImage = InGameUIManager.Instance.DisplayStatusEffect(description);
+        }
+
         timeSinceLastTick += deltaTime;
 
         if (timeSinceLastTick >= tickInterval)

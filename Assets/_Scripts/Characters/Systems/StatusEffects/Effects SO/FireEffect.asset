@@ -15,3 +15,8 @@ MonoBehaviour:
   duration: 5
   tickDamage: 5
   tickInterval: 1
+  description:
+    EffectName: On Fire
+    EffectDescription: You're on fire and getting damaged. Fast movement might remove
+      this effect.
+    EffectIcon: {fileID: 4037955967195674726, guid: 0704edad1c22a9a4c9d0323b690ec639, type: 3}

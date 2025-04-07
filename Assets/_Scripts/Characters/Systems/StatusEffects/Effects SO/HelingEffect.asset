@@ -15,3 +15,7 @@ MonoBehaviour:
   duration: 5
   tickHeal: 5
   tickInterval: 1
+  description:
+    EffectName: Healing Effect
+    EffectDescription: Heals character each tick
+    EffectIcon: {fileID: -3457023620627777359, guid: 4ad9b5f73b2770a44b76ffd5a96181ac, type: 3}
