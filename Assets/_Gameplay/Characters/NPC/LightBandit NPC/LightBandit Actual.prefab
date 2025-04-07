@@ -14,8 +14,8 @@ GameObject:
   - component: {fileID: 688813510596029256}
   - component: {fileID: 5046454367188957185}
   - component: {fileID: 809022358864025864}
-  - component: {fileID: 695268961536209514}
   - component: {fileID: 690396304704366571}
+  - component: {fileID: 8918292408755285201}
   m_Layer: 8
   m_Name: LightBandit Actual
   m_TagString: Enemy
@@ -226,7 +226,7 @@ MonoBehaviour:
   _attackZoneGizmosAtRuntime: 0
   _visibilityZoneGizmosInEditor: 0
   _visibilityZoneGizmosAtRuntime: 0
---- !u!114 &695268961536209514
+--- !u!114 &690396304704366571
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -235,20 +235,39 @@ MonoBehaviour:
   m_GameObject: {fileID: 985652492713296805}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a8faf8b6babc7544b8e4717989f7d100, type: 3}
+  m_Script: {fileID: 11500000, guid: 228f0bffb1529564bbd8fe90591a0a7e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  combatNav: {fileID: 0}
-  AnimationState: {fileID: 0}
-  <CharacterName>k__BackingField: LightBandit_a
+  AnimationsDictionary: []
+--- !u!114 &8918292408755285201
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 985652492713296805}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: db07217144d4a3c4e896e79937d66047, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  <CharacterName>k__BackingField: LightBandit
   <NPCType>k__BackingField: 0
   <CharacterTeam>k__BackingField: 0
-  <MaxHealth>k__BackingField: 25
+  combatNav: {fileID: 0}
+  AnimationState: {fileID: 0}
+  <MaxHealth>k__BackingField: 100
   <CurrentHealth>k__BackingField: 0
   <RegenDelay>k__BackingField: 3
   <RegenRate>k__BackingField: 1
-  <WalkSpeed>k__BackingField: 4
-  <RunSpeed>k__BackingField: 8
+  _droppableLoot:
+  - {fileID: 5494316111969297195, guid: 544ac10295e8bed478fdbd522dc469eb, type: 3}
+  - {fileID: 5494316111969297195, guid: 544ac10295e8bed478fdbd522dc469eb, type: 3}
+  - {fileID: 5494316111969297195, guid: 544ac10295e8bed478fdbd522dc469eb, type: 3}
+  _dropForce: 2
+  _isLootDropped: 0
+  <WalkSpeed>k__BackingField: 2
+  <RunSpeed>k__BackingField: 4
   <JumpHeight>k__BackingField: 12
   <GroundMask>k__BackingField:
     serializedVersion: 2
@@ -282,22 +301,6 @@ MonoBehaviour:
   NPCAttackBase: {fileID: 11400000, guid: 0811f88692390c3479c878d62c7f2690, type: 2}
   NPCHurtBase: {fileID: 11400000, guid: 0f205a514062982408f0b8b299ba0d26, type: 2}
   NPCDeadBase: {fileID: 11400000, guid: 48668b9046c361048b31d7c94b393cd9, type: 2}
---- !u!114 &690396304704366571
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 985652492713296805}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 228f0bffb1529564bbd8fe90591a0a7e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _animator: {fileID: 0}
-  _currentState: 
-  _previousState: 
-  idleAnimationState: 
 --- !u!1 &1314736524737962975
 GameObject:
   m_ObjectHideFlags: 0

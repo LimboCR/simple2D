@@ -112,7 +112,7 @@ GameObject:
   - component: {fileID: 2343595920190996784}
   - component: {fileID: 2036518233625794938}
   - component: {fileID: 3803337591463067467}
-  - component: {fileID: 8149778319111358371}
+  - component: {fileID: 7556788210500148457}
   m_Layer: 7
   m_Name: Player Actual
   m_TagString: Player
@@ -209,7 +209,7 @@ Rigidbody2D:
   m_LinearDamping: 0
   m_AngularDamping: 0.05
   m_GravityScale: 3
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: 2a932c692c85e1249a3e18b2a8b2fd5e, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -230,7 +230,7 @@ BoxCollider2D:
   m_Enabled: 1
   serializedVersion: 3
   m_Density: 1
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: 2a932c692c85e1249a3e18b2a8b2fd5e, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -300,10 +300,29 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 228f0bffb1529564bbd8fe90591a0a7e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _animator: {fileID: 3650110625873065452}
-  _currentState: 
-  _previousState: 
-  idleAnimationState: 
+  AnimationsDictionary:
+  - Key: Idle
+    AnimationName: HeroKnight_Idle
+  - Key: Run
+    AnimationName: HeroKnight_Run
+  - Key: Jump
+    AnimationName: HeroKnight_Jump
+  - Key: Fall
+    AnimationName: HeroKnight_Fall
+  - Key: Roll
+    AnimationName: HeroKnight_Roll
+  - Key: WallSlide
+    AnimationName: HeroKnight_WallSlide
+  - Key: BlockIdle
+    AnimationName: HeroKnight_BlockIdle
+  - Key: Attack1
+    AnimationName: HeroKnight_Attack1
+  - Key: Attack2
+    AnimationName: HeroKnight_Attack2
+  - Key: SkillAttack
+    AnimationName: HeroKnight_Attack3
+  - Key: Hurt
+    AnimationName: HeroKnight_Hurt
 --- !u!114 &2036518233625794938
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -336,7 +355,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   AnimationState: {fileID: 0}
-  PlayerHP: {fileID: 0}
+  StatusEffectManager: {fileID: 0}
   _moveSpeed: 8
   _jumpHeight: 15
   _rollSpeed: 10
@@ -346,6 +365,9 @@ MonoBehaviour:
   WallSlideLeft: 0
   WallSlideRight: 0
   IsFalling: 0
+  <MaxHealth>k__BackingField: 100
+  <CurrentHealth>k__BackingField: 0
+  ProbabilityToGetHurtAnimation: 10
   Movement: 0
   IsGrounded: 0
   _groundMask:
@@ -366,8 +388,11 @@ MonoBehaviour:
   HaveAttacked: 0
   SkillAttackCooldown: 0
   IsBlocking: 0
+  SkillCooldownTimer: 5
+  SkillCooldownElapsedTime: 0
   LockMovement: 0
---- !u!114 &8149778319111358371
+  LockStateChange: 0
+--- !u!114 &7556788210500148457
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -376,18 +401,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 1955887423130372096}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 431f92de8f51ffc469a3cdf524708bfb, type: 3}
+  m_Script: {fileID: 11500000, guid: 989b28e1f22710048ad8102d65140152, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  currentHealth: 0
-  maxHealth: 100
-  regenDelay: 5
-  regenRate: 1
-  alive: 0
-  colorFull: {r: 0, g: 0, b: 0, a: 0}
-  colorDamaged: {r: 0, g: 0, b: 0, a: 0}
-  colorHalf: {r: 0, g: 0, b: 0, a: 0}
-  colorLow: {r: 0, g: 0, b: 0, a: 0}
+  ApplyFireEffect: 0
+  ApplyPoisonEffect: 0
+  effectToApply: {fileID: 0}
 --- !u!1 &1983483580446060724
 GameObject:
   m_ObjectHideFlags: 0

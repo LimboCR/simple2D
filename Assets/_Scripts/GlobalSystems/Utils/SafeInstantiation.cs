@@ -40,11 +40,11 @@ public static class SafeInstantiation
     /// </summary>
     public struct HealthStats
     {
-        public int? MaxHealth { get; private set; }
-        public int? RegenRate { get; private set; }
+        public float? MaxHealth { get; private set; }
+        public float? RegenRate { get; private set; }
         public float? RegenDelay { get; private set; }
 
-        public HealthStats(int? maxHealth = null, int? regenRate = null, float? regenDelay = null)
+        public HealthStats(float? maxHealth = null, float? regenRate = null, float? regenDelay = null)
         {
             MaxHealth = maxHealth;
             RegenRate = regenRate;

@@ -7,6 +7,7 @@ public class PlayerHurtState : PlayerState
     public override void EnterState()
     {
         player.LockMovement = true;
+        player.GotDamagedCounter += 1;
         player.AnimationState.ChangeAnimationState("HeroKnight_Hurt");
     }
 
@@ -17,7 +18,7 @@ public class PlayerHurtState : PlayerState
 
     public override void FrameUpdate()
     {
-        if (player.AnimationState.IsAnimationFinished(player.AnimationState.CurrentState) && player.PlayerHP.alive)
+        if (player.AnimationState.IsAnimationFinished(player.AnimationState.CurrentState) && player.Alive)
         {
             player.LockMovement = false;
 
@@ -44,6 +45,5 @@ public class PlayerHurtState : PlayerState
                 player.StateMachine.ChangeState(player.FallState);
             }
         }
-        else { }
     }
 }

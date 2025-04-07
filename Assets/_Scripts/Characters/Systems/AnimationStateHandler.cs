@@ -1,19 +1,31 @@
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(Animator))]
 public class AnimationStateHandler : MonoBehaviour
 {
-    [SerializeField] private Animator _animator;
-    [SerializeField] private string _currentState;
-    [SerializeField] private string _previousState;
-    [SerializeField] private string idleAnimationState;
+    private Animator _animator;
+    private string _currentState;
+    private string _previousState;
+    private string idleAnimationState;
 
-    public string CurrentState => _currentState;
-    public string PreviousState => _previousState;
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    public string CurrentState { get { return _currentState; } set { _currentState = value; } }
+    public string PreviousState { get { return _previousState; } set { _previousState = value; } }
+
+    public List<AnimationDictionaryEntry> AnimationsDictionary = new();
+    public Dictionary<string, string> CharacterAnimations;
+
     void Awake()
     {
         _animator = GetComponent<Animator>();
+
+        CharacterAnimations = new Dictionary<string, string>();
+        foreach (var entry in AnimationsDictionary)
+        {
+            if (!CharacterAnimations.ContainsKey(entry.Key))
+                CharacterAnimations.Add(entry.Key, entry.AnimationName);
+        }
     }
 
     public bool IsAnimationFinished(string animationName, float animTimeFloat = 1.0f)
@@ -64,4 +76,11 @@ public class AnimationStateHandler : MonoBehaviour
     {
         _animator.SetBool(name, state);
     }
+}
+
+[Serializable]
+public class AnimationDictionaryEntry
+{
+    public string Key;
+    public string AnimationName;
 }
