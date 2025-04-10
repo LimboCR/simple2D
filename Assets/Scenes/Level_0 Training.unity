@@ -20714,7 +20714,6 @@ MonoBehaviour:
   _triggerZone: {fileID: 0}
   _interactiveZone: {fileID: 1735007350}
   _interactiveCanvas: {fileID: 454902348}
-  collisionObjects: []
 --- !u!1 &901274557
 GameObject:
   m_ObjectHideFlags: 0
