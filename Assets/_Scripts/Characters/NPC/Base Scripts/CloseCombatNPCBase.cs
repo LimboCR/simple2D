@@ -37,7 +37,7 @@ public abstract class CloseCombatNPCBase : NPCBase, IDamageble, INPCMovable
     [Space]
     [Header("Droppable Loot")]
     [SerializeField] protected List<GameObject> _droppableLoot = new();
-    [SerializeField] protected float _dropForce = 2f;
+    [SerializeField] protected float _dropForce = 5f;
     [SerializeField] protected bool _isLootDropped = false;
 
     #endregion
@@ -195,13 +195,13 @@ public abstract class CloseCombatNPCBase : NPCBase, IDamageble, INPCMovable
         {
             this.gameObject.tag = "Friendly";
             this.gameObject.layer = LayerMask.NameToLayer("Friendly");
-            combatNav.ModifyCombatLayers(LayerMask.GetMask("Friendly", "Player", "Ground", "WaypointsAndNav", "Default", "Platform", "Items"), LayerMask.NameToLayer("Enemy"));
+            combatNav.ModifyCombatLayers(LayerMask.GetMask("Friendly", "Player", "Ground", "WaypointsAndNav", "Default", "Platform", "Items", "Destructable"), LayerMask.NameToLayer("Enemy"));
         }
         else if (CharacterTeam == 1)
         {
             this.gameObject.tag = "Enemy";
             this.gameObject.layer = LayerMask.NameToLayer("Enemy");
-            combatNav.ModifyCombatLayers(LayerMask.GetMask("Enemy", "Ground", "WaypointsAndNav", "Default", "Platform", "Items"), LayerMask.GetMask("Friendly", "Player"));
+            combatNav.ModifyCombatLayers(LayerMask.GetMask("Enemy", "Ground", "WaypointsAndNav", "Default", "Platform", "Items", "Destructable"), LayerMask.GetMask("Friendly", "Player"));
         }
     }
 
@@ -317,7 +317,7 @@ public abstract class CloseCombatNPCBase : NPCBase, IDamageble, INPCMovable
         {
             foreach(GameObject loot in _droppableLoot)
             {
-                Vector3 spawnPos = transform.position + new Vector3(0, 0.3f, 0);
+                Vector3 spawnPos = transform.position + new Vector3(0, 0.4f, 0);
                 GameObject drop = Instantiate(loot, spawnPos, Quaternion.identity);
 
                 Vector2 randomDir = Random.insideUnitCircle.normalized + Vector2.up * 0.5f;

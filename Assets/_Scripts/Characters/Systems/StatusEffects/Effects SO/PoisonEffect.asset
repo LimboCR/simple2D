@@ -15,3 +15,8 @@ MonoBehaviour:
   duration: 8
   poisonDamage: 1.5
   tickInterval: 2
+  description:
+    EffectName: Poison Effect
+    EffectDescription: Poisons character each second, may provide exstensive side
+      effects.
+    EffectIcon: {fileID: 19613940502702119, guid: 83e42c74199d3c04ebfa1a134a078324, type: 3}

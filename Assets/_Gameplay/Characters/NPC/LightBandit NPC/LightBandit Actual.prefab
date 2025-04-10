@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 809022358864025864}
   - component: {fileID: 690396304704366571}
   - component: {fileID: 8918292408755285201}
+  - component: {fileID: 3696707156554870111}
   m_Layer: 8
   m_Name: LightBandit Actual
   m_TagString: Enemy
@@ -301,6 +302,21 @@ MonoBehaviour:
   NPCAttackBase: {fileID: 11400000, guid: 0811f88692390c3479c878d62c7f2690, type: 2}
   NPCHurtBase: {fileID: 11400000, guid: 0f205a514062982408f0b8b299ba0d26, type: 2}
   NPCDeadBase: {fileID: 11400000, guid: 48668b9046c361048b31d7c94b393cd9, type: 2}
+--- !u!114 &3696707156554870111
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 985652492713296805}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 989b28e1f22710048ad8102d65140152, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ApplyFireEffect: 0
+  ApplyPoisonEffect: 0
+  effectToApply: {fileID: 0}
 --- !u!1 &1314736524737962975
 GameObject:
   m_ObjectHideFlags: 0

@@ -4,29 +4,43 @@ public class PlayerRollState : PlayerState
 {
     public PlayerRollState(NewPlayerController player, PlayerStateMachine playerStateMachine) : base(player, playerStateMachine){}
 
+    public override void AnimationTriggerEvent(NewPlayerController.PlayerAnimationTriggerType triggerType)
+    {
+        base.AnimationTriggerEvent(triggerType);
+
+        if(player.PlayerRollBaseInstance != null)
+            player.PlayerRollBaseInstance.DoAnimationTriggerEventLogic(triggerType);
+    }
+
     public override void EnterState()
     {
-        player.AnimationState.ChangeAnimationState("HeroKnight_Roll");
-        player.IsRolling = true;
+        base.EnterState();
 
-        if (player.FacingRight)
-            player.PlayerRb.AddForce(new Vector2(player.RollSpeed, 0f), ForceMode2D.Impulse);
-        else
-            player.PlayerRb.AddForce(new Vector2(-player.RollSpeed, 0f), ForceMode2D.Impulse);
+        if (player.PlayerRollBaseInstance != null)
+            player.PlayerRollBaseInstance.DoEnterLogic();
     }
 
     public override void ExitState()
     {
-        player.IsRolling = false;
+        base.ExitState();
+
+        if (player.PlayerRollBaseInstance != null)
+            player.PlayerRollBaseInstance.DoExitLogic();
     }
 
     public override void FrameUpdate()
     {
-        if(player.AnimationState.IsAnimationFinished("HeroKnight_Roll")) player.IsRolling = false;
+        base.FrameUpdate();
 
-        if (player.IsGrounded && !player.IsRolling)
-        {
-            player.StateMachine.ChangeState(Mathf.Abs(player.Movement) > 0 ? player.RunState : player.IdleState);
-        }
+        if (player.PlayerRollBaseInstance != null)
+            player.PlayerRollBaseInstance.DoFrameUpdateLogic();
+    }
+
+    public override void PhysicsUpdate()
+    {
+        base.PhysicsUpdate();
+
+        if (player.PlayerRollBaseInstance != null)
+            player.PlayerRollBaseInstance.DoPhysicsUpdateLogic();
     }
 }

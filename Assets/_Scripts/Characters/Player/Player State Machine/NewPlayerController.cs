@@ -2,15 +2,27 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using MultiSaveSystem;
 
 public class NewPlayerController : MonoBehaviour, IDamageble
 {
-    public AnimationStateHandler AnimationState;
-    public StatusEffectHandler StatusEffectManager;
-    public Rigidbody2D PlayerRb { get; private set; }
+    [HideInInspector] public AnimationStateHandler AnimationState;
+    [HideInInspector] public StatusEffectHandler StatusEffectManager;
+    [HideInInspector] public Rigidbody2D PlayerRb { get; private set; }
+
+    public ButtonBindingsSO Buttons;
+
+    #region Coinns values
+
+    public int GoldenCoins;
+    public int SilverCoins;
+    public int RedCoins;
+
+    #endregion
 
     #region Movement Stats
     [Header("Movement Settings")]
+    [HideInInspector] public float Movement;
     [SerializeField] private float _moveSpeed;
     [SerializeField] private float _jumpHeight;
     [SerializeField] private float _rollSpeed;
@@ -36,11 +48,7 @@ public class NewPlayerController : MonoBehaviour, IDamageble
     public int GotDamagedCounter { get; set; }
 
     [Range(0, 10)] public int ProbabilityToGetHurtAnimation = 10;
-    #endregion
-
-    [Space]
-    [Header("Do not touch")]
-    [HideInInspector] public float Movement;
+    #endregion    
 
     #region GroundVariables
     [Space]
@@ -101,7 +109,37 @@ public class NewPlayerController : MonoBehaviour, IDamageble
     public PlayerSuperAttackState SkillAttackState { get; set; }
     public PlayerBlockState BlockState { get; set; }
     public PlayerHurtState HurtState { get; set; }
-    public PlayerWallSlideState WallSlideState { get; set; }
+    //public PlayerWallSlideState WallSlideState { get; set; }
+
+    #endregion
+
+    #region SO States Varibales
+
+    [Space]
+    [Header("Player States Assigner")]
+    [SerializeField] private PlayerIdleSOBase PlayerIdleBase;
+    [SerializeField] private PlayerWalkSOBase PlayerWalkBase;
+    [SerializeField] private PlayerRunSOBase PlayerRunBase;
+    [SerializeField] private PlayerJumpSOBase PlayerJumpBase;
+    [SerializeField] private PlayerFallSOBase PlayerFallBase;
+    [SerializeField] private PlayerRollSOBase PlayerRollBase;
+    [SerializeField] private PlayerAttackSOBase PlayerAttackBase;
+    [SerializeField] private PlayerSkillAttackSOBase PlayerSkillAttackBase;
+    [SerializeField] private PlayerBlockSOBase PlayerBlockBase;
+    [SerializeField] private PlayerHurtSOBase PlayerHurtBase;
+    [SerializeField] private PlayerDeadSOBase PlayerDeadBase;
+
+    public PlayerIdleSOBase PlayerIdleBaseInstance { get; set; }
+    public PlayerWalkSOBase PlayerWalkBaseInstance { get; set; }
+    public PlayerRunSOBase PlayerRunBaseInstance { get; set; }
+    public PlayerJumpSOBase PlayerJumpBaseInstance { get; set; }
+    public PlayerFallSOBase PlayerFallBaseInstance { get; set; }
+    public PlayerRollSOBase PlayerRollBaseInstance { get; set; }
+    public PlayerAttackSOBase PlayerAttackBaseInstance { get; set; }
+    public PlayerSkillAttackSOBase PlayerSkillAttackBaseInstance { get; set; }
+    public PlayerBlockSOBase PlayerBlockBaseInstance { get; set; }
+    public PlayerHurtSOBase PlayerHurtBaseInstance { get; set; }
+    public PlayerDeadSOBase PlayerDeadBaseInstance { get; set; }
 
     #endregion
 
@@ -111,6 +149,83 @@ public class NewPlayerController : MonoBehaviour, IDamageble
         AnimationState = GetComponent<AnimationStateHandler>();
         PlayerRb = GetComponent<Rigidbody2D>();
         StatusEffectManager = GetComponent<StatusEffectHandler>();
+
+        StateMachineInitilizer();
+
+        CurrentHealth = MaxHealth;
+        Alive = true;
+    }
+
+    private void StateMachineInitilizer()
+    {
+        #region SO States Instances
+        if (PlayerIdleBase != null)
+        {
+            PlayerIdleBaseInstance = Instantiate(PlayerIdleBase);
+            PlayerIdleBaseInstance.Initialize(gameObject, this);
+        }
+            
+        if (PlayerWalkBase != null)
+        {
+            PlayerWalkBaseInstance = Instantiate(PlayerWalkBase);
+            PlayerWalkBaseInstance.Initialize(gameObject, this);
+        }
+            
+        if (PlayerRunBase != null)
+        {
+            PlayerRunBaseInstance = Instantiate(PlayerRunBase);
+            PlayerRunBaseInstance.Initialize(gameObject, this);
+        }
+            
+        if (PlayerJumpBase != null)
+        {
+            PlayerJumpBaseInstance = Instantiate(PlayerJumpBase);
+            PlayerJumpBaseInstance.Initialize(gameObject, this);
+        }
+            
+        if (PlayerFallBase != null)
+        {
+            PlayerFallBaseInstance = Instantiate(PlayerFallBase);
+            PlayerFallBaseInstance.Initialize(gameObject, this);
+        }
+            
+        if (PlayerRollBase != null)
+        {
+            PlayerRollBaseInstance = Instantiate(PlayerRollBase);
+            PlayerRollBaseInstance.Initialize(gameObject, this);
+        }
+            
+        if (PlayerAttackBase != null)
+        {
+            PlayerAttackBaseInstance = Instantiate(PlayerAttackBase);
+            PlayerAttackBaseInstance.Initialize(gameObject, this);
+        }
+            
+        if (PlayerSkillAttackBase != null)
+        {
+            PlayerSkillAttackBaseInstance = Instantiate(PlayerSkillAttackBase);
+            PlayerSkillAttackBaseInstance.Initialize(gameObject, this);
+        }
+            
+        if (PlayerBlockBase != null)
+        {
+            PlayerBlockBaseInstance = Instantiate(PlayerBlockBase);
+            PlayerBlockBaseInstance.Initialize(gameObject, this);
+        }
+            
+        if (PlayerHurtBase != null)
+        {
+            PlayerHurtBaseInstance = Instantiate(PlayerHurtBase);
+            PlayerHurtBaseInstance.Initialize(gameObject, this);
+        }
+            
+        if (PlayerDeadBase != null)
+        {
+            PlayerDeadBaseInstance = Instantiate(PlayerDeadBase);
+            PlayerDeadBaseInstance.Initialize(gameObject, this);
+        }
+        
+        #endregion
 
         StateMachine = new PlayerStateMachine();
         IdleState = new PlayerIdleState(this, StateMachine);
@@ -122,10 +237,7 @@ public class NewPlayerController : MonoBehaviour, IDamageble
         SkillAttackState = new PlayerSuperAttackState(this, StateMachine);
         BlockState = new PlayerBlockState(this, StateMachine);
         HurtState = new PlayerHurtState(this, StateMachine);
-        WallSlideState = new PlayerWallSlideState(this, StateMachine);
-
-        CurrentHealth = MaxHealth;
-        Alive = true;
+        //WallSlideState = new PlayerWallSlideState(this, StateMachine);
     }
 
     private void Start()
@@ -133,6 +245,8 @@ public class NewPlayerController : MonoBehaviour, IDamageble
         StateMachine.Initialize(IdleState);
 
         GlobalEventsManager.SendPlayerHealthChanged(CurrentHealth);
+
+        GlobalEventsManager.GameStateListener.AddListener(GameStateReactor);
     }
 
     private void Update()
@@ -149,9 +263,14 @@ public class NewPlayerController : MonoBehaviour, IDamageble
             FlipSidesHandler();
         }
 
-        if (Keyboard.current.slashKey.wasPressedThisFrame)
+        if (Input.GetKeyDown(Buttons.Quicksave))
         {
-            TakeDamage(Random.Range(1f, 10f));
+            GlobalEventsManager.BroadcastActualGameState(GameStates.QuickSave);
+        }
+
+        if (Input.GetKeyDown(Buttons.Quickload))
+        {
+            GlobalEventsManager.BroadcastActualGameState(GameStates.Restart);
         }
     }
 
@@ -160,10 +279,9 @@ public class NewPlayerController : MonoBehaviour, IDamageble
         if (Alive)
         {
             StateMachine.CurrentPlayerState.PhysicsUpdate();
-            if (!LockMovement) transform.position += new Vector3(Movement, 0.0f, 0.0f) * Time.fixedDeltaTime * MoveSpeed;
+            if (!LockMovement) transform.position += MoveSpeed * Time.fixedDeltaTime * new Vector3(Movement, 0.0f, 0.0f);
         }
     }
-    #endregion
 
     private void HandleLogic()
     {
@@ -188,10 +306,64 @@ public class NewPlayerController : MonoBehaviour, IDamageble
                 StateMachine.ChangeState(BlockState);
             }
 
-            if (WallSlideLeft || WallSlideRight)
-                StateMachine.ChangeState(WallSlideState);
+            //if (WallSlideLeft || WallSlideRight)
+            //    StateMachine.ChangeState(WallSlideState);
         }
     }
+
+    private void GameStateReactor(GameStates estates)
+    {
+        switch (estates)
+        {
+            case GameStates.Save:
+                SavePlayerData();
+                break;
+
+            case GameStates.QuickSave:
+                SavePlayerData();
+                break;
+
+            case GameStates.Restart:
+                LoadPlayerData();
+                break;
+
+            case GameStates.Load:
+                LoadPlayerData();
+                break;
+
+            case GameStates.Pause:
+                break;
+
+            case GameStates.Unpause:
+                break;
+
+            case GameStates.Start:
+                break;
+
+            case GameStates.Exit:
+                break;
+        }
+    }
+    #endregion
+
+    #region Animation Trigger Events Logic
+
+    protected virtual void AnimationTriggerEvent(PlayerAnimationTriggerType triggerType)
+    {
+        StateMachine.CurrentPlayerState.AnimationTriggerEvent(triggerType);
+    }
+
+    public enum PlayerAnimationTriggerType
+    {
+        ParralaxShake,
+        DamageTargetsInHitZone,
+        SkillAction1,
+        SkillAction2,
+        SkillAction3,
+        SkillAction4
+    }
+
+    #endregion
 
     #region Movement & Checks Logic
     private void FlipSidesHandler()
@@ -330,17 +502,25 @@ public class NewPlayerController : MonoBehaviour, IDamageble
     #endregion
 
     #region Save, Load, Reset
-
-    public void Save(ref PlayerSaveData data)
+    private void SavePlayerData()
     {
-        data.Position = transform.position;
+        string folder = MSS.GetSavePath(GameManager.SaveFileName, GameManager.SaveFileFolder);
+
+        MSS.Save("playerPosition", transform.position, folder);
+        MSS.Save("playerGoldenCoins", GoldenCoins, folder);
+        MSS.Save("playerSilverCoins", SilverCoins, folder);
+        MSS.Save("playerRedCoins", RedCoins, folder);
     }
 
-    public void Load(PlayerSaveData data)
+    private void LoadPlayerData()
     {
-        transform.position = data.Position;
-    }
+        string folder = MSS.GetSavePath(GameManager.SaveFileName, GameManager.SaveFileFolder);
 
+        transform.position = MSS.Load("playerPosition", Vector3.zero, folder);
+        MSS.LoadInto("playerGoldenCoins", ref GoldenCoins, folder);
+        MSS.LoadInto("playerSilverCoins", ref SilverCoins, folder);
+        MSS.LoadInto("playerRedCoins", ref RedCoins, folder);
+    }
     #endregion
 
     private void OnDrawGizmosSelected()
@@ -386,12 +566,4 @@ public class NewPlayerController : MonoBehaviour, IDamageble
         }
         #endregion
     }
-
-    
-}
-
-[System.Serializable]
-public struct PlayerSaveData
-{
-    public Vector3 Position;
 }

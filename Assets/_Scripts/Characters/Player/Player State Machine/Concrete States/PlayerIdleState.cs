@@ -4,33 +4,38 @@ public class PlayerIdleState : PlayerState
 {
     public PlayerIdleState(NewPlayerController player, PlayerStateMachine playerStateMachine) : base(player, playerStateMachine){}
 
+    public override void AnimationTriggerEvent(NewPlayerController.PlayerAnimationTriggerType triggerType)
+    {
+        base.AnimationTriggerEvent(triggerType);
+        if(player.PlayerIdleBaseInstance != null)
+            player.PlayerIdleBaseInstance.DoAnimationTriggerEventLogic(triggerType);
+    }
+
     public override void EnterState()
     {
-        player.AnimationState.ChangeAnimationState("HeroKnight_Idle");
+        base.EnterState();
+        if(player.PlayerIdleBaseInstance != null)
+            player.PlayerIdleBaseInstance.DoEnterLogic();
+    }
+
+    public override void ExitState()
+    {
+        base.ExitState();
+        if (player.PlayerIdleBaseInstance != null)
+            player.PlayerIdleBaseInstance.DoExitLogic();
     }
 
     public override void FrameUpdate()
     {
         base.FrameUpdate();
+        if (player.PlayerIdleBaseInstance != null)
+            player.PlayerIdleBaseInstance.DoFrameUpdateLogic();
+    }
 
-        if (Mathf.Abs(player.Movement) > 0f)
-            player.StateMachine.ChangeState(player.RunState);
-
-        if (Input.GetKeyDown(KeyCode.W) && player.IsGrounded)
-            player.StateMachine.ChangeState(player.JumpState);
-
-        if (Input.GetKeyDown(KeyCode.C) && !player.IsRolling)
-            player.StateMachine.ChangeState(player.RollState);
-
-        if (Input.GetKeyDown(KeyCode.Z))
-            player.StateMachine.ChangeState(player.AttackState);
-
-        if(Input.GetKeyDown(KeyCode.X) && !player.SkillAttackCooldown)
-            playerStateMachine.ChangeState(player.SkillAttackState);
-
-        if (player.PlayerRb.linearVelocity.y < -1.5f)
-        {
-            player.StateMachine.ChangeState(player.FallState);
-        }
+    public override void PhysicsUpdate()
+    {
+        base.PhysicsUpdate();
+        if (player.PlayerIdleBaseInstance != null)
+            player.PlayerIdleBaseInstance.DoPhysicsUpdateLogic();
     }
 }

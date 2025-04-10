@@ -10,6 +10,7 @@ TagManager:
   - PlayerTrigger
   - Coin
   - ItemSlotImage
+  - SavePoint
   layers:
   - Default
   - TransparentFX
@@ -26,7 +27,7 @@ TagManager:
   - Items
   - Platform
   - WaypointsAndNav
-  - 
+  - Interactable
   - 
   - 
   - 

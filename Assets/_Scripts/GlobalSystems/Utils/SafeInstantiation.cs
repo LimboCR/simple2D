@@ -153,7 +153,7 @@ public static class SafeInstantiation
     /// <param name="movableStats">Modifying INPCMovable stats if given</param>
     /// <param name="parent">Setting parrent GameObject for NPC if given</param>
     /// <returns></returns>
-    public static GameObject SafeNPCInstantiation(GameObject npcPrefab, World world,
+    public static GameObject InstantiateNPC(GameObject npcPrefab, World world,
         CharacterData? characterData = null, HealthStats ? healthStats = null,
         MovableStats? movableStats = null, Transform parent = null)
     {
@@ -168,8 +168,11 @@ public static class SafeInstantiation
 
         var movementComponent = npc.GetComponent<INPCMovable>();
         movementComponent?.SetInitialINPCMovable(movableStats);
+        //
 
         return npc;
     }
     #endregion
+
+
 }
