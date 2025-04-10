@@ -10,7 +10,7 @@ public class HealingEffect : StatusEffectBase
     private StatusEffectDescription description;
     private GameObject StatusEffectImage;
 
-    public HealingEffect(GameObject target, float duration, float tickHeal, float tickInterval, StatusEffectDescription? description = null)
+    public HealingEffect(GameObject target, float duration, float tickHeal, float tickInterval, StatusEffectDescription description = null)
         : base(target, duration)
     {
         this.tickHeal = tickHeal;

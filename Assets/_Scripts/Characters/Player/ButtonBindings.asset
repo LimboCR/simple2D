@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7cd53359daf9c3a4c94ec3bb076a2e45, type: 3}
+  m_Name: ButtonBindings
+  m_EditorClassIdentifier: 
+  JumpKey: 119
+  RollKey: 99
+  ShieldKey: 32
+  Skill1: 113
+  Skill2: 101
+  SimpleAttack: 122
+  HeavyAttack: 120
+  InGameMenu: 9
+  Inventory: 105
+  Map: 109
+  SkillsMenu: 107
+  Quicksave: 286
+  Quickload: 287

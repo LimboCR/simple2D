@@ -4,46 +4,38 @@ public class PlayerHurtState : PlayerState
 {
     public PlayerHurtState(NewPlayerController player, PlayerStateMachine playerStateMachine) : base(player, playerStateMachine) { }
 
+    public override void AnimationTriggerEvent(NewPlayerController.PlayerAnimationTriggerType triggerType)
+    {
+        base.AnimationTriggerEvent(triggerType);
+        if(player.PlayerHurtBaseInstance != null)
+            player.PlayerHurtBaseInstance.DoAnimationTriggerEventLogic(triggerType);
+    }
+
     public override void EnterState()
     {
-        player.LockMovement = true;
-        player.GotDamagedCounter += 1;
-        player.AnimationState.ChangeAnimationState("HeroKnight_Hurt");
+        base.EnterState();
+        if (player.PlayerHurtBaseInstance != null)
+            player.PlayerHurtBaseInstance.DoEnterLogic();
     }
 
     public override void ExitState()
     {
         base.ExitState();
+        if (player.PlayerHurtBaseInstance != null)
+            player.PlayerHurtBaseInstance.DoExitLogic();
     }
 
     public override void FrameUpdate()
     {
-        if (player.AnimationState.IsAnimationFinished(player.AnimationState.CurrentState) && player.Alive)
-        {
-            player.LockMovement = false;
+        base.FrameUpdate();
+        if (player.PlayerHurtBaseInstance != null)
+            player.PlayerHurtBaseInstance.DoFrameUpdateLogic();
+    }
 
-            if (Mathf.Abs(player.Movement) == 0f)
-                player.StateMachine.ChangeState(player.IdleState);
-
-            if (Mathf.Abs(player.Movement) > 0f)
-                player.StateMachine.ChangeState(player.RunState);
-
-            if (Input.GetKeyDown(KeyCode.Z))
-                player.StateMachine.ChangeState(player.AttackState);
-
-            if (Input.GetKeyDown(KeyCode.X) && !player.SkillAttackCooldown)
-                playerStateMachine.ChangeState(player.SkillAttackState);
-
-            if (Input.GetKeyDown(KeyCode.W) && player.IsGrounded)
-                player.StateMachine.ChangeState(player.JumpState);
-
-            if (Input.GetKeyDown(KeyCode.C) && !player.IsRolling)
-                player.StateMachine.ChangeState(player.RollState);
-
-            if (player.PlayerRb.linearVelocity.y < -1.5f)
-            {
-                player.StateMachine.ChangeState(player.FallState);
-            }
-        }
+    public override void PhysicsUpdate()
+    {
+        base.PhysicsUpdate();
+        if (player.PlayerHurtBaseInstance != null)
+            player.PlayerHurtBaseInstance.DoPhysicsUpdateLogic();
     }
 }

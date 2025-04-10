@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class PlayerState
+public abstract class PlayerState
 {
     protected NewPlayerController player;
     protected PlayerStateMachine playerStateMachine;
@@ -15,5 +15,5 @@ public class PlayerState
     public virtual void ExitState() { }
     public virtual void FrameUpdate() { }
     public virtual void PhysicsUpdate() { }
-    public virtual void AnimationTriggerEvent(CloseCombatNPCBase.AnimationTriggerType triggerType) { }
+    public virtual void AnimationTriggerEvent(NewPlayerController.PlayerAnimationTriggerType triggerType) { }
 }

@@ -6,45 +6,38 @@ public class PlayerBlockState : PlayerState
     {
     }
 
+    public override void AnimationTriggerEvent(NewPlayerController.PlayerAnimationTriggerType triggerType)
+    {
+        base.AnimationTriggerEvent(triggerType);
+        if(player.PlayerBlockBaseInstance != null)
+            player.PlayerBlockBaseInstance.DoAnimationTriggerEventLogic(triggerType);
+    }
+
     public override void EnterState()
     {
-        player.AnimationState.ChangeAnimationState("HeroKnight_BlockIdle");
-        player.LockMovement = true;
+        base.EnterState();
+        if (player.PlayerBlockBaseInstance != null)
+            player.PlayerBlockBaseInstance.DoEnterLogic();
     }
 
     public override void ExitState()
     {
-        player.IsBlocking = false;
+        base.ExitState();
+        if (player.PlayerBlockBaseInstance != null)
+            player.PlayerBlockBaseInstance.DoExitLogic();
     }
 
     public override void FrameUpdate()
     {
-        if (Input.GetKeyUp(KeyCode.Space))
-        {
-            player.LockMovement = false;
+        base.FrameUpdate();
+        if (player.PlayerBlockBaseInstance != null)
+            player.PlayerBlockBaseInstance.DoFrameUpdateLogic();
+    }
 
-            if (Mathf.Abs(player.Movement) == 0f)
-                player.StateMachine.ChangeState(player.IdleState);
-
-            if (Mathf.Abs(player.Movement) > 0f)
-                player.StateMachine.ChangeState(player.RunState);
-
-            if (Input.GetKeyDown(KeyCode.Z))
-                player.StateMachine.ChangeState(player.AttackState);
-
-            if (Input.GetKeyDown(KeyCode.X) && !player.SkillAttackCooldown)
-                playerStateMachine.ChangeState(player.SkillAttackState);
-
-            if (Input.GetKeyDown(KeyCode.W) && player.IsGrounded)
-                player.StateMachine.ChangeState(player.JumpState);
-
-            if (Input.GetKeyDown(KeyCode.C) && !player.IsRolling)
-                player.StateMachine.ChangeState(player.RollState);
-
-            if (player.PlayerRb.linearVelocity.y < -1.5f)
-            {
-                player.StateMachine.ChangeState(player.FallState);
-            }
-        }
+    public override void PhysicsUpdate()
+    {
+        base.PhysicsUpdate();
+        if (player.PlayerBlockBaseInstance != null)
+            player.PlayerBlockBaseInstance.DoPhysicsUpdateLogic();
     }
 }

@@ -338,6 +338,7 @@ GameObject:
   - component: {fileID: 2088532975049443027}
   - component: {fileID: 3693946090317910242}
   - component: {fileID: 1675982558349779172}
+  - component: {fileID: 6710686484894079034}
   m_Layer: 0
   m_Name: HeavyBandit NPC
   m_TagString: Untagged
@@ -405,7 +406,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 7
   m_Sprite: {fileID: 21300000, guid: 317b8365a4649ab459f6cb58ec8f9f18, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -524,10 +525,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 228f0bffb1529564bbd8fe90591a0a7e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _animator: {fileID: 0}
-  _currentState: 
-  _previousState: 
-  idleAnimationState: 
+  AnimationsDictionary: []
 --- !u!114 &3693946090317910242
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -540,15 +538,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9af50e91ed99da74c9ceaf0add24d885, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  combatNav: {fileID: 0}
-  AnimationState: {fileID: 0}
   <CharacterName>k__BackingField: HeavyBandit
   <NPCType>k__BackingField: 0
-  <CharacterTeam>k__BackingField: 0
+  <CharacterTeam>k__BackingField: 1
+  combatNav: {fileID: 0}
+  AnimationState: {fileID: 0}
   <MaxHealth>k__BackingField: 45
   <CurrentHealth>k__BackingField: 0
   <RegenDelay>k__BackingField: 7
   <RegenRate>k__BackingField: 2
+  _droppableLoot:
+  - {fileID: 5494316111969297195, guid: 544ac10295e8bed478fdbd522dc469eb, type: 3}
+  - {fileID: 5494316111969297195, guid: 544ac10295e8bed478fdbd522dc469eb, type: 3}
+  - {fileID: 8325350448387753671, guid: db80b04ee8232c047959268088a3172b, type: 3}
+  - {fileID: 8325350448387753671, guid: db80b04ee8232c047959268088a3172b, type: 3}
+  _dropForce: 2
+  _isLootDropped: 0
   <WalkSpeed>k__BackingField: 3
   <RunSpeed>k__BackingField: 5
   <JumpHeight>k__BackingField: 15
@@ -620,6 +625,21 @@ MonoBehaviour:
   _attackZoneGizmosAtRuntime: 0
   _visibilityZoneGizmosInEditor: 0
   _visibilityZoneGizmosAtRuntime: 0
+--- !u!114 &6710686484894079034
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8039488085255698433}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 989b28e1f22710048ad8102d65140152, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ApplyFireEffect: 0
+  ApplyPoisonEffect: 0
+  effectToApply: {fileID: 0}
 --- !u!1 &8985758729116314882
 GameObject:
   m_ObjectHideFlags: 0

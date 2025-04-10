@@ -12,6 +12,11 @@ public class LightScript : MonoBehaviour
 
     private void Awake()
     {
+        
+    }
+
+    private void Start()
+    {
         IsLightOn = LightsManager.Instance.LightsOn;
         HandleLights(IsLightOn);
     }

@@ -4,28 +4,38 @@ public class PlayerFallState : PlayerState
 {
     public PlayerFallState(NewPlayerController player, PlayerStateMachine playerStateMachine) : base(player, playerStateMachine){}
 
+    public override void AnimationTriggerEvent(NewPlayerController.PlayerAnimationTriggerType triggerType)
+    {
+        base.AnimationTriggerEvent(triggerType);
+        if (player.PlayerFallBaseInstance != null)
+            player.PlayerFallBaseInstance.DoAnimationTriggerEventLogic(triggerType);
+    }
+
     public override void EnterState()
     {
-        player.AnimationState.ChangeAnimationState("HeroKnight_Fall");
-        player.IsFalling = true;
+        base.EnterState();
+        if(player.PlayerFallBaseInstance != null) 
+            player.PlayerFallBaseInstance.DoEnterLogic();
     }
 
     public override void ExitState()
     {
-        player.IsFalling = false;
+        base.ExitState();
+        if (player.PlayerFallBaseInstance != null)
+            player.PlayerFallBaseInstance.DoExitLogic();
     }
 
     public override void FrameUpdate()
     {
-        if (Input.GetKeyDown(KeyCode.C) && !player.IsRolling)
-            player.StateMachine.ChangeState(player.RollState);
+        base.FrameUpdate();
+        if (player.PlayerFallBaseInstance != null)
+            player.PlayerFallBaseInstance.DoFrameUpdateLogic();
     }
 
     public override void PhysicsUpdate()
     {
-        if (player.IsGrounded)
-        {
-            playerStateMachine.ChangeState(Mathf.Abs(player.Movement) > 0 ? player.RunState : player.IdleState);
-        }
+        base.PhysicsUpdate();
+        if (player.PlayerFallBaseInstance != null)
+            player.PlayerFallBaseInstance.DoPhysicsUpdateLogic();
     }
 }

@@ -65,13 +65,13 @@ public class SpawnPointHandler : MonoBehaviour
     {
         //Instantiates character and assigns it's reference to spawn point, to then access it's CharacterCommands to set waypoints to move between
         if (HealthScriptOverride && !INPCMovableOverride)
-            _referenceCharacter = SafeNPCInstantiation(npc, new World(transform.position), new CharacterData(NPCTeam), new HealthStats(NPCMaxHealth, NPCRegenRate, NPCRegenDelay));
+            _referenceCharacter = InstantiateNPC(npc, new World(transform.position), new CharacterData(NPCTeam), new HealthStats(NPCMaxHealth, NPCRegenRate, NPCRegenDelay));
 
         else if (HealthScriptOverride && INPCMovableOverride)
-            _referenceCharacter = SafeNPCInstantiation(npc, new World(transform.position), new CharacterData(NPCTeam), new HealthStats(NPCMaxHealth, NPCRegenRate, NPCRegenDelay), new MovableStats(WalkSpeed, RunSpeed, JumpHeight));
+            _referenceCharacter = InstantiateNPC(npc, new World(transform.position), new CharacterData(NPCTeam), new HealthStats(NPCMaxHealth, NPCRegenRate, NPCRegenDelay), new MovableStats(WalkSpeed, RunSpeed, JumpHeight));
 
         else
-            _referenceCharacter = SafeNPCInstantiation(npc, new World(transform.position), new CharacterData(NPCTeam));
+            _referenceCharacter = InstantiateNPC(npc, new World(transform.position), new CharacterData(NPCTeam));
 
         _referenceCharacter.GetComponent<CloseCombatNPCBase>().WaypointL = (Instantiate(waypointPrefab, 
             new Vector3(transform.position.x - waypointLeftOffset, transform.position.y, transform.position.z), Quaternion.identity, this.transform));

@@ -28,7 +28,7 @@ public static class CommandsInterpreter
 
     }
 
-    public static void SpawnNPC(string npcID, int? npcTeam = 0, Transform? position = null, Quaternion? rotation = null)
+    public static void SpawnNPC(string npcID, int? npcTeam = 0, Transform position = null, Quaternion? rotation = null)
     {
 
     }

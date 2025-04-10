@@ -15,10 +15,10 @@ public class SpawnSettingsWindow : EditorWindow
     //Full editor window variables
     private List<SpawnPointHandler> selectedSpawnPoints = new();
     private bool _hasDifferentNPCs = false;
-    private bool _allEmpty = true;
+    //private bool _allEmpty = true;
     //private bool _openedEditor;
     private string _npcName;
-    private Texture2D _npcPreview;
+    //private Texture2D _npcPreview;
 
     private bool _onSelectionChanged;
     #endregion
@@ -137,7 +137,7 @@ public class SpawnSettingsWindow : EditorWindow
         selectedSpawnPoints.Clear();
         _fetchedActualData = false;
         _hasDifferentNPCs = false;
-        _allEmpty = true;
+        //_allEmpty = true;
 
         Object[] objects = Selection.objects;
         HashSet<GameObject> uniqueNPCs = new();
@@ -153,7 +153,7 @@ public class SpawnSettingsWindow : EditorWindow
                     selectedSpawnPoints.Add(sph);
                     uniqueNPCs.Add(sph.npc);
 
-                    if(sph.npc != null) _allEmpty = false;
+                    //if(sph.npc != null) _allEmpty = false;
                 }
             }
         }
@@ -161,7 +161,7 @@ public class SpawnSettingsWindow : EditorWindow
         if(uniqueNPCs.Count > 1)
         {
             _hasDifferentNPCs = true;
-            _npcPreview = null;
+            //_npcPreview = null;
             _selectedNPC = null;
             _npcName = "Multiple Values";
         }
@@ -173,7 +173,7 @@ public class SpawnSettingsWindow : EditorWindow
         else
         {
             _npcName = "None";
-            _npcPreview = null;
+            //_npcPreview = null;
             _selectedNPC = null;
         }
     }

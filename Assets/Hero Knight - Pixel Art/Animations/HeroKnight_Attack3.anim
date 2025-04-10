@@ -98,3 +98,10 @@ AnimationClip:
     floatParameter: 10
     intParameter: 10
     messageOptions: 0
+  - time: 0.14285715
+    functionName: AnimationTriggerEvent
+    data: 
+    objectReferenceParameter: {fileID: 0}
+    floatParameter: 0
+    intParameter: 2
+    messageOptions: 0

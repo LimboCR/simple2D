@@ -10,7 +10,7 @@ public class PoisonEffect : StatusEffectBase
     private StatusEffectDescription description;
     private GameObject StatusEffectImage;
 
-    public PoisonEffect(GameObject target, float duration, float poisonDamage, float tickInterval, StatusEffectDescription? description = null)
+    public PoisonEffect(GameObject target, float duration, float poisonDamage, float tickInterval, StatusEffectDescription description = null)
         : base(target, duration)
     {
         this.poisonDamage = poisonDamage;

@@ -21,9 +21,9 @@ public class GameManager : MonoBehaviour
     }
 
     [Header("GameStates")]
-    [SerializeField] private GameStates currentGameState;
-    [SerializeField] private NewPlayerController _player;
-    public NewPlayerController Player
+    [SerializeField] public static GameStates currentGameState;
+    [SerializeField] private static NewPlayerController _player;
+    public static NewPlayerController Player
     {
         get { return _player; }
         set
@@ -32,16 +32,27 @@ public class GameManager : MonoBehaviour
             {
                 _player = value;
             }
+            else Debug.LogError($"Player's Script Already found: {Player.gameObject.name}");
         }
     }
 
     [SerializeField] public List<GameObject> EnemyAtScene = new();
     public List<GameObject> SpawnPoints = new();
 
+    public List<string> LayerMasksToRemoveFromEnemy;
+    public List<string> LayerMasksToRemoveFromFriendly;
+
     public static LayerMask AllInGameLayers;
+
+    //Saving data
+    public static string SaveFileName = null;
+    public static string SaveFileFolder = "SaveFiles";
+    public static string QuickSaveFolder = "QuickSaves";
+    public static int QuickSaveCounter = 0;
 
     private void Awake()
     {
+        AllInGameLayers = LayerMask.GetMask(LayerMasksToRemoveFromEnemy.ToString());
         if(instance == null)
         {
             instance = this;
@@ -57,14 +68,7 @@ public class GameManager : MonoBehaviour
 
     private void Update()
     {
-        if (Keyboard.current.numpad0Key.wasPressedThisFrame)
-        {
-            SaveSystem.Save();
-        }
-        if (Keyboard.current.numpad1Key.wasPressedThisFrame)
-        {
-            SaveSystem.Load();
-        }
+
     }
 
     #region Static Getters
@@ -90,7 +94,6 @@ public class GameManager : MonoBehaviour
     private void ChangeGameState(GameStates state)
     {
         currentGameState = state;
-        BroadcastActualGameState(currentGameState);
     }
 
     private void AddEnemyAtScene(GameObject enemy)
@@ -113,14 +116,61 @@ public class GameManager : MonoBehaviour
     }
 
     #endregion
+
+    private static void PerformQuickSave()
+    {
+        if(QuickSaveCounter == 5) QuickSaveCounter = 0;
+        SaveFileName = $"QuickSave{QuickSaveCounter}";
+        SaveFileFolder = MultiSaveSystem.MSS.GetSavePath(SaveFileName, QuickSaveFolder);
+        QuickSaveCounter++;
+
+        currentGameState = GameStates.QuickSave;
+        BroadcastActualGameState(currentGameState);
+
+        currentGameState = GameStates.Play;
+        BroadcastActualGameState(currentGameState);
+    }
+
+    private static void PerformSave(string saveFileName)
+    {
+        currentGameState = GameStates.QuickSave;
+        SaveFileFolder = MultiSaveSystem.MSS.GetSavePath(saveFileName, SaveFileFolder);
+        BroadcastActualGameState(currentGameState);
+
+        currentGameState = GameStates.Play;
+        BroadcastActualGameState(currentGameState);
+    }
+
+    private static void PerformQuickLoad()
+    {
+        currentGameState = GameStates.Restart;
+        BroadcastActualGameState(currentGameState);
+
+        currentGameState = GameStates.Play;
+        BroadcastActualGameState(currentGameState);
+    }
+
+    public static void PerformLoading()
+    {
+        currentGameState = GameStates.Load;
+        SaveFileName = $"QuickSave{QuickSaveCounter}";
+        SaveFileFolder = MultiSaveSystem.MSS.GetSavePath(SaveFileName, QuickSaveFolder);
+        BroadcastActualGameState(currentGameState);
+
+        currentGameState = GameStates.Play;
+        BroadcastActualGameState(currentGameState);
+    }
 }
 
 public enum GameStates
 {
     Start,
+    Play,
     Pause,
     Unpause,
     Save,
+    QuickSave,
     Restart,
+    Load,
     Exit
 }

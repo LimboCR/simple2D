@@ -1,0 +1,11 @@
+{
+    "keys": [
+        "playerPosition"
+    ],
+    "jsonValues": [
+        "{\"x\":-172.5450897216797,\"y\":-0.06499677896499634,\"z\":0.0}"
+    ],
+    "types": [
+        "UnityEngine.Vector3, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null"
+    ]
+}

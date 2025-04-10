@@ -10,7 +10,7 @@ public class FireEffect : StatusEffectBase
     private StatusEffectDescription description;
     private GameObject StatusEffectImage;
 
-    public FireEffect(GameObject target, float duration, float tickDamage, float tickInterval, StatusEffectDescription? description = null)
+    public FireEffect(GameObject target, float duration, float tickDamage, float tickInterval, StatusEffectDescription description = null)
         : base(target, duration)
     {
         this.tickDamage = tickDamage;

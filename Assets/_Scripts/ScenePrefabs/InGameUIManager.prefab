@@ -1,0 +1,77 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &4954334239394201349
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 534320264194616794}
+  - component: {fileID: 5311491259516663372}
+  - component: {fileID: 7089176038457148327}
+  m_Layer: 0
+  m_Name: InGameUIManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &534320264194616794
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4954334239394201349}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5311491259516663372
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4954334239394201349}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 80362199b35e9e74e841b5e5decf6b0c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _healthText: {fileID: 0}
+  _coinsText: {fileID: 0}
+  _health: 0
+  _coinsAmount: 0
+  _skillAttackCooldown: {fileID: 0}
+  _skillIcon: {fileID: 0}
+  _skillAtCooldownColor: {r: 0.3773585, g: 0.3773585, b: 0.3773585, a: 0.80784315}
+  InventoryPanel: {fileID: 0}
+  InventorySlotImages: []
+  CommandLine: {fileID: 0}
+  _statusEffectsPanel: {fileID: 0}
+  _statusEffectsImages: []
+  _statusEffectImagePrefab: {fileID: 2420551848794365095, guid: 8c44c77d10e6f0644be757fbeb40a192, type: 3}
+  _hoursText: {fileID: 0}
+  _minutesText: {fileID: 0}
+--- !u!114 &7089176038457148327
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4954334239394201349}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2957248fb20310f4a9f2507cb5e3fa26, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _healthBarFillImage: {fileID: 0}
+  _healthBarTrailingFillImage: {fileID: 0}
+  _trailDelay: 0.4
