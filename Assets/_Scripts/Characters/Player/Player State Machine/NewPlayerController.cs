@@ -11,6 +11,10 @@ public class NewPlayerController : MonoBehaviour, IDamageble
     [HideInInspector] public Rigidbody2D PlayerRb { get; private set; }
 
     public ButtonBindingsSO Buttons;
+    public BoxCollider2D InteractableZone;
+    public CircleCollider2D AttackZone;
+    public List<Collider2D> AttackableObjectsAtZone;
+    public List<Collider2D> InteractableObjectsAtZone;
 
     #region Coinns values
 
@@ -272,6 +276,11 @@ public class NewPlayerController : MonoBehaviour, IDamageble
         {
             GlobalEventsManager.BroadcastActualGameState(GameStates.Restart);
         }
+
+        if (Input.GetKeyDown(Buttons.Interaction))
+        {
+            TryInteract();
+        }
     }
 
     private void FixedUpdate()
@@ -316,19 +325,15 @@ public class NewPlayerController : MonoBehaviour, IDamageble
         switch (estates)
         {
             case GameStates.Save:
-                SavePlayerData();
                 break;
 
             case GameStates.QuickSave:
-                SavePlayerData();
                 break;
 
             case GameStates.Restart:
-                LoadPlayerData();
                 break;
 
             case GameStates.Load:
-                LoadPlayerData();
                 break;
 
             case GameStates.Pause:
@@ -461,9 +466,51 @@ public class NewPlayerController : MonoBehaviour, IDamageble
     }
     #endregion
 
-    #region Combat Logic
+    #region Collider Zones & Things
+    private void TryInteract()
+    {
+        if(InteractableObjectsAtZone != null && InteractableObjectsAtZone.Count > 0)
+        {
+            foreach(var col in InteractableObjectsAtZone)
+            {
+                if(col.gameObject.TryGetComponent<InteractableObjects>(out InteractableObjects logic))
+                {
+                    logic.DoAction();
+                    break;
+                }
+            }
+        }
+    }
 
-    public void Attack()
+    public void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.IsTouching(AttackZone))
+        {
+            AttackableObjectsAtZone.Add(other);
+        }
+        else if (other.IsTouching(InteractableZone))
+        {
+            InteractableObjectsAtZone.Add(other);
+        }
+    }
+
+    public void OnTriggerExit2D(Collider2D other)
+    {
+        if (AttackableObjectsAtZone.Contains(other))
+        {
+            if (!other.IsTouching(AttackZone)) AttackableObjectsAtZone.Remove(other);
+        }
+
+        if (InteractableObjectsAtZone.Contains(other))
+        {
+            if (!other.IsTouching(InteractableZone)) InteractableObjectsAtZone.Remove(other);
+        }
+    }
+
+    #endregion
+
+    #region Combat Logic
+    public void Attack(float amount)
     {
 
     }
@@ -498,28 +545,6 @@ public class NewPlayerController : MonoBehaviour, IDamageble
 
         SkillAttackCooldown = false;
         GlobalEventsManager.SendPlayerSkillCooldownStatus(SkillAttackCooldown);
-    }
-    #endregion
-
-    #region Save, Load, Reset
-    private void SavePlayerData()
-    {
-        string folder = MSS.GetSavePath(GameManager.SaveFileName, GameManager.SaveFileFolder);
-
-        MSS.Save("playerPosition", transform.position, folder);
-        MSS.Save("playerGoldenCoins", GoldenCoins, folder);
-        MSS.Save("playerSilverCoins", SilverCoins, folder);
-        MSS.Save("playerRedCoins", RedCoins, folder);
-    }
-
-    private void LoadPlayerData()
-    {
-        string folder = MSS.GetSavePath(GameManager.SaveFileName, GameManager.SaveFileFolder);
-
-        transform.position = MSS.Load("playerPosition", Vector3.zero, folder);
-        MSS.LoadInto("playerGoldenCoins", ref GoldenCoins, folder);
-        MSS.LoadInto("playerSilverCoins", ref SilverCoins, folder);
-        MSS.LoadInto("playerRedCoins", ref RedCoins, folder);
     }
     #endregion
 

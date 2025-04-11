@@ -23,6 +23,7 @@ public class ButtonBindingsSO : ScriptableObject
     public KeyCode Inventory = KeyCode.I;
     public KeyCode Map = KeyCode.M;
     public KeyCode SkillsMenu = KeyCode.K;
+    public KeyCode Interaction = KeyCode.F;
 
     [Space]
     [Header("Saving")]

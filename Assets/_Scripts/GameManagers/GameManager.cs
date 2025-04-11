@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using static GlobalEventsManager;
+using MultiSaveSystem;
 
 public class GameManager : MonoBehaviour
 {
@@ -45,10 +46,11 @@ public class GameManager : MonoBehaviour
     public static LayerMask AllInGameLayers;
 
     //Saving data
-    public static string SaveFileName = null;
-    public static string SaveFileFolder = "SaveFiles";
-    public static string QuickSaveFolder = "QuickSaves";
-    public static int QuickSaveCounter = 0;
+    [Space]
+    [Header("Save things")]
+    public static string SaveFileName;
+    public static string SaveFolderName;
+    public static string SaveFilePath;
 
     private void Awake()
     {
@@ -64,11 +66,46 @@ public class GameManager : MonoBehaviour
         
 
         Player = FindAnyObjectByType<NewPlayerController>();
+        if (Player != null) Debug.Log("Player found");
+        
     }
 
     private void Update()
     {
+        if (Keyboard.current.leftBracketKey.wasPressedThisFrame)
+        {
+            SetPath("TestSaveFolder2", "SaveBro2");
+            SavePlayerDataAtPath();
+        }
 
+        if (Keyboard.current.rightBracketKey.wasPressedThisFrame)
+        {
+            SetPath("TestSaveFolder", "SaveBro1");
+            SavePlayerData();
+        }
+
+        if (Keyboard.current.numpad7Key.wasPressedThisFrame)
+        {
+            SetPath("TestSaveFolder2", "SaveBro2");
+            LoadPlayerData();
+        }
+
+        if (Keyboard.current.numpad9Key.wasPressedThisFrame)
+        {
+            SetPath("TestSaveFolder", "SaveBro1");
+            LoadPlayerData();
+        }
+
+        if (Keyboard.current.numpadMinusKey.wasPressedThisFrame)
+        {
+            MSSTest.SaveSession.SetActiveSlot(1);
+            TestSave(MSSTest.SaveSession.ActiveSavePath);
+        }
+        if (Keyboard.current.numpadPlusKey.wasPressedThisFrame)
+        {
+            MSSTest.SaveSession.SetActiveSlot(1);
+            TestSave(MSSTest.SaveSession.ActiveSavePath);
+        }
     }
 
     #region Static Getters
@@ -117,13 +154,8 @@ public class GameManager : MonoBehaviour
 
     #endregion
 
-    private static void PerformQuickSave()
+    public static void PerformQuickSave()
     {
-        if(QuickSaveCounter == 5) QuickSaveCounter = 0;
-        SaveFileName = $"QuickSave{QuickSaveCounter}";
-        SaveFileFolder = MultiSaveSystem.MSS.GetSavePath(SaveFileName, QuickSaveFolder);
-        QuickSaveCounter++;
-
         currentGameState = GameStates.QuickSave;
         BroadcastActualGameState(currentGameState);
 
@@ -131,18 +163,18 @@ public class GameManager : MonoBehaviour
         BroadcastActualGameState(currentGameState);
     }
 
-    private static void PerformSave(string saveFileName)
+    public static void PerformSave(string saveFileName)
     {
         currentGameState = GameStates.QuickSave;
-        SaveFileFolder = MultiSaveSystem.MSS.GetSavePath(saveFileName, SaveFileFolder);
         BroadcastActualGameState(currentGameState);
 
         currentGameState = GameStates.Play;
         BroadcastActualGameState(currentGameState);
     }
 
-    private static void PerformQuickLoad()
+    public static void PerformQuickLoad()
     {
+
         currentGameState = GameStates.Restart;
         BroadcastActualGameState(currentGameState);
 
@@ -153,13 +185,84 @@ public class GameManager : MonoBehaviour
     public static void PerformLoading()
     {
         currentGameState = GameStates.Load;
-        SaveFileName = $"QuickSave{QuickSaveCounter}";
-        SaveFileFolder = MultiSaveSystem.MSS.GetSavePath(SaveFileName, QuickSaveFolder);
         BroadcastActualGameState(currentGameState);
 
         currentGameState = GameStates.Play;
         BroadcastActualGameState(currentGameState);
     }
+
+    private static void SetupSaving()
+    {
+        //int quickSavesCount = MSS.GetAllSaveFiles(QuickSaveFolder)
+    }
+
+    #region Saving
+    public void TestSave(string path)
+    {
+        //Debug.Log($"\n================================\n" +
+        //    $"|GAME MANAGER - TestSave(string path)| \nSaving this data: \nPlayerPosition:{Player.transform.position} " +
+        //    $"\nPlayer Golden Coins: {Player.GoldenCoins} \nPlayer Silver Coins: {Player.SilverCoins} \nPlayer Red Coins: {Player.RedCoins}" +
+        //    $"\n================================\n");
+
+        MSSTest.Save("playerPosition", Player.transform.position, path);
+        MSSTest.Save("playerGoldenCoins", Player.GoldenCoins, path);
+        MSSTest.Save("playerSilverCoins", Player.SilverCoins, path);
+        MSSTest.Save("playerRedCoins", Player.RedCoins, path);
+    }
+
+    public void TestLoad(string path)
+    {
+        Player.gameObject.transform.position = MSSTest.Load("playerPosition", Vector3.zero, path);
+        Player.GoldenCoins = MSSTest.Load("playerGoldenCoins", 1, path);
+        Player.SilverCoins = MSSTest.Load("playerSilverCoins", 1, path);
+        Player.RedCoins = MSSTest.Load("playerRedCoins", 1, path);
+    }
+
+    public static void SavePlayerData()
+    {
+        //Debug.Log($"\n================================\n" +
+        //    $"|GAME MANAGER - SavePlayerData()| \nSaving this data: \nPlayerPosition:{Player.transform.position} " +
+        //    $"\nPlayer Golden Coins: {Player.GoldenCoins} \nPlayer Silver Coins: {Player.SilverCoins} \nPlayer Red Coins: {Player.RedCoins}" +
+        //    $"\n================================\n");
+
+        MSS.Save("playerPosition", Player.transform.position, SaveFolderName, SaveFileName);
+        MSS.Save("playerGoldenCoins", Player.GoldenCoins, SaveFolderName, SaveFileName);
+        MSS.Save("playerSilverCoins", Player.SilverCoins, SaveFolderName, SaveFileName);
+        MSS.Save("playerRedCoins", Player.RedCoins, SaveFolderName, SaveFileName);
+    }
+
+    public static void SavePlayerDataAtPath()
+    {
+        //Debug.Log($"\n================================\n" +
+        //    $"|GAME MANAGER - SavePlayerData()| \nSaving this data: \nPlayerPosition:{Player.transform.position} " +
+        //    $"\nPlayer Golden Coins: {Player.GoldenCoins} \nPlayer Silver Coins: {Player.SilverCoins} \nPlayer Red Coins: {Player.RedCoins}" +
+        //    $"\n================================\n");
+
+        MSSPath.Save("playerPosition", Player.transform.position, SaveFilePath);
+        MSSPath.Save("playerGoldenCoins", Player.GoldenCoins, SaveFilePath);
+        MSSPath.Save("playerSilverCoins", Player.SilverCoins, SaveFilePath);
+        MSSPath.Save("playerRedCoins", Player.RedCoins, SaveFilePath);
+    }
+
+    public static void LoadPlayerData()
+    {
+        Player.transform.position = MSS.Load("playerPosition", SaveFilePath, Vector3.zero);
+        Player.GoldenCoins = MSS.Load("playerGoldenCoins", SaveFilePath, 1);
+        Player.SilverCoins = MSS.Load("playerSilverCoins", SaveFilePath, 1);
+        Player.RedCoins = MSS.Load("playerRedCoins", SaveFilePath, 1);
+    }
+
+    public static void SetPath(string folderName, string fileName)
+    {
+        SaveFileName = fileName;
+        SaveFolderName = folderName;
+        SaveFilePath = MSSPath.CombinePersistent(SaveFolderName, SaveFileName);
+
+        //Debug.Log($"\n================================\n" +
+        //    $"|GAME MANAGER - SetPath()| \nSaveFile path was set at: {SaveFilePath}" +
+        //    $"\n================================\n");
+    }
+    #endregion
 }
 
 public enum GameStates

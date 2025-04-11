@@ -15,21 +15,17 @@ public class InteractableObjects : MonoBehaviour
 
     private NewPlayerController _playerRef;
 
-    private void OnTriggerEnter2D(Collider2D other)
+    public void ShowWorldSpaceUI()
     {
-        if (other.IsTouching(_interactiveZone))
-        {
-            if (other.TryGetComponent<NewPlayerController>(out NewPlayerController player)) _playerRef = player;
-            _interactiveCanvas.SetActive(true);
-        }
+        _interactiveCanvas.SetActive(true);
+    }
+    public void HideWorldSpaceUI()
+    {
+        _interactiveCanvas.SetActive(false);
     }
 
-    private void OnTriggerExit2D(Collider2D other)
+    public void DoAction()
     {
-        if (!other.IsTouching(_interactiveZone))
-        {
-            _playerRef = null;
-            _interactiveCanvas.SetActive(false);
-        }
+        if(eventToDo != null) eventToDo.Invoke();
     }
 }
