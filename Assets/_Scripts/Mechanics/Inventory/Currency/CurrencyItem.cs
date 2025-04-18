@@ -2,15 +2,19 @@ using UnityEngine;
 
 public class CurrencyItem : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
+    public ECollectable type;
+    public int Amount = 1;
 
-    // Update is called once per frame
-    void Update()
+    public void PickUp()
     {
-        
+        Destroy(gameObject);
     }
+}
+
+public enum ECollectable
+{
+    Golden,
+    Silver,
+    Red,
+    SkillPoint
 }

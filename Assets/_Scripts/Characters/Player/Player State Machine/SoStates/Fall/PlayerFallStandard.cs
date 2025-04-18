@@ -38,6 +38,7 @@ public class PlayerFallStandard : PlayerFallSOBase
 
         if (player.IsGrounded)
         {
+            player.soundManager.ForcePlayTrack("Land");
             player.StateMachine.ChangeState(Mathf.Abs(player.Movement) > 0 ? player.RunState : player.IdleState);
         }
     }

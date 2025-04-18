@@ -43,7 +43,7 @@ public class PlayerBlockStandard : PlayerBlockSOBase
             if (Input.GetKeyDown(KeyCode.Z))
                 player.StateMachine.ChangeState(player.AttackState);
 
-            if (Input.GetKeyDown(KeyCode.X) && !player.SkillAttackCooldown)
+            if (Input.GetKeyDown(KeyCode.X) && !player.IsHeavyAttackCooldown)
                 player.StateMachine.ChangeState(player.SkillAttackState);
 
             if (Input.GetKeyDown(KeyCode.W) && player.IsGrounded)

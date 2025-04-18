@@ -3,6 +3,12 @@ using UnityEngine;
 public class SkillEffectApplier : MonoBehaviour
 {
     public StatusEffectSO effectToApply;
+    public float lifeTime = 5f;
+
+    private void Update()
+    {
+        StartCoroutine(CoroutineUtils.WaitThenDo(lifeTime, () => Destroy(gameObject)));
+    }
 
     private void OnTriggerEnter2D(Collider2D other)
     {

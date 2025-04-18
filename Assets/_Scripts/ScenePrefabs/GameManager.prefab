@@ -26,7 +26,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7372219115755518935}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 67.85297, y: -1.2163965, z: 0.012787818}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -45,12 +45,90 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b1ba79f2df55abc419f0c508ad50ac88, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  currentGameState: 0
-  _player: {fileID: 0}
-  EnemyAtScene: []
-  SpawnPoints: []
-  LayerMasksToRemoveFromEnemy: []
-  LayerMasksToRemoveFromFriendly: []
+  GameStateDisplay: 0
+  AllEnemiesAtScene: []
+  AllFriendlyAtScene: []
+  AllPeacfullAtScene: []
+  AllSpawnPointsAtScene: []
+  EnemiesAtSector: []
+  FriendlyAtSector: []
+  PeacfullAtSector: []
+  SpawnPointsAtSector: []
+  LayersToRemoveFromNavigation:
+    serializedVersion: 2
+    m_Bits: 0
+  LayersToAddToNavigation:
+    serializedVersion: 2
+    m_Bits: 0
+  LayersToRemoveFromProps:
+    serializedVersion: 2
+    m_Bits: 0
+  LayersToAddToProps:
+    serializedVersion: 2
+    m_Bits: 0
+  LayersToRemoveFromItems:
+    serializedVersion: 2
+    m_Bits: 0
+  LayersToAddToItems:
+    serializedVersion: 2
+    m_Bits: 0
+  LayersToRemoveFromDestructable:
+    serializedVersion: 2
+    m_Bits: 0
+  LayersToAddToDestructable:
+    serializedVersion: 2
+    m_Bits: 0
+  LayersToRemoveFromInteractable:
+    serializedVersion: 2
+    m_Bits: 0
+  LayersToAddToInteractable:
+    serializedVersion: 2
+    m_Bits: 0
+  LayersToRemoveFromCombatEnemies:
+    serializedVersion: 2
+    m_Bits: 0
+  LayersToAddToCombatEnemies:
+    serializedVersion: 2
+    m_Bits: 0
+  LayersToRemoveFromCombatFriendlies:
+    serializedVersion: 2
+    m_Bits: 0
+  LayersToAddToCombatFriendlies:
+    serializedVersion: 2
+    m_Bits: 0
+  LayersToRemoveFromPeacfull:
+    serializedVersion: 2
+    m_Bits: 0
+  LayerToAddToPeacfull:
+    serializedVersion: 2
+    m_Bits: 0
+  LayersToRemoveFromPlayer:
+    serializedVersion: 2
+    m_Bits: 0
+  LayerToAddToPlayer:
+    serializedVersion: 2
+    m_Bits: 0
+  foldout1: 1
+  foldout2: 0
+  foldout3: 0
+  foldout4: 1
+  foldout5: 0
+  layerMsksFoldout1: 0
+  layerMsksFoldout2: 0
+  layerMsksFoldout3: 0
+  layerMsksFoldout4: 0
+  layerMsksFoldout5: 0
+  layerMsksFoldout6: 0
+  layerMsksFoldout7: 0
+  layerMsksFoldout8: 0
+  SaveFileNameDispaly: SaveFileName
+  SaveFolderDispaly: SaveFolderName
+  SaveFilePathDisplay: /path/to/saveFile.mss
+  SoundsList:
+  - Key: Save
+    Sound: {fileID: 8300000, guid: b83bf8726a7fac349a54389f0c57cda6, type: 3}
+  - Key: Load
+    Sound: {fileID: 8300000, guid: e58d8bd078f188a4ba314e933b98528b, type: 3}
 --- !u!114 &3208458342975966825
 MonoBehaviour:
   m_ObjectHideFlags: 0

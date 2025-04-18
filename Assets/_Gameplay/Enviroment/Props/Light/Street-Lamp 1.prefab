@@ -108,14 +108,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   objectLights:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  - {fileID: 8843280135639688334}
+  - {fileID: 6984356031490174433}
+  - {fileID: 3282370080012998085}
+  - {fileID: 4381104417828075496}
   relatedObjects:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  - {fileID: 8793259603154704067}
+  - {fileID: 2073130468397841869}
+  - {fileID: 3431079329918321352}
 --- !u!1 &2073130468397841869
 GameObject:
   m_ObjectHideFlags: 0
@@ -14958,7 +14958,7 @@ MonoBehaviour:
   m_ApplyToSortingLayers: 00000000f9f475a1
   m_LightCookieSprite: {fileID: 0}
   m_DeprecatedPointLightCookieSprite: {fileID: 0}
-  m_LightOrder: 7
+  m_LightOrder: 5
   m_AlphaBlendOnOverlap: 0
   m_OverlapOperation: 1
   m_NormalMapDistance: 3

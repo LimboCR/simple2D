@@ -2,30 +2,20 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
-public class InteractableObjects : MonoBehaviour
+public class InteractableObjects : MonoBehaviour, IInteractable
 {
-    [Header("Action to do on interaction")]
-    public UnityEvent eventToDo;
+    [field: SerializeField] public UnityEvent ActionToDo { get; set; }
+    [field: SerializeField] public bool Interactable { get; set; }
 
-    [SerializeField] private bool _useTriggerZone;
-    [SerializeField] private BoxCollider2D _triggerZone;
-
-    [SerializeField] private CircleCollider2D _interactiveZone;
     [SerializeField] private GameObject _interactiveCanvas;
-
-    private NewPlayerController _playerRef;
-
-    public void ShowWorldSpaceUI()
-    {
-        _interactiveCanvas.SetActive(true);
-    }
-    public void HideWorldSpaceUI()
-    {
-        _interactiveCanvas.SetActive(false);
-    }
 
     public void DoAction()
     {
-        if(eventToDo != null) eventToDo.Invoke();
+        if(ActionToDo != null && Interactable) ActionToDo.Invoke();
+    }
+
+    public void ShowActionIcon(bool show)
+    {
+        if(Interactable) _interactiveCanvas.SetActive(show);
     }
 }

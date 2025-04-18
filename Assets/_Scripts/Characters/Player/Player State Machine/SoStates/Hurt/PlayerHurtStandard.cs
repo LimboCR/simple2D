@@ -18,6 +18,8 @@ public class PlayerHurtStandard : PlayerHurtSOBase
         if (_hurtAnimationName != null)
             player.AnimationState.ChangeAnimationState(_hurtAnimationName);
         else Debug.LogWarning("Animation for PlayerHurtStandard wasn't set");
+
+        player.soundManager.ForcePlayTrack("Hurt");
     }
 
     public override void DoExitLogic()
@@ -42,7 +44,7 @@ public class PlayerHurtStandard : PlayerHurtSOBase
             if (Input.GetKeyDown(KeyCode.Z))
                 player.StateMachine.ChangeState(player.AttackState);
 
-            if (Input.GetKeyDown(KeyCode.X) && !player.SkillAttackCooldown)
+            if (Input.GetKeyDown(KeyCode.X) && !player.IsHeavyAttackCooldown)
                 player.StateMachine.ChangeState(player.SkillAttackState);
 
             if (Input.GetKeyDown(KeyCode.W) && player.IsGrounded)

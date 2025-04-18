@@ -53,7 +53,7 @@ public class ItemSlotStorage : MonoBehaviour
         ItemAmount = 0;
     }
 
-    public void ConsumeItem(GameObject player)
+    public void UseItem(GameObject player)
     {
         if(player.TryGetComponent<StatusEffectHandler>(out StatusEffectHandler effectsManager))
         {

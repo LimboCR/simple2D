@@ -11,7 +11,7 @@ public class PlayerHealth : Health
 
         currentHealth -= amount;
 
-        GlobalEventsManager.SendPlayerHealthChanged(currentHealth);
+        GlobalEventsManager.SendPlayerCurrentHealth(currentHealth);
 
         if (currentHealth <= 0)
         {

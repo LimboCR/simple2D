@@ -5,8 +5,6 @@ public class TimeManager : MonoBehaviour
 {
     public static TimeManager Instance;
 
-    public Light2D globalLight;
-
     public int hours = CurrentHours;
     public int minutes = CurrentMinutes;
     public float timeScale = 96f; // 24 hours × 60 minutes / 15 minutes real-time
@@ -17,6 +15,17 @@ public class TimeManager : MonoBehaviour
     public static int CurrentHours;
     public static int CurrentMinutes;
 
+    [Space]
+    [Header("Testing time change")]
+    [Space]
+    [Header("Set initial game time")]
+    public bool SetInitialTime;
+    public int SetIHours, SetIMinutes;
+    [Space, Header("Change time in game")]
+    public bool ChangeTime;
+    public int SetHours, SetMinutes;
+
+
     void Awake()
     {
         if(Instance != null && Instance != this)
@@ -25,11 +34,19 @@ public class TimeManager : MonoBehaviour
             return;
         }
         Instance = this;
+
+        if(SetInitialTime)
+            SetTime(SetIHours > 0 ? SetIHours : 0, SetIMinutes > 0 ? SetIMinutes : 0);
     }
 
     void Update()
     {
-        
+        if (ChangeTime)
+        {
+            ChangeTime = false;
+            SetTime(SetHours > 0 ? SetHours : 0, SetMinutes > 0 ? SetMinutes : 0);
+            SetHours = 0; SetMinutes = 0;
+        }
     }
 
     void FixedUpdate()

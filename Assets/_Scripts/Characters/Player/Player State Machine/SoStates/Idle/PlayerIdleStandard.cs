@@ -36,7 +36,7 @@ public class PlayerIdleStandard : PlayerIdleSOBase
         if (Input.GetKeyDown(KeyCode.Z))
             player.StateMachine.ChangeState(player.AttackState);
 
-        if (Input.GetKeyDown(KeyCode.X) && !player.SkillAttackCooldown)
+        if (Input.GetKeyDown(KeyCode.X) && !player.IsHeavyAttackCooldown)
             player.StateMachine.ChangeState(player.SkillAttackState);
 
         if (player.PlayerRb.linearVelocity.y < -1.5f)

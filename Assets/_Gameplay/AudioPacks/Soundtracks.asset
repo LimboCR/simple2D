@@ -1,0 +1,67 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fedf8d984051e034f9c9baee49b627d8, type: 3}
+  m_Name: Soundtracks
+  m_EditorClassIdentifier: 
+  PackType: 0
+  Tracks:
+  - Key: Action1
+    Sound: {fileID: 8300000, guid: 7a623e7f8f4bed04381696332c76d035, type: 3}
+  - Key: Action2
+    Sound: {fileID: 8300000, guid: 9e1e5582c73921241a3efc072e6f5eac, type: 3}
+  - Key: Action3
+    Sound: {fileID: 8300000, guid: c98f11e8a7f84ec4596af43ab5d14309, type: 3}
+  - Key: Action4
+    Sound: {fileID: 8300000, guid: 582a73d54f2dba64590e4ce3711b4289, type: 3}
+  - Key: Action5
+    Sound: {fileID: 8300000, guid: 8beeda3d00c308346b39a1ced72c48e5, type: 3}
+  - Key: Ambient1
+    Sound: {fileID: 8300000, guid: 20a2d5002e84fc34ea85ca048a7c5a80, type: 3}
+  - Key: Ambient2
+    Sound: {fileID: 8300000, guid: 71510083ca7a71540ae269e4b8522685, type: 3}
+  - Key: Ambient3
+    Sound: {fileID: 8300000, guid: 06fd6be9034845546bc1b5e184d097c2, type: 3}
+  - Key: Ambient4
+    Sound: {fileID: 8300000, guid: fc5ff7d838e836f4f8d52b67b1b2a304, type: 3}
+  - Key: Ambient5
+    Sound: {fileID: 8300000, guid: ab41497061138b049b0e4eeacb6af021, type: 3}
+  - Key: Ambient6
+    Sound: {fileID: 8300000, guid: 2cea2a35c0cde314e91a2c0786632ddb, type: 3}
+  - Key: Ambient7
+    Sound: {fileID: 8300000, guid: 7af915ab14c3ab143bbd8225d3b51168, type: 3}
+  - Key: Ambient8
+    Sound: {fileID: 8300000, guid: 9e1502f32b4736a4cb9828a0d6c662b2, type: 3}
+  - Key: Ambient9
+    Sound: {fileID: 8300000, guid: 92967c1e11f6b1745b78448e1142d3ac, type: 3}
+  - Key: Ambient10
+    Sound: {fileID: 8300000, guid: eedec8dc6fa766d42ab4d00800443d2e, type: 3}
+  - Key: DarkAmbient1
+    Sound: {fileID: 8300000, guid: 8d004795910232c4ba89957a0281a33b, type: 3}
+  - Key: DarkAmbient2
+    Sound: {fileID: 8300000, guid: 15283b368d65602479c4b751318b52e4, type: 3}
+  - Key: DarkAmbient3
+    Sound: {fileID: 8300000, guid: 4c76c09a8aee6134c94ca144123bbbed, type: 3}
+  - Key: DarkAmbient4
+    Sound: {fileID: 8300000, guid: 06c3268d8e96c2d4681113ab3157dfc6, type: 3}
+  - Key: DarkAmbient5
+    Sound: {fileID: 8300000, guid: 3a096e1e1dde5854dbd4e19a11df36a5, type: 3}
+  - Key: LightAmbience1
+    Sound: {fileID: 8300000, guid: bf35421f59481d64ea15e2571da3e888, type: 3}
+  - Key: LightAmbience2
+    Sound: {fileID: 8300000, guid: 1dba2a09141b719408ed71339a4a541e, type: 3}
+  - Key: LightAmbience3
+    Sound: {fileID: 8300000, guid: 7502c5969ac699645b6d0b4fa97c7afd, type: 3}
+  - Key: LightAmbience4
+    Sound: {fileID: 8300000, guid: 517c1fe41162c7a43ab5d2db3856f002, type: 3}
+  - Key: LightAmbience5
+    Sound: {fileID: 8300000, guid: 86ae02d825956f0468f72915641fa95e, type: 3}
+  IsInitialized: 0

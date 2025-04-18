@@ -139,7 +139,7 @@ BoxCollider2D:
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 896
+    m_Bits: 66432
   m_LayerOverridePriority: 0
   m_ForceSendLayers:
     serializedVersion: 2
@@ -253,7 +253,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   <CharacterName>k__BackingField: LightBandit
-  <NPCType>k__BackingField: 0
+  <TypeOfNPC>k__BackingField: 0
   <CharacterTeam>k__BackingField: 0
   combatNav: {fileID: 0}
   AnimationState: {fileID: 0}
@@ -262,9 +262,11 @@ MonoBehaviour:
   <RegenDelay>k__BackingField: 3
   <RegenRate>k__BackingField: 1
   _droppableLoot:
+  - {fileID: 8325350448387753671, guid: db80b04ee8232c047959268088a3172b, type: 3}
+  - {fileID: 8325350448387753671, guid: db80b04ee8232c047959268088a3172b, type: 3}
   - {fileID: 5494316111969297195, guid: 544ac10295e8bed478fdbd522dc469eb, type: 3}
-  - {fileID: 5494316111969297195, guid: 544ac10295e8bed478fdbd522dc469eb, type: 3}
-  - {fileID: 5494316111969297195, guid: 544ac10295e8bed478fdbd522dc469eb, type: 3}
+  - {fileID: 6949673639617353901, guid: 911ebfaf92dbcc84887b20e5f687e5c5, type: 3}
+  - {fileID: 6949673639617353901, guid: 911ebfaf92dbcc84887b20e5f687e5c5, type: 3}
   _dropForce: 2
   _isLootDropped: 0
   <WalkSpeed>k__BackingField: 2

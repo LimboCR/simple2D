@@ -11,6 +11,9 @@ TagManager:
   - Coin
   - ItemSlotImage
   - SavePoint
+  - GlobalLight
+  - Destructable
+  - Portal
   layers:
   - Default
   - TransparentFX
@@ -28,7 +31,7 @@ TagManager:
   - Platform
   - WaypointsAndNav
   - Interactable
-  - 
+  - Peacfull
   - 
   - 
   - 
@@ -50,6 +53,9 @@ TagManager:
     locked: 0
   - name: Ground
     uniqueID: 2708862201
+    locked: 0
+  - name: CutSceneCharacters
+    uniqueID: 191795231
     locked: 0
   m_RenderingLayers:
   - Default

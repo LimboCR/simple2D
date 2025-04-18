@@ -23,10 +23,10 @@ public class SpawnPointInspector : Editor
         DrawDefaultInspector();
 
         SpawnPointHandler spawnPoint = (SpawnPointHandler)target;
-        if (GUILayout.Button("Open Spawn Settings"))
-        {
-            SpawnSettingsWindow.OpenWindow(spawnPoint);
-        }
+        //if (GUILayout.Button("Open Spawn Settings"))
+        //{
+        //    SpawnSettingsWindow.OpenWindow(spawnPoint);
+        //}
 
         if (spawnPoint.HealthScriptOverride)
         {

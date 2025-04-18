@@ -56,6 +56,7 @@ public class NPCCombatNav : MonoBehaviour
     private void Update()
     {
         RemoveInvalidTargets();
+        RemoveInvalidPotentialTargets();
         if (_currentTarget == null) _currentTarget = ChooseClosestTarget();
 
         if (_hitTargets.Count > 0) _charInAttackRange = true;
@@ -75,38 +76,57 @@ public class NPCCombatNav : MonoBehaviour
 
         if(_hitTargets.Count > 0)
         {
-            foreach (Collider2D target in _hitTargets)
-            {
-                if (target.CompareTag("Dead"))
-                {
-                    _hitTargets.Remove(target);
-                    break;
-                }
-                    
-            }
+            _hitTargets.RemoveAll(item => item == null);
+            _hitTargets.RemoveAll(item => item.CompareTag("Dead"));
+
+            //foreach (Collider2D target in _hitTargets)
+            //{
+            //    if (target.CompareTag("Dead"))
+            //    {
+            //        _hitTargets.Remove(target);
+            //        break;
+            //    }
+            //}
         }
 
-        if(_potentialTargets.Count > 0)
+        //if(_potentialTargets.Count > 0)
+        //{
+        //    _potentialTargets.RemoveAll(item => item == null);
+        //    _potentialTargets.RemoveAll(item => item.CompareTag("Dead"));
+
+        //    //foreach (Collider2D target in _potentialTargets)
+        //    //{
+        //    //    if (target.CompareTag("Dead"))
+        //    //    {
+        //    //        _potentialTargets.Remove(target);
+        //    //        break;
+        //    //    }
+        //    //}
+        //}
+    }
+
+    private void RemoveInvalidPotentialTargets()
+    {
+        if (_potentialTargets.Count > 0)
         {
-            foreach (Collider2D target in _potentialTargets)
-            {
-                if (target.CompareTag("Dead"))
-                {
-                    _potentialTargets.Remove(target);
-                    break;
-                }
-                    
-            }
+            _potentialTargets.RemoveAll(item => item == null);
+            _potentialTargets.RemoveAll(item => item.CompareTag("Dead"));
         }
     }
 
     private GameObject ChooseClosestTarget()
     {
         if(_hitTargets.Count > 0)
+        {
+            RemoveInvalidTargets();
             return _hitTargets.First().gameObject;
+        }
+            
 
         else if (_potentialTargets.Count > 0)
         {
+            RemoveInvalidPotentialTargets();
+
             _newTarget = null;
             float closestDistance = 100f;
 
@@ -126,7 +146,7 @@ public class NPCCombatNav : MonoBehaviour
 
     private IEnumerator KeepTargetValid()
     {
-        float validationTime = UnityEngine.Random.Range(_targetValidationMinTime, _targetValidationMaxTime);
+        float validationTime = Random.Range(_targetValidationMinTime, _targetValidationMaxTime);
         float elapsedTime = 0f;
         Collider2D check = _currentTarget.GetComponent<Collider2D>();
 

@@ -10,21 +10,20 @@ public class InGameUIManager : MonoBehaviour
 {
     public static InGameUIManager Instance;
 
-    [Header("UI TextMeshPro References \n--(currently manual)--")]
-    [SerializeField] private TMP_Text _healthText;
-    [SerializeField] private TMP_Text _coinsText;
-
     [Space]
-    [Header("Stats variables")]
-    [SerializeField] private float _health = 0;
-    [SerializeField] private int _coinsAmount = 0;
+    [Header("Coins")]
+    private int _goldenC, _silverC, _redC;
+    [SerializeField] private TMP_Text _goldenCoins;
+    [SerializeField] private TMP_Text _silverCoins;
+    [SerializeField] private TMP_Text _redCoins;
 
     [Space]
     [Header("Skill Attack")]
-    [SerializeField] private Image _skillAttackCooldown;
-    [SerializeField] private Image _skillIcon;
-    bool IsSkillAtCooldown = false;
-    bool resetSkillCooldown = false;
+    [SerializeField] private Image _heavyAttackCooldown;
+    [SerializeField] private Image _heavyAttackIcon;
+    bool IsHeavyAttackAtCooldown = false;
+    bool ResetHeavyAttackCooldown = false;
+    float HeavyAttackCooldownTimer = 0f;
 
     [SerializeField] private Color _skillAtCooldownColor;
     private Color _initialSkillRefColor;
@@ -36,7 +35,9 @@ public class InGameUIManager : MonoBehaviour
     public GameObject InventoryPanel;
     public List<GameObject> InventorySlotImages;
     List<GameObject> inventorySlots;
-
+    
+    [Space]
+    [Header("Dev Tools")]
     public TMP_InputField CommandLine;
 
     [Header("StatusEffect Display")]
@@ -44,10 +45,13 @@ public class InGameUIManager : MonoBehaviour
     [SerializeField] private List<GameObject> _statusEffectsImages;
     [SerializeField] private GameObject _statusEffectImagePrefab;
 
-    private GameManager _gameManager;
-
     //Clock staff
     [SerializeField] private TMP_Text _hoursText, _minutesText;
+
+    [Space]
+    [Header("Notification prefab")]
+    public GameObject NotificationPrefab;
+    public GameObject NotificationsPanel;
 
     private void Awake()
     {
@@ -62,26 +66,26 @@ public class InGameUIManager : MonoBehaviour
         EventSubscriber();
         FetchQuickItemsSlots();
 
-        _initialSkillRefColor = _skillIcon.color;
+        _initialSkillRefColor = _heavyAttackIcon.color;
     }
     
     void Update()
     {
-        if (IsSkillAtCooldown == true)
+        if (IsHeavyAttackAtCooldown == true)
         {
-            if (resetSkillCooldown == false)
+            if (ResetHeavyAttackCooldown == false)
             {
-                resetSkillCooldown = true;
-                _skillAttackCooldown.fillAmount = 0;
-                _skillIcon.color = _skillAtCooldownColor;
+                ResetHeavyAttackCooldown = true;
+                _heavyAttackCooldown.fillAmount = 0;
+                _heavyAttackIcon.color = _skillAtCooldownColor;
             }
             ShowSkillCooldown();
         }
-        else if (IsSkillAtCooldown == false)
+        else if (IsHeavyAttackAtCooldown == false)
         {
-            _skillAttackCooldown.fillAmount = 0;
-            _skillIcon.color = _initialSkillRefColor;
-            resetSkillCooldown = false;
+            _heavyAttackCooldown.fillAmount = 0;
+            _heavyAttackIcon.color = _initialSkillRefColor;
+            ResetHeavyAttackCooldown = false;
         }
 
         if (Player != null)
@@ -91,7 +95,7 @@ public class InGameUIManager : MonoBehaviour
                 if (inventorySlots[0].TryGetComponent<ItemSlotStorage>(out ItemSlotStorage slotStorage))
                 {
                     if (slotStorage.ItemInstance != null)
-                        slotStorage.ConsumeItem(Player.gameObject);
+                        slotStorage.UseItem(Player.gameObject);
                 }
             }
 
@@ -100,7 +104,7 @@ public class InGameUIManager : MonoBehaviour
                 if (inventorySlots[1].TryGetComponent<ItemSlotStorage>(out ItemSlotStorage slotStorage))
                 {
                     if (slotStorage.ItemInstance != null)
-                        slotStorage.ConsumeItem(Player.gameObject);
+                        slotStorage.UseItem(Player.gameObject);
                 }
             }
 
@@ -109,7 +113,7 @@ public class InGameUIManager : MonoBehaviour
                 if (inventorySlots[2].TryGetComponent<ItemSlotStorage>(out ItemSlotStorage slotStorage))
                 {
                     if (slotStorage.ItemInstance != null)
-                        slotStorage.ConsumeItem(Player.gameObject);
+                        slotStorage.UseItem(Player.gameObject);
                 }
             }
 
@@ -118,7 +122,7 @@ public class InGameUIManager : MonoBehaviour
                 if (inventorySlots[3].TryGetComponent<ItemSlotStorage>(out ItemSlotStorage slotStorage))
                 {
                     if (slotStorage.ItemInstance != null)
-                        slotStorage.ConsumeItem(Player.gameObject);
+                        slotStorage.UseItem(Player.gameObject);
                 }
             }
 
@@ -127,7 +131,7 @@ public class InGameUIManager : MonoBehaviour
                 if (inventorySlots[4].TryGetComponent<ItemSlotStorage>(out ItemSlotStorage slotStorage))
                 {
                     if (slotStorage.ItemInstance != null)
-                        slotStorage.ConsumeItem(Player.gameObject);
+                        slotStorage.UseItem(Player.gameObject);
                 }
             }
 
@@ -136,7 +140,7 @@ public class InGameUIManager : MonoBehaviour
                 if (inventorySlots[5].TryGetComponent<ItemSlotStorage>(out ItemSlotStorage slotStorage))
                 {
                     if (slotStorage.ItemInstance != null)
-                        slotStorage.ConsumeItem(Player.gameObject);
+                        slotStorage.UseItem(Player.gameObject);
                 }
             }
         }
@@ -157,22 +161,30 @@ public class InGameUIManager : MonoBehaviour
 
     private void EventSubscriber()
     {
-        OnPlayerHealthChanged.AddListener(HelthStatsDisplay);
         OnPlayerCoinsChanged.AddListener(CoinsStatsDisplay);
-        OnPlayerSkillAttackCooldown.AddListener(IsPlayerSkillCooldown);
+        OnPlayerHeavyAttackCooldown.AddListener(IsPlayerHeavyAttackAtCooldown);
+        OnMessageSent.AddListener(ShowNotification);
     }
 
-    private void HelthStatsDisplay(float currentHealth)
+    private void CoinsStatsDisplay(ECollectable type, int amount)
     {
-        _health = currentHealth;
-        if (_healthText) _healthText.text = _health.ToString();
+        switch (type)
+        {
+            case ECollectable.Golden:
+                _goldenC = amount;
+                if(_goldenCoins) _goldenCoins.text = _goldenC.ToString();
+                break;
+            case ECollectable.Silver:
+                _silverC = amount;
+                if (_silverCoins) _silverCoins.text = _silverC.ToString();
+                break;
+            case ECollectable.Red:
+                _redC = amount;
+                if (_redCoins) _redCoins.text = _redC.ToString();
+                break;
 
-    }
-
-    private void CoinsStatsDisplay(int currentCoins)
-    {
-        _coinsAmount = currentCoins;
-        if (_coinsText) _coinsText.text = _coinsAmount.ToString();
+            default: break;
+        }
     }
 
     #endregion
@@ -199,16 +211,18 @@ public class InGameUIManager : MonoBehaviour
     #region PlayerHUD Logic
     private void ShowSkillCooldown()
     {
-        float ratio = Player.SkillCooldownElapsedTime / Player.SkillCooldownTimer;
+        float ratio = Player.SkillCooldownElapsedTime / HeavyAttackCooldownTimer;
 
         Sequence sequence = DOTween.Sequence();
-        sequence.Append(_skillAttackCooldown.DOFillAmount(ratio, 0.01f)).SetEase(Ease.InOutSine);
+        sequence.Append(_heavyAttackCooldown.DOFillAmount(ratio, 0.01f)).SetEase(Ease.InOutSine);
         sequence.Play();
     }
 
-    private void IsPlayerSkillCooldown(bool info)
+    private void IsPlayerHeavyAttackAtCooldown(bool info, float timer)
     {
-        IsSkillAtCooldown = info;
+        HeavyAttackCooldownTimer = 0f;
+        HeavyAttackCooldownTimer = timer;
+        IsHeavyAttackAtCooldown = info;
     }
 
     public GameObject DisplayStatusEffect(StatusEffectDescription effectDescription)
@@ -231,6 +245,14 @@ public class InGameUIManager : MonoBehaviour
         }
     }
 
+    #endregion
+
+    #region Notifications
+    private void ShowNotification(string messageText)
+    {
+        var msgRef = Instantiate(NotificationPrefab, NotificationsPanel.transform);
+        if(msgRef.TryGetComponent<Notification>(out Notification script)) script.SetText(messageText);
+    }
     #endregion
 
     #region Command Line Logic

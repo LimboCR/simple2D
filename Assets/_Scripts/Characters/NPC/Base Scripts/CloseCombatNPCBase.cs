@@ -163,18 +163,16 @@ public abstract class CloseCombatNPCBase : NPCBase, IDamageble, INPCMovable
     #endregion
 
     #region Awake, Start, Update, FixedUpdate and Required Functions
-    private void Awake()
-    {
-        SendEnemySpawn(gameObject);
-    }
 
-    private void OnDestroy()
-    {
-        SendEnemyRemove(gameObject);
-    }
+    //private void OnDestroy()
+    //{
+    //    SendEnemyRemove(gameObject, TypeOfNPC);
+    //}
 
     protected virtual void Start()
     {
+        SendEnemySpawn(gameObject, TypeOfNPC);
+
         AnimationState = GetComponent<AnimationStateHandler>();
         _npcRB = GetComponent<Rigidbody2D>();
         combatNav = GetComponent<NPCCombatNav>();
@@ -195,13 +193,13 @@ public abstract class CloseCombatNPCBase : NPCBase, IDamageble, INPCMovable
         {
             this.gameObject.tag = "Friendly";
             this.gameObject.layer = LayerMask.NameToLayer("Friendly");
-            combatNav.ModifyCombatLayers(LayerMask.GetMask("Friendly", "Player", "Ground", "WaypointsAndNav", "Default", "Platform", "Items", "Destructable"), LayerMask.NameToLayer("Enemy"));
+            combatNav.ModifyCombatLayers(LayerMask.GetMask("Friendly", "Player", "Peacfull", "Ground", "WaypointsAndNav", "Default", "Platform", "Items", "Destructable", "Props", "Interactable"), LayerMask.NameToLayer("Enemy"));
         }
         else if (CharacterTeam == 1)
         {
             this.gameObject.tag = "Enemy";
             this.gameObject.layer = LayerMask.NameToLayer("Enemy");
-            combatNav.ModifyCombatLayers(LayerMask.GetMask("Enemy", "Ground", "WaypointsAndNav", "Default", "Platform", "Items", "Destructable"), LayerMask.GetMask("Friendly", "Player"));
+            combatNav.ModifyCombatLayers(LayerMask.GetMask("Enemy", "Ground", "Peacfull", "WaypointsAndNav", "Default", "Platform", "Items", "Destructable", "Props", "Interactable"), LayerMask.GetMask("Friendly", "Player"));
         }
     }
 
@@ -307,7 +305,7 @@ public abstract class CloseCombatNPCBase : NPCBase, IDamageble, INPCMovable
         gameObject.tag = "Dead";
 
         if(_isLootDropped == false) DropLootOnDeath();
-
+        SendEnemyRemove(gameObject, TypeOfNPC);
         Destroy(gameObject, 15f); // Cleanup
     }
 

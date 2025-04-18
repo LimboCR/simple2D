@@ -37,9 +37,9 @@ namespace MultiSaveSystem
         /// <param name="fileName">Name of the file</param>
         /// <param name="isMSSFormat"></param>
         /// <returns>Path to the file inside folder</returns>
-        public static string CombinePersistent(string directoryName, string fileName, bool? isMSSFormat = null)
+        public static string CombinePersistent(string directoryName, string fileName, bool isMSSFormat = true)
         {
-            if((bool)isMSSFormat) return Path.Combine(Application.persistentDataPath, directoryName, fileName+".mss");
+            if(isMSSFormat) return Path.Combine(Application.persistentDataPath, directoryName, MSS.AutoFormat(fileName));
             return Path.Combine(Application.persistentDataPath, directoryName, fileName);
         }
 
@@ -69,7 +69,7 @@ namespace MultiSaveSystem
         /// <param name="path">Path to save in</param>
         public static void Save<T>(string key, T value, string path)
         {
-            if (!path.EndsWith(".mss")) path += ".mss";
+            path = FormatPath(path);
             _data[key] = value;
 
             string json = JsonUtility.ToJson(new MSS.Wrapper(_data), true);
@@ -85,8 +85,9 @@ namespace MultiSaveSystem
         /// <param name="defaultValue">Safety value in case of null</param>
         /// <param name="path">Path to save file</param>
         /// <returns>Value that was requested by key. If null - defaultValue</returns>
-        public static T Load<T>(string key, T defaultValue = default, string path = null)
+        public static T Load<T>(string key, string path, T defaultValue = default)
         {
+            path = FormatPath(path);
             if (!File.Exists(path)) return defaultValue;
 
             string json = File.ReadAllText(path);
@@ -100,18 +101,64 @@ namespace MultiSaveSystem
 
         #endregion
 
-        #region Path formats
         /// <summary>
-        /// Ensures the path exsist. If not - creates it.
+        /// Automatically formats the path to save file applying necessary format (<u><i>by default applies ".mss"</i></u>) if it's not formated in requested matter yet.
         /// </summary>
-        /// <param name="path">Path to check</param>
-        public static void EnsurePathExists(string path)
+        /// <param name="path">Path to format</param>
+        /// <param name="format">Format to apply (optional, default ".mss")</param>
+        /// <returns></returns>
+        public static string FormatPath(string path, string format = ".mss")
         {
-            if (!Directory.Exists(path))
-                Directory.CreateDirectory(path);
+            if (!path.EndsWith(format)) path += format;
+            return path; ;
         }
 
-        #endregion
+        /// <summary>
+        /// Builder class that helps create path and ensures it exists. Usefull for working with path-based saving and loading.
+        /// </summary>
+        public static class Builder
+        {
+            /// <summary>
+            /// Name for the save folder to construct
+            /// </summary>
+            public static string SaveFolderName;
+            /// <summary>
+            /// Unsafe. Use only if <i><b>MSSPath.Builder.SaveFolderName (string)</b></i> is set.
+            /// </summary>
+            public static string SaveFolderPath => CombinePersistent(SaveFolderName);
+
+            /// <summary>
+            /// Ensures directory exists
+            /// </summary>
+            private static void EnsureDirectoryExists()
+            {
+                if (!Directory.Exists(SaveFolderPath))
+                    Directory.CreateDirectory(SaveFolderPath);
+            }
+
+            /// <summary>
+            /// Creates the required dirictory as part of path builder to ensure it exists
+            /// </summary>
+            /// <param name="folderName">Name of the directory</param>
+            public static void CreatePath(string folderName)
+            {
+                SaveFolderName = folderName;
+                EnsureDirectoryExists();
+            }
+
+            /// <summary>
+            /// <b><u>|Safe|</u></b> Creates the directory if it does not exist and provides path to file inside it.
+            /// </summary>
+            /// <param name="fileName">File name</param>
+            /// <param name="folderName">Directory name</param>
+            /// <returns>Path to file inside the directory</returns>
+            public static string GetSavePath(string fileName, string folderName)
+            {
+                SaveFolderName = folderName;
+                EnsureDirectoryExists();
+                return Path.Combine(SaveFolderPath, MSS.AutoFormat(fileName));
+            }
+        }
     }
 
 }

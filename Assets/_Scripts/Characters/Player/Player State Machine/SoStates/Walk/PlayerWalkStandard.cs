@@ -23,13 +23,15 @@ public class PlayerWalkStandard : PlayerWalkSOBase
     public override void DoFrameUpdateLogic()
     {
         base.DoFrameUpdateLogic();
+        player.soundManager.PlayRandomTrack("Run1", "Run2", "Run3", "Run4", "Run5", "Run6", "Run7", "Run8", "Run9", "Run10");
+
         if (Mathf.Abs(player.Movement) == 0f)
             player.StateMachine.ChangeState(player.IdleState);
 
         if (Input.GetKeyDown(KeyCode.Z))
             player.StateMachine.ChangeState(player.AttackState);
 
-        if (Input.GetKeyDown(KeyCode.X) && !player.SkillAttackCooldown)
+        if (Input.GetKeyDown(KeyCode.X) && !player.IsHeavyAttackCooldown)
             player.StateMachine.ChangeState(player.SkillAttackState);
 
         if (Input.GetKeyDown(KeyCode.W) && player.IsGrounded)

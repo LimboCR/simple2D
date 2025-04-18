@@ -6,10 +6,13 @@ public class PlayerSkillAttackStandard : PlayerSkillAttackSOBase
     [SerializeField] private string _skillAttackAnimationName;
     [SerializeField] private SkillBase _skillAction;
     private SkillBase _skillInstance;
+    [SerializeField] private float _heavyAttackDamage = 15f;
     public override void DoAnimationTriggerEventLogic(NewPlayerController.PlayerAnimationTriggerType triggerType)
     {
         base.DoAnimationTriggerEventLogic(triggerType);
+        if (triggerType == NewPlayerController.PlayerAnimationTriggerType.HeavyAttack) player.Attack(_heavyAttackDamage);
         if (triggerType == NewPlayerController.PlayerAnimationTriggerType.SkillAction1) ActivateSkill();
+        
     }
 
     public override void DoEnterLogic()
@@ -17,7 +20,11 @@ public class PlayerSkillAttackStandard : PlayerSkillAttackSOBase
         base.DoEnterLogic();
 
         if (_skillAttackAnimationName != null)
+        {
             player.AnimationState.ChangeAnimationState(_skillAttackAnimationName);
+            player.soundManager.ForcePlayTrack("AttackHeavy");
+        }
+            
         else Debug.LogWarning($"Animation for PlayerSkillAttackStandard.so wasn't set.");
 
         player.StartCoroutine(player.SkillAttackCooldownTimer());

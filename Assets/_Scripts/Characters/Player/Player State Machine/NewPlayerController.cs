@@ -4,28 +4,44 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using MultiSaveSystem;
 
+[RequireComponent(typeof(AnimationStateHandler), typeof(StatusEffectHandler), typeof(Rigidbody2D))]
+[RequireComponent (typeof(PlayerZones), typeof(AudioSource), typeof(CharacterSoundsManager))]
 public class NewPlayerController : MonoBehaviour, IDamageble
 {
+    [HideInInspector] public CharacterSoundsManager soundManager;
+
     [HideInInspector] public AnimationStateHandler AnimationState;
     [HideInInspector] public StatusEffectHandler StatusEffectManager;
     [HideInInspector] public Rigidbody2D PlayerRb { get; private set; }
+    [HideInInspector] public PlayerZones Zones { get; private set;}
 
     public ButtonBindingsSO Buttons;
-    public BoxCollider2D InteractableZone;
-    public CircleCollider2D AttackZone;
-    public List<Collider2D> AttackableObjectsAtZone;
-    public List<Collider2D> InteractableObjectsAtZone;
+
+    #region SFX
+    [Header("Audio Staff")]
+    public List<SoundContainer> sounds = new();
+    #endregion
+
+    #region Skills
+    [Space, Header("Skills")]
+    public SkillBase ActiveSkill1;
+    public SkillBase ActiveSkill2;
+    public SkillBase PassiveSkill1;
+    public SkillBase PassiveSkill2;
+    #endregion
 
     #region Coinns values
-
+    [Space, Header("Coins and Levels")]
     public int GoldenCoins;
     public int SilverCoins;
     public int RedCoins;
+    public int SkillPoints;
+    public int PlayerLevel;
 
     #endregion
 
     #region Movement Stats
-    [Header("Movement Settings")]
+    [Space, Header("Movement Settings")]
     [HideInInspector] public float Movement;
     [SerializeField] private float _moveSpeed;
     [SerializeField] private float _jumpHeight;
@@ -67,32 +83,32 @@ public class NewPlayerController : MonoBehaviour, IDamageble
     #endregion
 
     #region WallSlide Vars
-    [Space]
-    [Header("===Wall Slide===")]
+    //[Space]
+    //[Header("===Wall Slide===")]
     [Header("Layer Mask")]
-    public LayerMask SlidableLayers;
-    [Header("Left Side Checkpoints")]
-    public Transform wallCheckLU;
-    public Transform wallCheckLM;
-    public Transform wallCheckLD;
-    RaycastHit2D wallRayLU, wallRayLM, wallRayLD;
-    [Header("Right Side Checkpoints")]
-    public Transform wallCheckRU;
-    public Transform wallCheckRM;
-    public Transform wallCheckRD;
-    RaycastHit2D wallRayRU, wallRayRM, wallRayRD;
-    bool wallCheckpointsAssigned;
-    Vector2 sideForLeft = Vector2.left, sideForRight = Vector2.right;
+    [HideInInspector] public LayerMask SlidableLayers;
+    //[Header("Left Side Checkpoints")]
+    [HideInInspector] public Transform wallCheckLU;
+    [HideInInspector] public Transform wallCheckLM;
+    [HideInInspector] public Transform wallCheckLD;
+    [HideInInspector] RaycastHit2D wallRayLU, wallRayLM, wallRayLD;
+    //[Header("Right Side Checkpoints")]
+    [HideInInspector] public Transform wallCheckRU;
+    [HideInInspector] public Transform wallCheckRM;
+    [HideInInspector] public Transform wallCheckRD;
+    [HideInInspector] RaycastHit2D wallRayRU, wallRayRM, wallRayRD;
+    [HideInInspector] bool wallCheckpointsAssigned;
+    [HideInInspector] Vector2 sideForLeft = Vector2.left, sideForRight = Vector2.right;
     #endregion
 
     #region Attack vars
     [Space]
     [Header("Attack Staff")]
     public bool HaveAttacked;
-    public bool SkillAttackCooldown;
+    public bool IsHeavyAttackCooldown;
     public bool IsBlocking;
 
-    public float SkillCooldownTimer = 5f;
+    public float HeavyAttackCooldownTimer = 5f;
     public float SkillCooldownElapsedTime = 0f;
     //[SerializeField] private float elapsedTime = 0f;
     #endregion
@@ -153,6 +169,8 @@ public class NewPlayerController : MonoBehaviour, IDamageble
         AnimationState = GetComponent<AnimationStateHandler>();
         PlayerRb = GetComponent<Rigidbody2D>();
         StatusEffectManager = GetComponent<StatusEffectHandler>();
+        Zones = GetComponent<PlayerZones>();
+        soundManager = GetComponent<CharacterSoundsManager>();
 
         StateMachineInitilizer();
 
@@ -248,7 +266,7 @@ public class NewPlayerController : MonoBehaviour, IDamageble
     {
         StateMachine.Initialize(IdleState);
 
-        GlobalEventsManager.SendPlayerHealthChanged(CurrentHealth);
+        GlobalEventsManager.SendPlayerCurrentHealth(CurrentHealth);
 
         GlobalEventsManager.GameStateListener.AddListener(GameStateReactor);
     }
@@ -265,21 +283,26 @@ public class NewPlayerController : MonoBehaviour, IDamageble
 
             HandleLogic();
             FlipSidesHandler();
-        }
 
-        if (Input.GetKeyDown(Buttons.Quicksave))
-        {
-            GlobalEventsManager.BroadcastActualGameState(GameStates.QuickSave);
+            if (Input.GetKeyDown(Buttons.Interaction))
+            {
+                Zones.TryInteract();
+            }
+            if (Input.GetKeyDown(Buttons.Quicksave))
+            {
+                GlobalEventsManager.BroadcastActualGameState(GameStates.QuickSave);
+            }
+
+            if (Input.GetKeyDown(Buttons.InGameMenu))
+            {
+                GlobalEventsManager.ShowNotification("Currently unavilable");
+                if (GameManager.Instance.GetGMSounds.TryGetValue("Save", out AudioClip clip)) GlobalEventsManager.PlayGMSfx(clip);
+            }
         }
 
         if (Input.GetKeyDown(Buttons.Quickload))
         {
             GlobalEventsManager.BroadcastActualGameState(GameStates.Restart);
-        }
-
-        if (Input.GetKeyDown(Buttons.Interaction))
-        {
-            TryInteract();
         }
     }
 
@@ -353,7 +376,7 @@ public class NewPlayerController : MonoBehaviour, IDamageble
 
     #region Animation Trigger Events Logic
 
-    protected virtual void AnimationTriggerEvent(PlayerAnimationTriggerType triggerType)
+    public void AnimationTriggerEvent(PlayerAnimationTriggerType triggerType)
     {
         StateMachine.CurrentPlayerState.AnimationTriggerEvent(triggerType);
     }
@@ -362,6 +385,8 @@ public class NewPlayerController : MonoBehaviour, IDamageble
     {
         ParralaxShake,
         DamageTargetsInHitZone,
+        LightAttack,
+        HeavyAttack,
         SkillAction1,
         SkillAction2,
         SkillAction3,
@@ -428,6 +453,45 @@ public class NewPlayerController : MonoBehaviour, IDamageble
 
     #endregion
 
+    #region Give
+    public void GiveCoin(ECollectable type, int amount)
+    {
+        switch (type)
+        {
+            case ECollectable.Golden:
+                GoldenCoins += amount;
+                GlobalEventsManager.SendCoinsChanged(type, GoldenCoins);
+                break;
+            case ECollectable.Silver:
+                SilverCoins += amount;
+                GlobalEventsManager.SendCoinsChanged(type, SilverCoins);
+                break;
+            case ECollectable.Red:
+                RedCoins += amount;
+                GlobalEventsManager.SendCoinsChanged(type, RedCoins);
+                break;
+            case ECollectable.SkillPoint:
+                SkillPoints += amount;
+                CheckLevelUp();
+                //GlobalEventsManager.SendCoinsChanged(type, RedCoins);
+                break;
+
+            default: break;
+        }
+    }
+
+    private void CheckLevelUp()
+    {
+        if (SkillPoints >= 100)
+        {
+            PlayerLevel += (SkillPoints - (SkillPoints % 100)) / 100;
+            SkillPoints %= 100;
+            GlobalEventsManager.ShowNotification("Level UP!");
+        }
+    }
+
+    #endregion
+
     #region Health Logic
     public void TakeDamage(float amount)
     {
@@ -466,53 +530,10 @@ public class NewPlayerController : MonoBehaviour, IDamageble
     }
     #endregion
 
-    #region Collider Zones & Things
-    private void TryInteract()
-    {
-        if(InteractableObjectsAtZone != null && InteractableObjectsAtZone.Count > 0)
-        {
-            foreach(var col in InteractableObjectsAtZone)
-            {
-                if(col.gameObject.TryGetComponent<InteractableObjects>(out InteractableObjects logic))
-                {
-                    logic.DoAction();
-                    break;
-                }
-            }
-        }
-    }
-
-    public void OnTriggerEnter2D(Collider2D other)
-    {
-        if (other.IsTouching(AttackZone))
-        {
-            AttackableObjectsAtZone.Add(other);
-        }
-        else if (other.IsTouching(InteractableZone))
-        {
-            InteractableObjectsAtZone.Add(other);
-        }
-    }
-
-    public void OnTriggerExit2D(Collider2D other)
-    {
-        if (AttackableObjectsAtZone.Contains(other))
-        {
-            if (!other.IsTouching(AttackZone)) AttackableObjectsAtZone.Remove(other);
-        }
-
-        if (InteractableObjectsAtZone.Contains(other))
-        {
-            if (!other.IsTouching(InteractableZone)) InteractableObjectsAtZone.Remove(other);
-        }
-    }
-
-    #endregion
-
     #region Combat Logic
     public void Attack(float amount)
     {
-
+        Zones.TryAttack(amount);
     }
     public IEnumerator ComboAttackTimer()
     {
@@ -531,11 +552,11 @@ public class NewPlayerController : MonoBehaviour, IDamageble
 
     public IEnumerator SkillAttackCooldownTimer()
     {
-        float waitTime = SkillCooldownTimer;
+        float waitTime = HeavyAttackCooldownTimer;
         SkillCooldownElapsedTime = 0f;
 
-        SkillAttackCooldown = true;
-        GlobalEventsManager.SendPlayerSkillCooldownStatus(SkillAttackCooldown);
+        IsHeavyAttackCooldown = true;
+        GlobalEventsManager.SendPlayerHeavyAttackCooldown(IsHeavyAttackCooldown, HeavyAttackCooldownTimer);
 
         while (SkillCooldownElapsedTime < waitTime)
         {
@@ -543,8 +564,8 @@ public class NewPlayerController : MonoBehaviour, IDamageble
             yield return null;
         }
 
-        SkillAttackCooldown = false;
-        GlobalEventsManager.SendPlayerSkillCooldownStatus(SkillAttackCooldown);
+        IsHeavyAttackCooldown = false;
+        GlobalEventsManager.SendPlayerHeavyAttackCooldown(IsHeavyAttackCooldown, 0f);
     }
     #endregion
 

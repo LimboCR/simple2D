@@ -19,6 +19,8 @@ public class PlayerRollStandard : PlayerRollSOBase
             player.PlayerRb.AddForce(new Vector2(player.RollSpeed, 0f), ForceMode2D.Impulse);
         else
             player.PlayerRb.AddForce(new Vector2(-player.RollSpeed, 0f), ForceMode2D.Impulse);
+
+        player.soundManager.ForcePlayTrack("Roll");
     }
 
     public override void DoExitLogic()

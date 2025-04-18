@@ -3,9 +3,12 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using static GlobalEventsManager;
 using MultiSaveSystem;
+using Limbo.CollectionUtils;
 
 public class GameManager : MonoBehaviour
 {
+    ////     Variables     \\\\
+    #region Instance
     private static GameManager instance;
     public static GameManager Instance
     {
@@ -20,10 +23,17 @@ public class GameManager : MonoBehaviour
             return instance;
         }
     }
+    #endregion
 
+    #region Game States
     [Header("GameStates")]
     [SerializeField] public static GameStates currentGameState;
-    [SerializeField] private static NewPlayerController _player;
+    [SerializeField] public GameStates GameStateDisplay;
+
+    #endregion
+
+    #region Scripts and objects references
+    private static NewPlayerController _player;
     public static NewPlayerController Player
     {
         get { return _player; }
@@ -37,25 +47,87 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    [SerializeField] public List<GameObject> EnemyAtScene = new();
-    public List<GameObject> SpawnPoints = new();
+    #endregion
 
-    public List<string> LayerMasksToRemoveFromEnemy;
-    public List<string> LayerMasksToRemoveFromFriendly;
+    #region NPC References at scene
+    [Header("All NPCs & spawn point references")]
+    public List<GameObject> AllEnemiesAtScene = new();
+    public List<GameObject> AllFriendlyAtScene = new();
+    public List<GameObject> AllPeacfullAtScene = new();
+    public List<GameObject> AllSpawnPointsAtScene = new();
 
-    public static LayerMask AllInGameLayers;
+    [Header("Sectorial reference")]
+    public List<GameObject> EnemiesAtSector = new();
+    public List<GameObject> FriendlyAtSector = new();
+    public List<GameObject> PeacfullAtSector = new();
+    public List<GameObject> SpawnPointsAtSector = new();
 
+    #endregion
+
+    #region Global LayerMasks settings
+    [Space]
+    [Header("==== GLOBAL LAYERMASKS ====")]
+
+    [Space]
+    [Header("Navigation & Waypoints Remove/Add")]
+    public LayerMask LayersToRemoveFromNavigation, LayersToAddToNavigation;
+
+    [Header("Props")]
+    public LayerMask LayersToRemoveFromProps, LayersToAddToProps;
+    [Header("Items")]
+    public LayerMask LayersToRemoveFromItems, LayersToAddToItems;
+
+    [Header("Destructable")]
+    public LayerMask LayersToRemoveFromDestructable, LayersToAddToDestructable;
+    [Header("Interactable")]
+    public LayerMask LayersToRemoveFromInteractable, LayersToAddToInteractable;
+
+    [Header("Combat Enemy Remove/Add")]
+    public LayerMask LayersToRemoveFromCombatEnemies, LayersToAddToCombatEnemies;
+    [Header("Combat Friendlies Remove/Add")]
+    public LayerMask LayersToRemoveFromCombatFriendlies, LayersToAddToCombatFriendlies;
+    [Header("Peacfull")]
+    public LayerMask LayersToRemoveFromPeacfull, LayerToAddToPeacfull;
+
+    [Header("Player")]
+    public LayerMask LayersToRemoveFromPlayer, LayerToAddToPlayer;
+    #region Static Variables
+
+    #endregion
+
+    #endregion
+
+    #region Editor Variables
+    [HideInInspector] public bool foldout1, foldout2, foldout3, foldout4, foldout5, layerMsksFoldout1, layerMsksFoldout2, layerMsksFoldout3, layerMsksFoldout4, layerMsksFoldout5, layerMsksFoldout6, layerMsksFoldout7, layerMsksFoldout8;
+    #endregion
+
+    #region Saving Variables
     //Saving data
     [Space]
     [Header("Save things")]
     public static string SaveFileName;
     public static string SaveFolderName;
     public static string SaveFilePath;
+    #endregion
 
+    #region Inspector
+    [HideInInspector] public string SaveFileNameDispaly = "SaveFileName", SaveFolderDispaly = "SaveFolderName", SaveFilePathDisplay = "/path/to/saveFile.mss";
+    #endregion
+
+    #region SFX
+    //Sounds
+    [SerializeField] private List<SoundContainer> SoundsList;
+    public Dictionary<string, AudioClip> GetGMSounds => Sounds;
+    private static Dictionary<string, AudioClip> Sounds;
+    #endregion
+
+    //=======================\\
+
+    ////     Logic     \\\\
+    #region Awake, Start, Update, Fixed update functions
     private void Awake()
     {
-        AllInGameLayers = LayerMask.GetMask(LayerMasksToRemoveFromEnemy.ToString());
-        if(instance == null)
+        if (instance == null)
         {
             instance = this;
             DontDestroyOnLoad(gameObject);
@@ -63,68 +135,43 @@ public class GameManager : MonoBehaviour
         else Destroy(gameObject);
 
         EventSubscriber();
-        
+        Sounds = SoundsList.ToDictionarySafe(sound => sound.Key, sound => sound.Sound);
 
         Player = FindAnyObjectByType<NewPlayerController>();
-        if (Player != null) Debug.Log("Player found");
-        
     }
 
     private void Update()
     {
+        GameStateDisplay = currentGameState;
+        SaveFileNameDispaly = SaveFileName;
+        SaveFolderDispaly = SaveFolderName;
+        SaveFilePathDisplay = SaveFilePath;
+
+        GoThroughStates();
+
+        // For testing saving & loading
         if (Keyboard.current.leftBracketKey.wasPressedThisFrame)
         {
-            SetPath("TestSaveFolder2", "SaveBro2");
-            SavePlayerDataAtPath();
+            PerformQuickSave();
         }
-
         if (Keyboard.current.rightBracketKey.wasPressedThisFrame)
         {
-            SetPath("TestSaveFolder", "SaveBro1");
-            SavePlayerData();
-        }
-
-        if (Keyboard.current.numpad7Key.wasPressedThisFrame)
-        {
-            SetPath("TestSaveFolder2", "SaveBro2");
-            LoadPlayerData();
-        }
-
-        if (Keyboard.current.numpad9Key.wasPressedThisFrame)
-        {
-            SetPath("TestSaveFolder", "SaveBro1");
-            LoadPlayerData();
-        }
-
-        if (Keyboard.current.numpadMinusKey.wasPressedThisFrame)
-        {
-            MSSTest.SaveSession.SetActiveSlot(1);
-            TestSave(MSSTest.SaveSession.ActiveSavePath);
-        }
-        if (Keyboard.current.numpadPlusKey.wasPressedThisFrame)
-        {
-            MSSTest.SaveSession.SetActiveSlot(1);
-            TestSave(MSSTest.SaveSession.ActiveSavePath);
+            PerformQuickLoad();
         }
     }
+    #endregion
 
-    #region Static Getters
-
+    #region General
     public GameObject GetPlayerGameObject()
     {
         if (Player != null) return Player.gameObject;
         return null;
     }
-
-    #endregion
-
-    #region Event Based Actions
-
     private void EventSubscriber()
     {
         OnStateChange.AddListener(ChangeGameState);
-        OnEnemySpawn.AddListener(AddEnemyAtScene);
-        OnEnemyRemove.AddListener(RemoveEnemyAtScene);
+        OnNPCSpawn.AddListener(AddNPCAtScene);
+        OnNPCRemove.AddListener(RemoveNPCAtScene);
         OnSpawnAdd.AddListener(AddSpawnPointAtScene);
         OnSpawnRemove.AddListener(RemoveSpawnPointAtScene);
     }
@@ -132,32 +179,130 @@ public class GameManager : MonoBehaviour
     {
         currentGameState = state;
     }
+    #endregion
 
-    private void AddEnemyAtScene(GameObject enemy)
+    #region Event Based Fucntions
+
+    #region Scene tracker
+
+    #region NPCs At Scene
+    private void AddNPCAtScene(GameObject npc, NPCType type)
     {
-        EnemyAtScene.Add(enemy);
-    }
+        if (AllEnemiesAtScene.Contains(npc) || AllFriendlyAtScene.Contains(npc) || AllPeacfullAtScene.Contains(npc))
+        {
+            Debug.LogWarning($"NPC: {npc.name} of type {type} is already added to one of the All NPCs at scene lists");
+            return;
+        }
 
-    private void RemoveEnemyAtScene(GameObject enemy)
+        switch (type)
+        {
+            case NPCType.CloseCombat:
+                if (npc.TryGetComponent<IMultiCharacterData>(out IMultiCharacterData data))
+                {
+                    if (data.CharacterTeam == 0) AllFriendlyAtScene.Add(npc);
+                    else if (data.CharacterTeam == 1) AllEnemiesAtScene.Add(npc);
+                    else Debug.LogWarning("NPCTeam was unknown");
+
+                    if (AllEnemiesAtScene.Contains(npc) && AllFriendlyAtScene.Contains(npc))
+                        Debug.LogError($"NPC: {npc.name} Can't be in both AllFriendlyNPCAtScene and AllEnemiesAtScene Lists at the same time.");
+                    else if (AllPeacfullAtScene.Contains(npc))
+                        Debug.LogError($"NPC: {npc.name} Can't be in AllPeacfullAtScene List and combat NPCs List at the same time.");
+                }
+                break;
+
+            case NPCType.Peacful:
+                AllPeacfullAtScene.Add(npc);
+                break;
+
+            case NPCType.Trader:
+                break;
+
+            default: break;
+        }
+    }
+    private void RemoveNPCAtScene(GameObject npc, NPCType type)
     {
-        EnemyAtScene.Remove(enemy);
-    }
+        if (!AllEnemiesAtScene.Contains(npc) || !AllFriendlyAtScene.Contains(npc) || !AllPeacfullAtScene.Contains(npc))
+        {
+            Debug.LogWarning($"NPC: {npc.name} of type {type} isn't in any lists of the All NPCs at scene ");
+            return;
+        }
 
+        switch (type)
+        {
+            case NPCType.CloseCombat:
+                if(npc.TryGetComponent<IMultiCharacterData>(out IMultiCharacterData data))
+                {
+                    if (data.CharacterTeam == 0)
+                    {
+                        if (AllFriendlyAtScene.Contains(npc)) AllFriendlyAtScene.Remove(npc);
+                        else Debug.LogWarning($"NPC: {npc.name} Wasn't in AllFriendlyNPCAtScene List");
+                    }
+                    else if (data.CharacterTeam == 1)
+                    {
+                        if (AllEnemiesAtScene.Contains(npc)) AllEnemiesAtScene.Remove(npc);
+                        else Debug.LogWarning($"NPC: {npc.name} Wasn't in AllEnemiesAtScene List");
+                    }
+                    else Debug.LogWarning("NPCTeam was unknown");
+                }
+                break;
+
+            case NPCType.Peacful:
+                if (AllPeacfullAtScene.Contains(npc)) AllPeacfullAtScene.Remove(npc);
+                else Debug.LogWarning($"NPC: {npc.name} wasnt in AllPeacfullAtScene List");
+                break;
+
+            case NPCType.Trader:
+                break;
+
+            default: break;
+        }
+    }
+    #endregion
+
+    #region Spawn Points At Scene
     private void AddSpawnPointAtScene(GameObject spawnPoint)
     {
-        SpawnPoints.Add(spawnPoint);
+        AllSpawnPointsAtScene.Add(spawnPoint);
     }
     private void RemoveSpawnPointAtScene(GameObject spawnPoint)
     {
-        SpawnPoints.Remove(spawnPoint);
+        AllSpawnPointsAtScene.Remove(spawnPoint);
+    }
+    #endregion
+
+    #endregion
+
+    #region GameStates
+    private static void GoThroughStates()
+    {
+        switch (currentGameState)
+        {
+            case GameStates.QuickSave:
+                PerformQuickSave();
+                break;
+            case GameStates.Load:
+                PerformQuickLoad();
+                break;
+
+            default: break;
+        }
     }
 
     #endregion
+
+    #endregion
+
+    #region Save System Callers
 
     public static void PerformQuickSave()
     {
         currentGameState = GameStates.QuickSave;
         BroadcastActualGameState(currentGameState);
+
+        SaveFileName = "QuickSave";
+        SaveFolderName = "QuickSaves";
+        SavePlayerData();
 
         currentGameState = GameStates.Play;
         BroadcastActualGameState(currentGameState);
@@ -178,6 +323,11 @@ public class GameManager : MonoBehaviour
         currentGameState = GameStates.Restart;
         BroadcastActualGameState(currentGameState);
 
+        SaveFileName = "QuickSave";
+        SaveFolderName = "QuickSaves";
+        SaveFilePath = MSSPath.CombinePersistent(SaveFolderName, SaveFileName);
+        LoadPlayerData();
+
         currentGameState = GameStates.Play;
         BroadcastActualGameState(currentGameState);
     }
@@ -191,19 +341,11 @@ public class GameManager : MonoBehaviour
         BroadcastActualGameState(currentGameState);
     }
 
-    private static void SetupSaving()
-    {
-        //int quickSavesCount = MSS.GetAllSaveFiles(QuickSaveFolder)
-    }
+    #endregion
 
-    #region Saving
+    #region Save System Functions
     public void TestSave(string path)
     {
-        //Debug.Log($"\n================================\n" +
-        //    $"|GAME MANAGER - TestSave(string path)| \nSaving this data: \nPlayerPosition:{Player.transform.position} " +
-        //    $"\nPlayer Golden Coins: {Player.GoldenCoins} \nPlayer Silver Coins: {Player.SilverCoins} \nPlayer Red Coins: {Player.RedCoins}" +
-        //    $"\n================================\n");
-
         MSSTest.Save("playerPosition", Player.transform.position, path);
         MSSTest.Save("playerGoldenCoins", Player.GoldenCoins, path);
         MSSTest.Save("playerSilverCoins", Player.SilverCoins, path);
@@ -212,44 +354,42 @@ public class GameManager : MonoBehaviour
 
     public void TestLoad(string path)
     {
-        Player.gameObject.transform.position = MSSTest.Load("playerPosition", Vector3.zero, path);
-        Player.GoldenCoins = MSSTest.Load("playerGoldenCoins", 1, path);
-        Player.SilverCoins = MSSTest.Load("playerSilverCoins", 1, path);
-        Player.RedCoins = MSSTest.Load("playerRedCoins", 1, path);
+        Player.gameObject.transform.position = MSSTest.Load("playerPosition", path, Vector3.zero);
+        Player.GoldenCoins = MSSTest.Load("playerGoldenCoins", path, 1);
+        Player.SilverCoins = MSSTest.Load("playerSilverCoins", path, 1);
+        Player.RedCoins = MSSTest.Load("playerRedCoins", path, 1);
     }
 
     public static void SavePlayerData()
     {
-        //Debug.Log($"\n================================\n" +
-        //    $"|GAME MANAGER - SavePlayerData()| \nSaving this data: \nPlayerPosition:{Player.transform.position} " +
-        //    $"\nPlayer Golden Coins: {Player.GoldenCoins} \nPlayer Silver Coins: {Player.SilverCoins} \nPlayer Red Coins: {Player.RedCoins}" +
-        //    $"\n================================\n");
+        ShowNotification("Saving game..");
 
         MSS.Save("playerPosition", Player.transform.position, SaveFolderName, SaveFileName);
         MSS.Save("playerGoldenCoins", Player.GoldenCoins, SaveFolderName, SaveFileName);
         MSS.Save("playerSilverCoins", Player.SilverCoins, SaveFolderName, SaveFileName);
         MSS.Save("playerRedCoins", Player.RedCoins, SaveFolderName, SaveFileName);
-    }
 
-    public static void SavePlayerDataAtPath()
-    {
-        //Debug.Log($"\n================================\n" +
-        //    $"|GAME MANAGER - SavePlayerData()| \nSaving this data: \nPlayerPosition:{Player.transform.position} " +
-        //    $"\nPlayer Golden Coins: {Player.GoldenCoins} \nPlayer Silver Coins: {Player.SilverCoins} \nPlayer Red Coins: {Player.RedCoins}" +
-        //    $"\n================================\n");
-
-        MSSPath.Save("playerPosition", Player.transform.position, SaveFilePath);
-        MSSPath.Save("playerGoldenCoins", Player.GoldenCoins, SaveFilePath);
-        MSSPath.Save("playerSilverCoins", Player.SilverCoins, SaveFilePath);
-        MSSPath.Save("playerRedCoins", Player.RedCoins, SaveFilePath);
+        ShowNotification("Game Saved");
+        if (Sounds.TryGetValue("Save", out AudioClip clip)) PlayGMSfx(clip);
     }
 
     public static void LoadPlayerData()
     {
+        ShowNotification("Loading game..");
+
         Player.transform.position = MSS.Load("playerPosition", SaveFilePath, Vector3.zero);
-        Player.GoldenCoins = MSS.Load("playerGoldenCoins", SaveFilePath, 1);
-        Player.SilverCoins = MSS.Load("playerSilverCoins", SaveFilePath, 1);
-        Player.RedCoins = MSS.Load("playerRedCoins", SaveFilePath, 1);
+
+        Player.GoldenCoins = MSS.Load("playerGoldenCoins", SaveFilePath, 0);
+        SendCoinsChanged(ECollectable.Golden, Player.GoldenCoins);
+
+        Player.SilverCoins = MSS.Load("playerSilverCoins", SaveFilePath, 0);
+        SendCoinsChanged(ECollectable.Silver, Player.SilverCoins);
+
+        Player.RedCoins = MSS.Load("playerRedCoins", SaveFilePath, 0);
+        SendCoinsChanged(ECollectable.Red, Player.RedCoins);
+
+        ShowNotification("Loading complete");
+        if (Sounds.TryGetValue("Load", out AudioClip clip)) PlayGMSfx(clip);
     }
 
     public static void SetPath(string folderName, string fileName)
@@ -257,12 +397,10 @@ public class GameManager : MonoBehaviour
         SaveFileName = fileName;
         SaveFolderName = folderName;
         SaveFilePath = MSSPath.CombinePersistent(SaveFolderName, SaveFileName);
-
-        //Debug.Log($"\n================================\n" +
-        //    $"|GAME MANAGER - SetPath()| \nSaveFile path was set at: {SaveFilePath}" +
-        //    $"\n================================\n");
     }
     #endregion
+
+    //=======================\\
 }
 
 public enum GameStates

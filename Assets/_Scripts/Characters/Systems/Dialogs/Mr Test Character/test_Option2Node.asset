@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a6d14db9e0085934eb6aa4e6eee8388c, type: 3}
+  m_Name: test_Option2Node
+  m_EditorClassIdentifier: 
+  LineText: Well, this is option 2 Node. Test buttons below
+  Options:
+  - OptionText: 1. Ha, I knew! Return to previous
+    NextDialog: {fileID: 11400000, guid: fd2b5b5173f0f614e8df9487c9ae7248, type: 2}
+    Result: {fileID: 0}
+  - OptionText: 2. Test test test... Return to previous with result
+    NextDialog: {fileID: 11400000, guid: fd2b5b5173f0f614e8df9487c9ae7248, type: 2}
+    Result: {fileID: 11400000, guid: 4b0906b3c4f4d53408cdce397cdd3eff, type: 2}

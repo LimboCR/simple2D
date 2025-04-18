@@ -27,11 +27,11 @@ public class GameManagerInspectorEditor : Editor
         //_fetchAllLayers.RegisterCallback<ClickEvent>(OnFetchLayersButtonClick);
 
         // Custom List View
-        SerializedProperty npcListProp = serializedObject.FindProperty("EnemyAtScene");
-        npcListField = root.Q<PropertyField>("NPCsAtScene");
+        SerializedProperty npcListProp = serializedObject.FindProperty("AllEnemiesAtScene");
+        npcListField = root.Q<PropertyField>("AllEnemiesAtScene");
         npcListField.BindProperty(npcListProp);
 
-        SerializedProperty spawnsListProp = serializedObject.FindProperty("SpawnPoints");
+        SerializedProperty spawnsListProp = serializedObject.FindProperty("AllSpawnPointsAtScene");
         spawnListField = root.Q<PropertyField>("SpawnPointsRef");
         spawnListField.BindProperty(spawnsListProp);
 

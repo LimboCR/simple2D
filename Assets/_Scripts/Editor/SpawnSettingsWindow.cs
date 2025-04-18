@@ -55,13 +55,13 @@ public class SpawnSettingsWindow : EditorWindow
 
     private bool _fetchedActualData;
 
-    //[MenuItem("Custom tools/Spawn Point Settings")]
-    public static void OpenWindow(SpawnPointHandler spawnPoint)
-    {
-        SpawnSettingsWindow window = GetWindow<SpawnSettingsWindow>("Direct Spawn Settings");
-        _spawnPointReference = spawnPoint;
-        window.Show();
-    }
+    ////[MenuItem("Custom tools/Spawn Point Settings")]
+    //public static void OpenWindow(SpawnPointHandler spawnPoint)
+    //{
+    //    SpawnSettingsWindow window = GetWindow<SpawnSettingsWindow>("Direct Spawn Settings");
+    //    _spawnPointReference = spawnPoint;
+    //    window.Show();
+    //}
 
     [MenuItem("Custom Tools/Spawn Points Window")]
     public static void ShowWindow()
@@ -113,7 +113,7 @@ public class SpawnSettingsWindow : EditorWindow
         if(_selectedNPC.TryGetComponent<IMultiCharacterData>(out IMultiCharacterData characterData))
         {
             _setNPCTeam = characterData.CharacterTeam;
-            _npcType = characterData.NPCType;
+            _npcType = characterData.TypeOfNPC;
 
             if(_selectedNPC.TryGetComponent<IDamageble>(out IDamageble healthData))
             {
@@ -213,7 +213,7 @@ public class SpawnSettingsWindow : EditorWindow
                 GUILayout.BeginHorizontal();
                 GUILayout.Label("Type: ", EditorStyles.miniLabel);
                 GUILayout.Space(0);
-                GUILayout.Label(characterData.NPCType.ToString(), EditorStyles.miniLabel);
+                GUILayout.Label(characterData.TypeOfNPC.ToString(), EditorStyles.miniLabel);
                 GUILayout.EndHorizontal();
             }   
             else GUILayout.Label("Type: N/A", EditorStyles.miniLabel);

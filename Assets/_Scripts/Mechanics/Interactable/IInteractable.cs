@@ -1,9 +1,9 @@
-using UnityEngine;
+using UnityEngine.Events;
 
 public interface IInteractable
 {
-    public void OnSelect();
-    public void OnDeselect();
-    public void OnPointerEnter();
-    public void OnPointerLeave();
+    public bool Interactable { get; set; }
+    public UnityEvent ActionToDo { get; set; }
+    public void DoAction() { }
+    public void ShowActionIcon(bool show) { }
 }

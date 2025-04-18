@@ -4,9 +4,14 @@ using UnityEngine;
 public class PlayerAttackStandard : PlayerAttackSOBase
 {
     [SerializeField] private string _attack1AnimationName, _attack2AnimationName;
+    [SerializeField] private float _attackDamage = 10f;
     public override void DoAnimationTriggerEventLogic(NewPlayerController.PlayerAnimationTriggerType triggerType)
     {
         base.DoAnimationTriggerEventLogic(triggerType);
+        if(triggerType == NewPlayerController.PlayerAnimationTriggerType.LightAttack)
+        {
+            player.Attack(_attackDamage);
+        }
     }
 
     public override void DoEnterLogic()
@@ -16,12 +21,14 @@ public class PlayerAttackStandard : PlayerAttackSOBase
         if (!player.HaveAttacked)
         {
             player.AnimationState.ChangeAnimationState(_attack1AnimationName);
+            player.soundManager.ForcePlayTrack("Attack1");
             player.HaveAttacked = true;
             player.StartCoroutine(player.ComboAttackTimer());
         }
         else
         {
             player.AnimationState.ChangeAnimationState(_attack2AnimationName);
+            player.soundManager.ForcePlayTrack("Attack2");
             player.HaveAttacked = false;
         }
     }
@@ -43,7 +50,7 @@ public class PlayerAttackStandard : PlayerAttackSOBase
             if (Mathf.Abs(player.Movement) > 0f)
                 player.StateMachine.ChangeState(player.RunState);
 
-            if (Input.GetKeyDown(KeyCode.X) && !player.SkillAttackCooldown)
+            if (Input.GetKeyDown(KeyCode.X) && !player.IsHeavyAttackCooldown)
                 player.StateMachine.ChangeState(player.SkillAttackState);
 
             if (Input.GetKeyDown(KeyCode.W) && player.IsGrounded)

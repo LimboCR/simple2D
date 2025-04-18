@@ -22,6 +22,8 @@ public class LightsManager : MonoBehaviour
         }
         Instance = this;
 
+        if (globalLight == null) globalLight = GameObject.Find("GlobalLight").GetComponent<Light2D>();
+
         GlobalLight = globalLight;
     }
 
@@ -68,6 +70,6 @@ public class LightsManager : MonoBehaviour
             Intensity = 1f;
         }
 
-        GlobalLight.intensity = Intensity;
+        if(GlobalLight!=null) GlobalLight.intensity = Intensity;
     }
 }

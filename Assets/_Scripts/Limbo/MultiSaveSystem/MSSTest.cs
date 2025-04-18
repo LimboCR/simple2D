@@ -23,7 +23,7 @@ namespace MultiSaveSystem
             File.WriteAllText(path ?? DefaultPath, json);
         }
 
-        public static T Load<T>(string key, T defaultValue = default, string path = null)
+        public static T Load<T>(string key, string path, T defaultValue = default)
         {
             if (!path.EndsWith(".mss")) path += ".mss";
             if (!File.Exists(path ?? DefaultPath)) return defaultValue;

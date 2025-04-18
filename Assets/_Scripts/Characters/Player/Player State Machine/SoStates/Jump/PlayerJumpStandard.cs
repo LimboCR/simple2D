@@ -15,6 +15,7 @@ public class PlayerJumpStandard : PlayerJumpSOBase
 
         player.AnimationState.ChangeAnimationState(_jumpAnimationName);
         player.PlayerRb.AddForce(new Vector2(0f, player.JumpHeight), ForceMode2D.Impulse);
+        player.soundManager.ForcePlayTrack("Jump");
         player.IsJumping = true;
     }
 

@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.Events;
 
+[RequireComponent(typeof(BoxCollider2D))]
 public class TriggerZone : MonoBehaviour
 {
     [Header("Events to Trigger")]

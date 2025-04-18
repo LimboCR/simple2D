@@ -30,6 +30,11 @@ public class SpawnPointHandler : MonoBehaviour
     [Header("In game reference")]
     private GameObject _referenceCharacter;
 
+    [Space, Header("MovingDirection")]
+    public GameObject WaypointToMoveTo;
+    public bool IsAggresive;
+    //public 
+
     // To show ui if custom health settings are set to NPC
     [HideInInspector] public bool HealthScriptOverride;
     [HideInInspector] public float NPCMaxHealth;

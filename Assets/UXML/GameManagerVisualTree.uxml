@@ -1,31 +1,128 @@
 <engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
     <Style src="project://database/Assets/UXML/GameManagerStyles.uss?fileID=7433441132597879392&amp;guid=89e907c2e45db3c419e4c92e6c746975&amp;type=3#GameManagerStyles" />
-    <engine:VisualElement class="section" style="flex-grow: 1; height: 25px; -unity-background-scale-mode: stretch-to-fill; -unity-background-image-tint-color: rgb(255, 255, 255); margin-top: 10px; background-color: rgba(0, 0, 0, 0);">
-        <engine:Label text="GameManager V1" style="-unity-font-style: bold; background-color: rgba(255, 255, 255, 0); font-size: 18px; color: rgb(119, 127, 224); padding-top: 0; margin-top: 0;" />
+    <engine:VisualElement name="TitleContainer" class="section" style="flex-grow: 1; height: 40px; -unity-background-scale-mode: stretch-to-fill; -unity-background-image-tint-color: rgb(255, 255, 255); margin-top: 10px; background-color: rgb(8, 131, 190); margin-bottom: 10px; padding-top: 0; justify-content: center; align-content: center; align-self: auto; padding-bottom: 0; font-size: 12px; padding-left: 8px;">
+        <engine:Label text="GameManager V2" style="-unity-font-style: bold; background-color: rgba(255, 255, 255, 0); font-size: 18px; color: rgb(255, 255, 255); padding-top: 0; margin-top: 0; padding-right: 0; padding-left: 0;" />
     </engine:VisualElement>
-    <engine:VisualElement class="section" style="flex-grow: 1; border-top-width: 0; border-right-width: 0; border-bottom-width: 0; border-left-width: 0; padding-top: 10px;">
+    <engine:VisualElement name="GameStatesAndRefContainer" class="section" style="flex-grow: 1; border-top-width: 0; border-right-width: 0; border-bottom-width: 0; border-left-width: 0; padding-top: 10px;">
         <engine:Label text="Game State &amp; Single References" style="-unity-font-style: bold; font-size: 15px; padding-left: 4px;" />
         <engine:VisualElement name="NPCListContainer" style="flex-grow: 1; flex-shrink: 1; flex-direction: column; flex-wrap: nowrap; flex-basis: auto; opacity: 1; height: auto; width: auto; padding-top: 0; padding-bottom: 0; margin-top: 0; margin-bottom: 0;">
-            <engine:EnumField label="Game State" value="Center" type="UnityEngine.TextAlignment, UnityEngine.TextRenderingModule" binding-path="currentGameState" class="obj-u2b" />
+            <engine:EnumField label="Current Game State" value="Center" type="UnityEngine.TextAlignment, UnityEngine.TextRenderingModule" binding-path="GameStateDisplay" class="obj-u2b" />
             <editor:ObjectField label="Player Game Object" binding-path="_player" class="obj-u2b" />
         </engine:VisualElement>
     </engine:VisualElement>
-    <engine:VisualElement class="section" style="flex-grow: 1; border-top-width: 0; border-right-width: 0; border-bottom-width: 0; border-left-width: 0; padding-top: 10px;">
-        <engine:Label text="All Layers" style="-unity-font-style: bold; font-size: 15px; padding-left: 4px;" />
-        <engine:VisualElement name="LayersContainer" style="flex-grow: 1; flex-shrink: 1; flex-direction: row; flex-wrap: nowrap; flex-basis: auto; opacity: 1; height: auto;">
-            <editor:LayerMaskField label="All Layer Masks" binding-path="AllInGameLayers" />
-        </engine:VisualElement>
+    <engine:VisualElement name="LayersContainer" class="section" style="flex-grow: 1; border-top-width: 0; border-right-width: 0; border-bottom-width: 0; border-left-width: 0; padding-top: 10px;">
+        <engine:Label text="Global LayerMask Settings" style="-unity-font-style: bold; font-size: 15px; padding-left: 4px;" />
+        <engine:Foldout text="Expand" binding-path="foldout3" class="foldout-style" style="margin-left: 15px;">
+            <engine:VisualElement name="LayersContainer" style="flex-grow: 1; flex-shrink: 1; flex-direction: column; flex-wrap: nowrap; flex-basis: auto; opacity: 1; height: auto; padding-left: 0; margin-left: -30px;">
+                <engine:VisualElement name="InternalContainer1" class="container-internal" style="flex-grow: 1;">
+                    <engine:Label text="Navigation &amp; Waypoints Remove/Add" class="label-internal" />
+                    <engine:Foldout text="Expand" value="true" focusable="true" binding-path="layerMsksFoldout1" class="foldout-style">
+                        <engine:VisualElement class="foldout-content" style="flex-grow: 1;">
+                            <editor:LayerMaskField label="Layers To Remove" binding-path="LayersToRemoveFromNavigation" />
+                            <editor:LayerMaskField label="Layers To Add" binding-path="LayersToAddToNavigation" />
+                        </engine:VisualElement>
+                    </engine:Foldout>
+                </engine:VisualElement>
+                <engine:VisualElement name="InternalContainer2" class="container-internal" style="flex-grow: 1;">
+                    <engine:Label text="Props Add/Remove" name="Label" class="label-internal" />
+                    <engine:Foldout text="Expand" binding-path="layerMsksFoldout2" class="foldout-style">
+                        <engine:VisualElement class="foldout-content" style="flex-grow: 1;">
+                            <editor:LayerMaskField label="Layers To Remove" binding-path="LayersToRemoveFromProps" />
+                            <editor:LayerMaskField label="Layers To Add" binding-path="LayersToAddToProps" />
+                        </engine:VisualElement>
+                    </engine:Foldout>
+                </engine:VisualElement>
+                <engine:VisualElement name="InternalContainer3" class="container-internal" style="flex-grow: 1;">
+                    <engine:Label text="Destructable Add/Remove" name="Label" class="label-internal" />
+                    <engine:Foldout text="Expand" binding-path="layerMsksFoldout3" class="foldout-style">
+                        <engine:VisualElement class="foldout-content" style="flex-grow: 1;">
+                            <editor:LayerMaskField label="Layers To Remove" binding-path="LayersToRemoveFromDestructable" />
+                            <editor:LayerMaskField label="Layers To Add" binding-path="LayersToAddToDestructable" />
+                        </engine:VisualElement>
+                    </engine:Foldout>
+                </engine:VisualElement>
+                <engine:VisualElement name="InternalContainer4" class="container-internal" style="flex-grow: 1;">
+                    <engine:Label text="Interactable Add/Remove" name="Label" class="label-internal" />
+                    <engine:Foldout text="Expand" binding-path="layerMsksFoldout4" class="foldout-style">
+                        <engine:VisualElement class="foldout-content" style="flex-grow: 1;">
+                            <editor:LayerMaskField label="Layers To Remove" binding-path="LayersToRemoveFromInteractable" />
+                            <editor:LayerMaskField label="Layers To Add" binding-path="LayersToAddToInteractable" />
+                        </engine:VisualElement>
+                    </engine:Foldout>
+                </engine:VisualElement>
+                <engine:VisualElement name="InternalContainer5" class="container-internal" style="flex-grow: 1;">
+                    <engine:Label text="Combat Enemy Remove/Add" name="Label" class="label-internal" />
+                    <engine:Foldout text="Expand" binding-path="layerMsksFoldout5" class="foldout-style">
+                        <engine:VisualElement class="foldout-content" style="flex-grow: 1;">
+                            <editor:LayerMaskField label="Layers To Remove" binding-path="LayersToRemoveFromCombatEnemies" />
+                            <editor:LayerMaskField label="Layers To Add" binding-path="LayersToAddToCombatEnemies" />
+                        </engine:VisualElement>
+                    </engine:Foldout>
+                </engine:VisualElement>
+                <engine:VisualElement name="InternalContainer6" class="container-internal" style="flex-grow: 1;">
+                    <engine:Label text="Combat Friendlies Remove/Add" name="Label" class="label-internal" />
+                    <engine:Foldout text="Expand" binding-path="layerMsksFoldout6" class="foldout-style">
+                        <engine:VisualElement class="foldout-content" style="flex-grow: 1;">
+                            <editor:LayerMaskField label="Layers To Remove" binding-path="LayersToRemoveFromCombatFriendlies" />
+                            <editor:LayerMaskField label="Layers To Add" binding-path="LayersToAddToCombatFriendlies" />
+                        </engine:VisualElement>
+                    </engine:Foldout>
+                </engine:VisualElement>
+                <engine:VisualElement name="InternalContainer7" class="container-internal" style="flex-grow: 1;">
+                    <engine:Label text="Peacfull Remove/Add" name="Label" class="label-internal" />
+                    <engine:Foldout text="Expand" binding-path="layerMsksFoldout7" class="foldout-style">
+                        <engine:VisualElement class="foldout-content" style="flex-grow: 1;">
+                            <editor:LayerMaskField label="Layers To Remove" binding-path="LayersToRemoveFromPeacfull" />
+                            <editor:LayerMaskField label="Layers To Add" binding-path="LayerToAddToPeacfull" />
+                        </engine:VisualElement>
+                    </engine:Foldout>
+                </engine:VisualElement>
+                <engine:VisualElement name="InternalContainer8" class="container-internal" style="flex-grow: 1;">
+                    <engine:Label text="Player Remove/Add" name="Label" class="label-internal" />
+                    <engine:Foldout text="Expand" language-direction="Inherit" enabled="true" toggle-on-label-click="true" binding-path="layerMsksFoldout8" class="foldout-style">
+                        <engine:VisualElement class="foldout-content" style="flex-grow: 1;">
+                            <editor:LayerMaskField label="Layers To Remove" binding-path="LayersToRemoveFromPlayer" />
+                            <editor:LayerMaskField label="Layers To Add" binding-path="LayerToAddToPlayer" />
+                        </engine:VisualElement>
+                    </engine:Foldout>
+                </engine:VisualElement>
+            </engine:VisualElement>
+        </engine:Foldout>
     </engine:VisualElement>
-    <engine:VisualElement class="section" style="flex-grow: 1; border-top-width: 0; border-right-width: 0; border-bottom-width: 0; border-left-width: 0; padding-top: 10px;">
-        <engine:Label text="NPC References" style="-unity-font-style: bold; font-size: 15px; padding-left: 4px;" />
-        <engine:VisualElement name="NPCListContainer" style="flex-grow: 1; flex-shrink: 1; flex-direction: column; flex-wrap: nowrap; flex-basis: auto; opacity: 1; height: auto; width: auto;">
-            <editor:PropertyField label="Enemies At Scene" name="NPCsAtScene" style="width: 400px;" />
-        </engine:VisualElement>
+    <engine:VisualElement name="SceneTrackerContainer" class="section" style="flex-grow: 1; border-top-width: 0; border-right-width: 0; border-bottom-width: 0; border-left-width: 0; padding-top: 10px;">
+        <engine:Label text="Scene Tracker" style="-unity-font-style: bold; font-size: 15px; padding-left: 4px;" />
+        <engine:Foldout text="Expand" binding-path="foldout1" style="margin-left: 15px; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; margin-right: 0; opacity: 1; display: flex; visibility: visible; overflow: visible; position: relative; flex-direction: column; align-self: auto; transform-origin: center;">
+            <engine:VisualElement name="NPCListContainer" class="foldout-content">
+                <editor:PropertyField label="AllEnemiesAtScene" name="AllEnemiesAtScene" class="foldout-fields" style="width: 400px;" />
+                <editor:PropertyField label="AllFriendlyAtScene" name="AllFriendlyAtScene" binding-path="AllFriendlyAtScene" class="foldout-fields" style="width: 400px;" />
+                <editor:PropertyField label="AllPeacfullAtScene" name="AllPeacfullAtScene" binding-path="AllPeacfullAtScene" class="foldout-fields" style="width: 400px;" />
+                <editor:PropertyField label="Spawn Points" name="SpawnPointsRef" class="foldout-fields" style="width: 400px;" />
+            </engine:VisualElement>
+        </engine:Foldout>
     </engine:VisualElement>
-    <engine:VisualElement class="section" style="flex-grow: 1; border-top-width: 0; border-right-width: 0; border-bottom-width: 0; border-left-width: 0; padding-top: 10px;">
-        <engine:Label text="Spawn Points Reference" style="-unity-font-style: bold; font-size: 15px; padding-left: 4px;" />
-        <engine:VisualElement name="NPCListContainer" style="flex-grow: 1; flex-shrink: 1; flex-direction: column; flex-wrap: nowrap; flex-basis: auto; opacity: 1; height: auto; width: auto;">
-            <editor:PropertyField label="Spawn Points" name="SpawnPointsRef" style="width: 400px;" />
-        </engine:VisualElement>
+    <engine:VisualElement name="SectorTrackingContainer" class="section" style="flex-grow: 1; border-top-width: 0; border-right-width: 0; border-bottom-width: 0; border-left-width: 0; padding-top: 10px;">
+        <engine:Label text="Sector Tracking" style="-unity-font-style: bold; font-size: 15px; padding-left: 4px;" />
+        <engine:Foldout text="Expand" binding-path="foldout2" style="margin-left: 15px;">
+            <engine:VisualElement name="NPCListContainer" class="foldout-content" style="flex-grow: 1; flex-shrink: 1; flex-direction: column; flex-wrap: nowrap; flex-basis: auto; opacity: 1; height: auto; width: auto;">
+                <editor:PropertyField label="EnemiesAtSector" name="EnemiesAtSector" binding-path="EnemiesAtSector" class="foldout-fields" style="width: 400px;" />
+                <editor:PropertyField label="FriendlyAtSector" name="FriendlyAtSector" binding-path="FriendlyAtSector" class="foldout-fields" style="width: 400px;" />
+                <editor:PropertyField label="PeacfullAtSector" name="PeacfullAtSector" binding-path="PeacfullAtSector" class="foldout-fields" style="width: 400px;" />
+                <editor:PropertyField label="SpawnPointsAtSector" name="SpawnPointsAtSector" binding-path="SpawnPointsAtSector" class="foldout-fields" style="width: 400px;" />
+            </engine:VisualElement>
+        </engine:Foldout>
+    </engine:VisualElement>
+    <engine:VisualElement name="SaveSettingsContainer" class="section" style="flex-grow: 1; border-top-width: 0; border-right-width: 0; border-bottom-width: 0; border-left-width: 0; padding-top: 10px;">
+        <engine:Label text="Saving variables (auto)" style="-unity-font-style: bold; font-size: 15px; padding-left: 4px;" />
+        <engine:Foldout text="Expand" binding-path="foldout4" class="foldout-style">
+            <engine:VisualElement name="InternalContainer" class="foldout-content" style="flex-grow: 1; flex-shrink: 1; flex-direction: column; flex-wrap: nowrap; flex-basis: auto; opacity: 1; height: auto; width: auto; padding-top: 5px; margin-top: 5px;">
+                <engine:TextField label="Save File Name" placeholder-text="filler text" binding-path="SaveFileNameDispaly" class="foldout-fields" style="margin-top: 0; padding-top: 0;" />
+                <engine:TextField label="Save Folder Name" placeholder-text="filler text" binding-path="SaveFolderDispaly" class="foldout-fields" style="padding-top: 3px;" />
+                <engine:TextField label="Save File Path" placeholder-text="filler text" binding-path="SaveFilePathDisplay" class="foldout-fields" style="padding-top: 3px;" />
+            </engine:VisualElement>
+        </engine:Foldout>
+    </engine:VisualElement>
+    <engine:VisualElement name="AudioSettingsContainer" class="section" style="flex-grow: 1; border-top-width: 0; border-right-width: 0; border-bottom-width: 0; border-left-width: 0; padding-top: 10px;">
+        <engine:Label text="Audio Settings" style="-unity-font-style: bold; font-size: 15px; padding-left: 4px;" />
+        <editor:PropertyField binding-path="SoundsList" label="Sounds List" />
     </engine:VisualElement>
 </engine:UXML>

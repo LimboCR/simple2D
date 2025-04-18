@@ -87,7 +87,7 @@ namespace MultiSaveSystem
         #region Loading Variants
         public static T Load<T>(string key, string path, T defaultValue = default)
         {
-            if (!path.EndsWith(".mss")) path += ".mss";
+            path = MSSPath.FormatPath(path);
 
             if (!File.Exists(path)) return defaultValue;
 
@@ -104,7 +104,7 @@ namespace MultiSaveSystem
 
         public static void LoadInto<T>(string key, ref T obj, string path)
         {
-            if (!path.EndsWith(".mss")) path += ".mss";
+            path = MSSPath.FormatPath(path);
 
             if (!File.Exists(path))
             {
@@ -656,7 +656,7 @@ namespace MultiSaveSystem
         /// <param name="fileName">Name of the file to format</param>
         /// <param name="format">Format to apply</param>
         /// <returns>Formatted File Name</returns>
-        private static string AutoFormat(string fileName, string format = ".mss")
+        public static string AutoFormat(string fileName, string format = ".mss")
         {
             if (!fileName.EndsWith(format)) return fileName += format;
             else return fileName;
@@ -665,7 +665,7 @@ namespace MultiSaveSystem
         #endregion
 
 
-
+       
         [Serializable]
         public class Wrapper
         {
@@ -687,10 +687,7 @@ namespace MultiSaveSystem
                         var wrapped = Activator.CreateInstance(typeof(PrimitiveWrapper<>).MakeGenericType(value.GetType()), value);
                         jsonValues.Add(JsonUtility.ToJson(wrapped));
                     }
-                    else
-                    {
-                        jsonValues.Add(JsonUtility.ToJson(value));
-                    }
+                    else jsonValues.Add(JsonUtility.ToJson(value));
 
                     types.Add(kvp.Value.GetType().AssemblyQualifiedName);
                 }
@@ -711,10 +708,7 @@ namespace MultiSaveSystem
                         var wrapperObj = JsonUtility.FromJson(jsonValues[i], wrapperType);
                         obj = wrapperType.GetField("value").GetValue(wrapperObj);
                     }
-                    else
-                    {
-                        obj = JsonUtility.FromJson(jsonValues[i], type);
-                    }
+                    else obj = JsonUtility.FromJson(jsonValues[i], type);
 
                     dict[keys[i]] = obj;
                 }
@@ -798,44 +792,6 @@ namespace MultiSaveSystem
                         $"\nDirectory Path: {path}");
                     return;
                 }
-            }
-        }
-
-        public static class PathBuilder
-        {
-            public static string SaveFolderName = "SaveFiles";
-            public static string SaveFolderPath => MSSPath.CombinePersistent(SaveFolderName);
-
-            private static void EnsureDirectoryExists()
-            {
-                if (!Directory.Exists(SaveFolderPath))
-                    Directory.CreateDirectory(SaveFolderPath);
-            }
-
-            public static void CreatePath(string folderName)
-            {
-                SaveFolderName = folderName;
-                EnsureDirectoryExists();
-            }
-
-
-            public static string GetSavePath(string fileName)
-            {
-                EnsureDirectoryExists();
-                return Path.Combine(SaveFolderPath, AutoFormat(fileName));
-            }
-
-            /// <summary>
-            /// <b><u>|Safe|</u></b> Creates the directory if it does not exist and provides path to file inside it.
-            /// </summary>
-            /// <param name="fileName">File name</param>
-            /// <param name="folderName">Directory name</param>
-            /// <returns>Path to file inside the directory</returns>
-            public static string GetSavePath(string fileName, string folderName)
-            {
-                SaveFolderName = folderName;
-                EnsureDirectoryExists();
-                return Path.Combine(SaveFolderPath, AutoFormat(fileName));
             }
         }
 

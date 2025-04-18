@@ -14,6 +14,7 @@ public class PlayerDeadStandard : PlayerDeadSOBase
         base.DoEnterLogic();
         if(_deadAnimationName != null)
             player.AnimationState.ChangeAnimationState(_deadAnimationName);
+        player.soundManager.ForcePlayTrack("Dead");
     }
 
     public override void DoExitLogic()

@@ -68,7 +68,7 @@ public class PlayerController : MonoBehaviour
         if (collision.gameObject.tag == "Coin")
         {
             _playerCoins += 1;
-            GlobalEventsManager.SendCoinsChanged(_playerCoins);
+            //GlobalEventsManager.SendCoinsChanged(_playerCoins);
             Destroy(collision.gameObject);
         }
     }
