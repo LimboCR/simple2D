@@ -1,3 +1,4 @@
+using System;
 using UnityEditor;
 using UnityEngine;
 
@@ -32,22 +33,37 @@ namespace Limbo.CustomEditorAttributes
                 return true;
             }
 
-            bool condition = false;
+            bool result = true;
 
             switch (conditionProp.propertyType)
             {
                 case SerializedPropertyType.Boolean:
-                    condition = conditionProp.boolValue;
+                    result = conditionProp.boolValue;
                     break;
+
                 case SerializedPropertyType.Enum:
-                    condition = conditionProp.enumValueIndex != 0;
+                case SerializedPropertyType.Integer:
+                    if (showIf.CompareValue != null)
+                    {
+                        int target = Convert.ToInt32(showIf.CompareValue);
+                        result = conditionProp.intValue == target;
+                    }
+                    else
+                    {
+                        result = conditionProp.intValue != 0;
+                    }
                     break;
+
+                case SerializedPropertyType.ObjectReference:
+                    result = conditionProp.objectReferenceValue != null;
+                    break;
+
                 default:
                     Debug.LogWarning($"[ShowIf] Unsupported property type: {conditionProp.propertyType}");
                     break;
             }
 
-            return showIf.Invert ? !condition : condition;
+            return showIf.Invert ? !result : result;
         }
     }
 }

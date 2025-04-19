@@ -68,6 +68,8 @@ public class SpawnPointHandler : MonoBehaviour
 
     public void SpawnCharacter()
     {
+        if(_referenceCharacter != null) return;
+
         //Instantiates character and assigns it's reference to spawn point, to then access it's CharacterCommands to set waypoints to move between
         if (HealthScriptOverride && !INPCMovableOverride)
             _referenceCharacter = InstantiateNPC(npc, new World(transform.position), new CharacterData(NPCTeam), new HealthStats(NPCMaxHealth, NPCRegenRate, NPCRegenDelay));
@@ -82,6 +84,11 @@ public class SpawnPointHandler : MonoBehaviour
             new Vector3(transform.position.x - waypointLeftOffset, transform.position.y, transform.position.z), Quaternion.identity, this.transform));
         _referenceCharacter.GetComponent<CloseCombatNPCBase>().WaypointR = (Instantiate(waypointPrefab, 
             new Vector3(transform.position.x + waypointRightOffset, transform.position.y, transform.position.z), Quaternion.identity, this.transform));
+    }
+
+    public void ResetSpawnPoint()
+    {
+        _referenceCharacter = null;
     }
 
     private void OnDrawGizmosSelected()

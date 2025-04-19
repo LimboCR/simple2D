@@ -6,9 +6,11 @@ public class ResetSpawnPointsSetting : LevelSettingsOptionBase
 {
     public override void Execute()
     {
-        foreach (var spawner in GameManager.Instance.AllSpawnPointsAtScene)
+        foreach (var spawn in GameManager.Instance.AllSpawnPointsAtScene)
         {
-            //spawner.ResetSpawner();
+            if(spawn.TryGetComponent<SpawnPointHandler>(out SpawnPointHandler sph)){
+                sph.ResetSpawnPoint();
+            }
         }
     }
 }

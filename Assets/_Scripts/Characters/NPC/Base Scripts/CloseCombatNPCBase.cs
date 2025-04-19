@@ -164,10 +164,11 @@ public abstract class CloseCombatNPCBase : NPCBase, IDamageble, INPCMovable
 
     #region Awake, Start, Update, FixedUpdate and Required Functions
 
-    //private void OnDestroy()
-    //{
-    //    SendEnemyRemove(gameObject, TypeOfNPC);
-    //}
+    private void OnDestroy()
+    {
+        //SendEnemyRemove(gameObject, TypeOfNPC);
+        StopAllCoroutines();
+    }
 
     protected virtual void Start()
     {
@@ -235,6 +236,11 @@ public abstract class CloseCombatNPCBase : NPCBase, IDamageble, INPCMovable
         NPCDeadBaseInstance.Initialize(gameObject, this);
 
         StateMachine.Initialize(IdleState);
+    }
+
+    public void DestroyOnRequest()
+    {
+        Destroy(gameObject);
     }
 
     protected virtual void Update()

@@ -74,6 +74,8 @@ public class GlobalEventsManager : MonoBehaviour
 
     #region UI Events
     public static UnityEvent<string> OnMessageSent = new();
+    public static UnityEvent<bool> OnShowDeathScreen = new();
+    public static UnityEvent OnHealthBarReset = new();
     #endregion
 
     #region NPCs Events Logic
@@ -162,6 +164,16 @@ public class GlobalEventsManager : MonoBehaviour
     public static void ShowNotification(string messageText)
     {
         OnMessageSent.Invoke(messageText);
+    }
+
+    public static void ShowDeathScreen(bool @active)
+    {
+        OnShowDeathScreen.Invoke(active);
+    }
+
+    public static void ResetHealthBar()
+    {
+        OnHealthBarReset.Invoke();
     }
     #endregion
 

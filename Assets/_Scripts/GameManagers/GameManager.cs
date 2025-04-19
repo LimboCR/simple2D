@@ -4,6 +4,8 @@ using UnityEngine.InputSystem;
 using static GlobalEventsManager;
 using MultiSaveSystem;
 using Limbo.CollectionUtils;
+using Unity.Cinemachine;
+using System;
 
 public class GameManager : MonoBehaviour
 {
@@ -46,6 +48,11 @@ public class GameManager : MonoBehaviour
             else Debug.LogError($"Player's Script Already found: {Player.gameObject.name}");
         }
     }
+
+    //public GameObject PlayerPrefab;
+    //public GameObject PlayerReference;
+    //public CinemachineCamera CinemachineCamera;
+    //public static GameObject s_PlayerPrefab;
 
     #endregion
 
@@ -121,12 +128,25 @@ public class GameManager : MonoBehaviour
     private static Dictionary<string, AudioClip> Sounds;
     #endregion
 
+    #region Scene Specific Variables
+    [Space, Header("Current Scene Data")]
+    public static GameObject InitialPlayerPosition;
+
+    [Space, Header("Cross Scene Data")]
+    public PersistentPlayerData CrossSceneDataContainer;
+    public static PersistentPlayerData s_CrossSceneDataContainer;
+    public static bool PlayerLeavingScene;
+    public static bool PlayerArrivedToScene;
+    #endregion
+
     //=======================\\
 
     ////     Logic     \\\\
-    #region Awake, Start, Update, Fixed update functions
+    #region Awake, Start, Update, Fixed Update and etc
     private void Awake()
     {
+        InitialPlayerPosition = GameObject.Find("PlayerInitial_Position");
+        s_CrossSceneDataContainer = CrossSceneDataContainer;
         if (instance == null)
         {
             instance = this;
@@ -138,6 +158,11 @@ public class GameManager : MonoBehaviour
         Sounds = SoundsList.ToDictionarySafe(sound => sound.Key, sound => sound.Sound);
 
         Player = FindAnyObjectByType<NewPlayerController>();
+    }
+
+    private void Start()
+    {
+        if (Player != null && !Player.AllSet) Player.ResetPlayer();
     }
 
     private void Update()
@@ -158,6 +183,30 @@ public class GameManager : MonoBehaviour
         {
             PerformQuickLoad();
         }
+    }
+
+    private void OnLevelWasLoaded(int level)
+    {
+        if (InitialPlayerPosition != null) InitialPlayerPosition = null;
+
+        InitialPlayerPosition = GameObject.Find("PlayerInitial_Position");
+        if (InitialPlayerPosition == null) Debug.LogWarning("No initial position for the player at this scene");
+
+        Player.transform.position = InitialPlayerPosition.transform.position;
+        if (PlayerLeavingScene == true && PlayerArrivedToScene == true)
+        {
+            if(CrossSceneDataContainer != null)
+            {
+                CrossSceneDataContainer.LoadToPlayer(Player);
+                Player.ResetPlayer();
+            }
+        }
+    }
+
+    internal static void PlayerIntializedLeavingScene()
+    {
+        PlayerLeavingScene = true;
+        if(s_CrossSceneDataContainer != null) s_CrossSceneDataContainer.SaveFromPlayer(Player);
     }
     #endregion
 
@@ -341,6 +390,29 @@ public class GameManager : MonoBehaviour
         BroadcastActualGameState(currentGameState);
     }
 
+    public static void TryLoad()
+    {
+        
+
+        Debug.Log("Trying to load");
+        SaveFileName = "QuickSave";
+        SaveFolderName = "QuickSaves";
+        if (MSS.SaveExists(SaveFileName, SaveFolderName, out string pathToFile)){
+            Debug.Log("File exists");
+            LoadPlayerData(pathToFile);
+        }
+        else
+        {
+            Debug.Log("File Does not existsm reseting to the beginning");
+            if (InitialPlayerPosition != null)
+            {
+                Debug.Log("Initial player position is found. Using it as leverage");
+                Player.transform.position = InitialPlayerPosition.transform.position;
+                Player.ResetPlayer();
+            }
+        }
+    }
+
     #endregion
 
     #region Save System Functions
@@ -363,11 +435,23 @@ public class GameManager : MonoBehaviour
     public static void SavePlayerData()
     {
         ShowNotification("Saving game..");
-
+        #region Player Common
         MSS.Save("playerPosition", Player.transform.position, SaveFolderName, SaveFileName);
+        #endregion
+
+        #region Player Stats
+        MSS.Save("playerHealth", Player.CurrentHealth, SaveFolderName, SaveFileName);
+        MSS.Save("playerMaxHealth", Player.MaxHealth, SaveFolderName, SaveFileName);
+        #endregion
+
+        #region Player Currency & Levels
         MSS.Save("playerGoldenCoins", Player.GoldenCoins, SaveFolderName, SaveFileName);
         MSS.Save("playerSilverCoins", Player.SilverCoins, SaveFolderName, SaveFileName);
         MSS.Save("playerRedCoins", Player.RedCoins, SaveFolderName, SaveFileName);
+        MSS.Save("playerSkillPoints", Player.SkillPoints, SaveFolderName, SaveFileName);
+        MSS.Save("playerLevel", Player.PlayerLevel, SaveFolderName, SaveFileName);
+
+        #endregion
 
         ShowNotification("Game Saved");
         if (Sounds.TryGetValue("Save", out AudioClip clip)) PlayGMSfx(clip);
@@ -376,9 +460,15 @@ public class GameManager : MonoBehaviour
     public static void LoadPlayerData()
     {
         ShowNotification("Loading game..");
-
+        #region Player Common
         Player.transform.position = MSS.Load("playerPosition", SaveFilePath, Vector3.zero);
+        #endregion
 
+        #region Player Stats
+        Player.MaxHealth = MSS.Load("playerMaxHealth", SaveFilePath, 100);
+        #endregion
+
+        #region Player Currency & Levels
         Player.GoldenCoins = MSS.Load("playerGoldenCoins", SaveFilePath, 0);
         SendCoinsChanged(ECollectable.Golden, Player.GoldenCoins);
 
@@ -387,6 +477,43 @@ public class GameManager : MonoBehaviour
 
         Player.RedCoins = MSS.Load("playerRedCoins", SaveFilePath, 0);
         SendCoinsChanged(ECollectable.Red, Player.RedCoins);
+
+        Player.SkillPoints = MSS.Load("playerSkillPoints", SaveFilePath, 0);
+        Player.PlayerLevel = MSS.Load("playerLevel", SaveFilePath, 0);
+        #endregion
+
+        Player.ResetPlayer();
+
+        ShowNotification("Loading complete");
+        if (Sounds.TryGetValue("Load", out AudioClip clip)) PlayGMSfx(clip);
+    }
+
+    public static void LoadPlayerData(string pathToFile)
+    {
+        ShowNotification("Loading game..");
+        #region Player Common
+        Player.transform.position = MSS.Load("playerPosition", pathToFile, Vector3.zero);
+        #endregion
+
+        #region Player Stats
+        Player.MaxHealth = MSS.Load("playerMaxHealth", pathToFile, 100);
+        #endregion
+
+        #region Player Currency & Levels
+        Player.GoldenCoins = MSS.Load("playerGoldenCoins", pathToFile, 0);
+        SendCoinsChanged(ECollectable.Golden, Player.GoldenCoins);
+
+        Player.SilverCoins = MSS.Load("playerSilverCoins", pathToFile, 0);
+        SendCoinsChanged(ECollectable.Silver, Player.SilverCoins);
+
+        Player.RedCoins = MSS.Load("playerRedCoins", pathToFile, 0);
+        SendCoinsChanged(ECollectable.Red, Player.RedCoins);
+
+        Player.SkillPoints = MSS.Load("playerSkillPoints", pathToFile, 0);
+        Player.PlayerLevel = MSS.Load("playerLevel", pathToFile, 0);
+        #endregion
+
+        Player.ResetPlayer();
 
         ShowNotification("Loading complete");
         if (Sounds.TryGetValue("Load", out AudioClip clip)) PlayGMSfx(clip);
@@ -397,6 +524,29 @@ public class GameManager : MonoBehaviour
         SaveFileName = fileName;
         SaveFolderName = folderName;
         SaveFilePath = MSSPath.CombinePersistent(SaveFolderName, SaveFileName);
+    }
+    #endregion
+
+    #region Reset Functions
+    public void ClearCombatNPCS()
+    {
+        foreach(var npc in AllEnemiesAtScene)
+        {
+            if(npc.TryGetComponent<CloseCombatNPCBase>(out CloseCombatNPCBase npcBase))
+            {
+                npcBase.DestroyOnRequest();
+            }
+        }
+        AllEnemiesAtScene.Clear();
+
+        foreach (var npc in AllFriendlyAtScene)
+        {
+            if (npc.TryGetComponent<CloseCombatNPCBase>(out CloseCombatNPCBase npcBase))
+            {
+                npcBase.DestroyOnRequest();
+            }
+        }
+        AllFriendlyAtScene.Clear();
     }
     #endregion
 

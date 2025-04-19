@@ -7,11 +7,13 @@ namespace Limbo.CustomEditorAttributes
     public class ShowIfAttribute : PropertyAttribute
     {
         public string ConditionName { get; }
+        public object CompareValue { get; }
         public bool Invert { get; }
 
-        public ShowIfAttribute(string conditionName, bool invert = false)
+        public ShowIfAttribute(string conditionName, object compareValue = null, bool invert = false)
         {
             ConditionName = conditionName;
+            CompareValue = compareValue;
             Invert = invert;
         }
     }

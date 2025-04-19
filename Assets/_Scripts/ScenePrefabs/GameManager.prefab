@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 3027343690360040375}
   - component: {fileID: 7002464896910484040}
   - component: {fileID: 3208458342975966825}
+  - component: {fileID: 8952579492607653449}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -145,3 +146,22 @@ MonoBehaviour:
   - {fileID: 11400000, guid: f736d37333cdd71409b528e6599146f6, type: 2}
   - {fileID: 11400000, guid: 7f1ba8fea9538954893b2872e547f935, type: 2}
   - {fileID: 11400000, guid: 096301b88545aee4aa5c17c0ce8e0d72, type: 2}
+--- !u!114 &8952579492607653449
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7372219115755518935}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 43e086113310f3242930c8c4ec2d4aeb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  settingsToApply:
+  - SettingsType: 1
+  - SettingsType: 2
+  CrossSceneDataContainer: {fileID: 0}
+  Health: 0
+  MaxHealth: 0
+  LastKnownPosition: {x: 0, y: 0, z: 0}

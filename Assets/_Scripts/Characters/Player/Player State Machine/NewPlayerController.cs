@@ -137,17 +137,17 @@ public class NewPlayerController : MonoBehaviour, IDamageble
 
     [Space]
     [Header("Player States Assigner")]
-    [SerializeField] private PlayerIdleSOBase PlayerIdleBase;
-    [SerializeField] private PlayerWalkSOBase PlayerWalkBase;
-    [SerializeField] private PlayerRunSOBase PlayerRunBase;
-    [SerializeField] private PlayerJumpSOBase PlayerJumpBase;
-    [SerializeField] private PlayerFallSOBase PlayerFallBase;
-    [SerializeField] private PlayerRollSOBase PlayerRollBase;
-    [SerializeField] private PlayerAttackSOBase PlayerAttackBase;
-    [SerializeField] private PlayerSkillAttackSOBase PlayerSkillAttackBase;
-    [SerializeField] private PlayerBlockSOBase PlayerBlockBase;
-    [SerializeField] private PlayerHurtSOBase PlayerHurtBase;
-    [SerializeField] private PlayerDeadSOBase PlayerDeadBase;
+    public PlayerIdleSOBase PlayerIdleBase;
+    public PlayerWalkSOBase PlayerWalkBase;
+    public PlayerRunSOBase PlayerRunBase;
+    public PlayerJumpSOBase PlayerJumpBase;
+    public PlayerFallSOBase PlayerFallBase;
+    public PlayerRollSOBase PlayerRollBase;
+    public PlayerAttackSOBase PlayerAttackBase;
+    public PlayerSkillAttackSOBase PlayerSkillAttackBase;
+    public PlayerBlockSOBase PlayerBlockBase;
+    public PlayerHurtSOBase PlayerHurtBase;
+    public PlayerDeadSOBase PlayerDeadBase;
 
     public PlayerIdleSOBase PlayerIdleBaseInstance { get; set; }
     public PlayerWalkSOBase PlayerWalkBaseInstance { get; set; }
@@ -163,19 +163,17 @@ public class NewPlayerController : MonoBehaviour, IDamageble
 
     #endregion
 
+    [Header("Reset Player")]
+    public bool Resetting, AllSet;
+
     #region Awake, Start, Update...
     private void Awake()
     {
-        AnimationState = GetComponent<AnimationStateHandler>();
-        PlayerRb = GetComponent<Rigidbody2D>();
-        StatusEffectManager = GetComponent<StatusEffectHandler>();
-        Zones = GetComponent<PlayerZones>();
-        soundManager = GetComponent<CharacterSoundsManager>();
+        AllSet = false;
+    }
+    private void Start()
+    {
 
-        StateMachineInitilizer();
-
-        CurrentHealth = MaxHealth;
-        Alive = true;
     }
 
     private void StateMachineInitilizer()
@@ -262,56 +260,77 @@ public class NewPlayerController : MonoBehaviour, IDamageble
         //WallSlideState = new PlayerWallSlideState(this, StateMachine);
     }
 
-    private void Start()
+    public void ResetPlayer()
     {
+        Resetting = true;
+        AnimationState = GetComponent<AnimationStateHandler>();
+        PlayerRb = GetComponent<Rigidbody2D>();
+        StatusEffectManager = GetComponent<StatusEffectHandler>();
+        Zones = GetComponent<PlayerZones>();
+        soundManager = GetComponent<CharacterSoundsManager>();
+
+        StateMachineInitilizer();
+
+        CurrentHealth = MaxHealth;
+        Alive = true;
+        gameObject.tag = "Player";
+
         StateMachine.Initialize(IdleState);
 
-        GlobalEventsManager.SendPlayerCurrentHealth(CurrentHealth);
+        GlobalEventsManager.ResetHealthBar();
+        //GlobalEventsManager.GameStateListener.AddListener(GameStateReactor);
 
-        GlobalEventsManager.GameStateListener.AddListener(GameStateReactor);
+        Resetting = false;
+        AllSet = true;
+        GlobalEventsManager.ShowDeathScreen(false);
     }
 
     private void Update()
     {
-        if (Alive)
+        if (AllSet)
         {
-            StateMachine.CurrentPlayerState.FrameUpdate();
-
-            IsPlayerGrounded();
-
-            if (IsJumping || IsFalling || !IsGrounded) CheckWallSlide();
-
-            HandleLogic();
-            FlipSidesHandler();
-
-            if (Input.GetKeyDown(Buttons.Interaction))
+            if (Alive)
             {
-                Zones.TryInteract();
-            }
-            if (Input.GetKeyDown(Buttons.Quicksave))
-            {
-                GlobalEventsManager.BroadcastActualGameState(GameStates.QuickSave);
-            }
+                StateMachine.CurrentPlayerState.FrameUpdate();
 
-            if (Input.GetKeyDown(Buttons.InGameMenu))
-            {
-                GlobalEventsManager.ShowNotification("Currently unavilable");
-                if (GameManager.Instance.GetGMSounds.TryGetValue("Save", out AudioClip clip)) GlobalEventsManager.PlayGMSfx(clip);
-            }
-        }
+                IsPlayerGrounded();
 
-        if (Input.GetKeyDown(Buttons.Quickload))
-        {
-            GlobalEventsManager.BroadcastActualGameState(GameStates.Restart);
-        }
+                if (IsJumping || IsFalling || !IsGrounded) CheckWallSlide();
+
+                HandleLogic();
+                FlipSidesHandler();
+
+                if (Input.GetKeyDown(Buttons.Interaction))
+                {
+                    Zones.TryInteract();
+                }
+                if (Input.GetKeyDown(Buttons.Quicksave))
+                {
+                    GlobalEventsManager.BroadcastActualGameState(GameStates.QuickSave);
+                }
+                if (Input.GetKeyDown(Buttons.Quickload))
+                {
+                    GlobalEventsManager.BroadcastActualGameState(GameStates.Restart);
+                }
+
+                if (Input.GetKeyDown(Buttons.InGameMenu))
+                {
+                    GlobalEventsManager.ShowNotification("Currently unavilable");
+                    if (GameManager.Instance.GetGMSounds.TryGetValue("Save", out AudioClip clip)) GlobalEventsManager.PlayGMSfx(clip);
+                }
+            }
+        }        
     }
 
     private void FixedUpdate()
     {
-        if (Alive)
+        if (AllSet)
         {
-            StateMachine.CurrentPlayerState.PhysicsUpdate();
-            if (!LockMovement) transform.position += MoveSpeed * Time.fixedDeltaTime * new Vector3(Movement, 0.0f, 0.0f);
+            if (Alive)
+            {
+                StateMachine.CurrentPlayerState.PhysicsUpdate();
+                if (!LockMovement) transform.position += MoveSpeed * Time.fixedDeltaTime * new Vector3(Movement, 0.0f, 0.0f);
+            }
         }
     }
 
@@ -372,6 +391,10 @@ public class NewPlayerController : MonoBehaviour, IDamageble
                 break;
         }
     }
+    #endregion
+
+    #region Reset Logic
+
     #endregion
 
     #region Animation Trigger Events Logic
@@ -521,7 +544,11 @@ public class NewPlayerController : MonoBehaviour, IDamageble
 
     public void Die()
     {
+        gameObject.tag = "Dead";
         AnimationState.ChangeAnimationState("HeroKnight_Death");
+        AllSet = false;
+        Alive = false;
+        StartCoroutine(CoroutineUtils.WaitThenDo(3f, () => GlobalEventsManager.ShowDeathScreen(true)));
     }
 
     public void SetInitialIDamageble(SafeInstantiation.HealthStats? healthStats)

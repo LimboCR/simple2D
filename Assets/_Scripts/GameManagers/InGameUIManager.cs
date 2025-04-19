@@ -10,15 +10,18 @@ public class InGameUIManager : MonoBehaviour
 {
     public static InGameUIManager Instance;
 
+    #region Currency
     [Space]
     [Header("Coins")]
     private int _goldenC, _silverC, _redC;
     [SerializeField] private TMP_Text _goldenCoins;
     [SerializeField] private TMP_Text _silverCoins;
     [SerializeField] private TMP_Text _redCoins;
+    #endregion
 
+    #region Heavy Attack
     [Space]
-    [Header("Skill Attack")]
+    [Header("Heavy Attack")]
     [SerializeField] private Image _heavyAttackCooldown;
     [SerializeField] private Image _heavyAttackIcon;
     bool IsHeavyAttackAtCooldown = false;
@@ -27,7 +30,9 @@ public class InGameUIManager : MonoBehaviour
 
     [SerializeField] private Color _skillAtCooldownColor;
     private Color _initialSkillRefColor;
+    #endregion
 
+    #region Player Hud
     private NewPlayerController Player;
 
     [Space]
@@ -35,7 +40,7 @@ public class InGameUIManager : MonoBehaviour
     public GameObject InventoryPanel;
     public List<GameObject> InventorySlotImages;
     List<GameObject> inventorySlots;
-    
+
     [Space]
     [Header("Dev Tools")]
     public TMP_InputField CommandLine;
@@ -52,6 +57,10 @@ public class InGameUIManager : MonoBehaviour
     [Header("Notification prefab")]
     public GameObject NotificationPrefab;
     public GameObject NotificationsPanel;
+
+    [Space, Header("Death screen")]
+    public GameObject DeathScreen;
+    #endregion
 
     private void Awake()
     {
@@ -164,6 +173,7 @@ public class InGameUIManager : MonoBehaviour
         OnPlayerCoinsChanged.AddListener(CoinsStatsDisplay);
         OnPlayerHeavyAttackCooldown.AddListener(IsPlayerHeavyAttackAtCooldown);
         OnMessageSent.AddListener(ShowNotification);
+        OnShowDeathScreen.AddListener(ShowDeathScreen);
     }
 
     private void CoinsStatsDisplay(ECollectable type, int amount)
@@ -243,6 +253,11 @@ public class InGameUIManager : MonoBehaviour
             _statusEffectsImages.Remove(effectImage);
             Destroy(effectImage);
         }
+    }
+
+    private void ShowDeathScreen(bool active)
+    {
+        if(DeathScreen!=null) DeathScreen.SetActive(active);
     }
 
     #endregion
