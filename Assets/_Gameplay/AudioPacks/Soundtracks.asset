@@ -64,4 +64,8 @@ MonoBehaviour:
     Sound: {fileID: 8300000, guid: 517c1fe41162c7a43ab5d2db3856f002, type: 3}
   - Key: LightAmbience5
     Sound: {fileID: 8300000, guid: 86ae02d825956f0468f72915641fa95e, type: 3}
+  - Key: Sword_7
+    Sound: {fileID: 8300000, guid: aa295de9779ce0146bce3cb4e81b7476, type: 3}
+  - Key: Sword_4
+    Sound: {fileID: 8300000, guid: a801254ed8d574b4e953e1bcb19f5526, type: 3}
   IsInitialized: 0

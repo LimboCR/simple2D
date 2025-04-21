@@ -304,6 +304,8 @@ public class GameManager : MonoBehaviour
         PlayerArrivedToScene = false;
         SpawnPlayerAtInitial = false;
 
+        AudioManager.MusicSourcePlay(AudioManager.Instance.AudioPacks[EAudioPackType.Soundtracks].TracksDictionary["DarkAmbient4"], PlayMode.force, true);
+
         yield break;
     }
 

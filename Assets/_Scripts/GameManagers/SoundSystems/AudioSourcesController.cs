@@ -20,7 +20,7 @@ public class AudioSourcesController : MonoBehaviour
         }
     }
 
-    public void PlayTrack(AudioClip clip, AudioSourceType type)
+    public void PlayTrack(AudioClip clip, AudioSourceType type, bool loop)
     {
         if(clip != null)
         {
@@ -29,13 +29,14 @@ public class AudioSourcesController : MonoBehaviour
                 if (!source.IsPlaying())
                 {
                     source.Source.clip = clip;
+                    source.Source.loop = loop;
                     source.Source.Play();
                 }
             }
         }
     }
 
-    public void PlayRandomTrack(AudioSourceType type, params AudioClip[] clips)
+    public void PlayRandomTrack(AudioSourceType type, bool loop, params AudioClip[] clips)
     {
         if (Sources.TryGetValue(type, out var source))
         {
@@ -44,30 +45,33 @@ public class AudioSourcesController : MonoBehaviour
                 int randomKey = Random.Range(0, clips.Length);
 
                 source.Source.clip = clips[randomKey];
+                source.Source.loop = loop;
                 source.Source.Play();
             }
         }
     }
 
-    public void ForcePlayTrack(AudioClip clip, AudioSourceType type)
+    public void ForcePlayTrack(AudioClip clip, AudioSourceType type, bool loop)
     {
         if (clip != null)
         {
             if (Sources.TryGetValue(type, out var source))
             {
                 source.Source.clip = clip;
+                source.Source.loop = loop;
                 source.Source.Play();
             }
         }
     }
 
-    public void ForcePlayRandomTrack(AudioSourceType type, params AudioClip[] clips)
+    public void ForcePlayRandomTrack(AudioSourceType type, bool loop, params AudioClip[] clips)
     {
         if (Sources.TryGetValue(type, out var source))
         {
             int randomKey = Random.Range(0, clips.Length);
 
             source.Source.clip = clips[randomKey];
+            source.Source.loop = loop;
             source.Source.Play();
         }
     }

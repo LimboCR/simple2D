@@ -41,6 +41,7 @@ public class AudioManager : MonoBehaviour
 
     [Space, Header("Play Music On Start")]
     public bool PlayOnStart = false;
+    public bool Loop = false;
     [ShowIf("PlayOnStart")] public string MusicToPlay = "DarkAmbient4";
 
     private void Awake()
@@ -89,7 +90,7 @@ public class AudioManager : MonoBehaviour
 
     void Start()
     {
-        if(PlayOnStart) MainCameraSource.PlayTrack(AudioPacks[EAudioPackType.Soundtracks].TracksDictionary[MusicToPlay], AudioSourceType.Music);
+        if(PlayOnStart) MainCameraSource.PlayTrack(AudioPacks[EAudioPackType.Soundtracks].TracksDictionary[MusicToPlay], AudioSourceType.Music, Loop);
     }
 
     
@@ -181,9 +182,9 @@ public class AudioManager : MonoBehaviour
         if (s_MainCameraSource == null) return;
 
         if(playMode == PlayMode.safe)
-            s_MainCameraSource.PlayTrack(clip, AudioSourceType.GameManager);
+            s_MainCameraSource.PlayTrack(clip, AudioSourceType.GameManager, false);
         else if(playMode == PlayMode.force)
-            s_MainCameraSource.ForcePlayTrack(clip, AudioSourceType.GameManager);
+            s_MainCameraSource.ForcePlayTrack(clip, AudioSourceType.GameManager, false);
     }
 
     public static void GM_SFX_PlayRandom(PlayMode playMode, params AudioClip[] clips)
@@ -191,9 +192,9 @@ public class AudioManager : MonoBehaviour
         if (s_MainCameraSource == null) return;
 
         if (playMode == PlayMode.safe)
-            s_MainCameraSource.PlayRandomTrack(AudioSourceType.GameManager, clips);
+            s_MainCameraSource.PlayRandomTrack(AudioSourceType.GameManager, false, clips);
         else if (playMode == PlayMode.force)
-            s_MainCameraSource.ForcePlayRandomTrack(AudioSourceType.GameManager, clips);
+            s_MainCameraSource.ForcePlayRandomTrack(AudioSourceType.GameManager, false, clips);
     }
 
     public static void GM_SFX_ForceStop()
@@ -206,24 +207,24 @@ public class AudioManager : MonoBehaviour
     #endregion
 
     #region Music Sound Source Logic
-    public static void MusicSourcePlay(AudioClip clip, PlayMode playMode = PlayMode.safe)
+    public static void MusicSourcePlay(AudioClip clip, PlayMode playMode = PlayMode.safe, bool loop = false)
     {
         if (s_MainCameraSource == null) return;
 
         if (playMode == PlayMode.safe)
-            s_MainCameraSource.PlayTrack(clip, AudioSourceType.GameManager);
+            s_MainCameraSource.PlayTrack(clip, AudioSourceType.GameManager, loop);
         else if (playMode == PlayMode.force)
-            s_MainCameraSource.ForcePlayTrack(clip, AudioSourceType.GameManager);
+            s_MainCameraSource.ForcePlayTrack(clip, AudioSourceType.GameManager, loop);
     }
 
-    public static void MusicSourcePlayRandom(PlayMode playMode, params AudioClip[] clips)
+    public static void MusicSourcePlayRandom(PlayMode playMode, bool loop = false, params AudioClip[] clips)
     {
         if (s_MainCameraSource == null) return;
 
         if (playMode == PlayMode.safe)
-            s_MainCameraSource.PlayRandomTrack(AudioSourceType.Music, clips);
+            s_MainCameraSource.PlayRandomTrack(AudioSourceType.Music, loop, clips);
         else if (playMode == PlayMode.force)
-            s_MainCameraSource.ForcePlayRandomTrack(AudioSourceType.Music, clips);
+            s_MainCameraSource.ForcePlayRandomTrack(AudioSourceType.Music, loop, clips);
     }
 
     public static void MusicSourceForceStop()
@@ -241,9 +242,9 @@ public class AudioManager : MonoBehaviour
         if (s_MainCameraSource == null) return;
 
         if (playMode == PlayMode.safe)
-            s_MainCameraSource.PlayTrack(clip, AudioSourceType.GameManager);
+            s_MainCameraSource.PlayTrack(clip, AudioSourceType.GameManager, false);
         else if (playMode == PlayMode.force)
-            s_MainCameraSource.ForcePlayTrack(clip, AudioSourceType.GameManager);
+            s_MainCameraSource.ForcePlayTrack(clip, AudioSourceType.GameManager, false);
     }
 
     public static void PlayerInterSourcePlayRandom(PlayMode playMode, params AudioClip[] clips)
@@ -251,9 +252,9 @@ public class AudioManager : MonoBehaviour
         if (s_MainCameraSource == null) return;
 
         if (playMode == PlayMode.safe)
-            s_MainCameraSource.PlayRandomTrack(AudioSourceType.PlayerConsumable, clips);
+            s_MainCameraSource.PlayRandomTrack(AudioSourceType.PlayerConsumable, false, clips);
         else if (playMode == PlayMode.force)
-            s_MainCameraSource.ForcePlayRandomTrack(AudioSourceType.PlayerConsumable, clips);
+            s_MainCameraSource.ForcePlayRandomTrack(AudioSourceType.PlayerConsumable, false, clips);
     }
 
     public static void PlayerInputSourceForceStop()

@@ -2,15 +2,12 @@ using UnityEngine;
 
 public class CutSceneHandler : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
+    public TestComicsFrame StartingFrame;
+    public TestComicsFrame EndingFrame;
 
-    // Update is called once per frame
-    void Update()
+    public GameObject ContinueButton;
+    private void Update()
     {
-        
+        if(EndingFrame.FrameLogicFinished == true) ContinueButton.SetActive(true);
     }
 }

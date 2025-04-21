@@ -65,6 +65,7 @@ namespace Limbo.DialogSystem
 
         void OnOptionSelected(DialogOptionVariant option)
         {
+            _player = GameManager.Instance.GetPlayerGameObject();
             option.Result?.ApplyResult(_player);
 
             if (option.NextNode != null)

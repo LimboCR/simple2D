@@ -8,8 +8,8 @@ public static class GlobalEventsManager
     public static UnityEvent<AudioClip, PlayMode> OnGameManagerSFXPlay = new();
     public static UnityEvent<PlayMode, AudioClip[]> OnGameManagerSFXPlayRandom = new();
 
-    public static UnityEvent<AudioClip, PlayMode> OnMusicSourcePlay = new();
-    public static UnityEvent<PlayMode, AudioClip[]> OnMusicSourcePlayRandom = new();
+    public static UnityEvent<AudioClip, PlayMode, bool> OnMusicSourcePlay = new();
+    public static UnityEvent<PlayMode, bool, AudioClip[]> OnMusicSourcePlayRandom = new();
 
     public static UnityEvent<AudioClip, PlayMode> OnPlayerInteractionPlay = new();
     public static UnityEvent<PlayMode, AudioClip[]> OnPlayerInteractionPlayRandom = new();
@@ -197,9 +197,9 @@ public static class GlobalEventsManager
     {
         OnGameManagerSFXPlay.Invoke(clip, playMode);
     }
-    public static void PlayMusicSource(AudioClip clip, PlayMode playMode = PlayMode.safe)
+    public static void PlayMusicSource(AudioClip clip, PlayMode playMode = PlayMode.safe, bool loop = false)
     {
-        OnMusicSourcePlay.Invoke(clip, playMode);
+        OnMusicSourcePlay.Invoke(clip, playMode, loop);
     }
     public static void PlayPlayerInteraction(AudioClip clip, PlayMode playMode = PlayMode.safe)
     {
@@ -213,9 +213,9 @@ public static class GlobalEventsManager
     {
         OnGameManagerSFXPlayRandom.Invoke(playMode, clip);
     }
-    public static void PlayRandomMusicSource(PlayMode playMode = PlayMode.safe, params AudioClip[] clip)
+    public static void PlayRandomMusicSource(PlayMode playMode = PlayMode.safe, bool loop = false, params AudioClip[] clip)
     {
-        OnMusicSourcePlayRandom.Invoke(playMode, clip);
+        OnMusicSourcePlayRandom.Invoke(playMode, loop, clip);
     }
     public static void PlayRandomPlayerInteraction(PlayMode playMode = PlayMode.safe, params AudioClip[] clip)
     {

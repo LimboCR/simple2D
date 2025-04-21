@@ -8,6 +8,7 @@ public class TestComicsFrame : MonoBehaviour
     public bool TestFadeIn;
     private Image img;
     private Tween fadeTween;
+    public bool FrameLogicFinished;
 
     public TestComicsFrame NextFrameToPlay;
 
@@ -24,7 +25,7 @@ public class TestComicsFrame : MonoBehaviour
         if (TestFadeIn)
         {
             TestFadeIn = false;
-            if(SoundToPlay!=null) AudioManager.GM_SFX_Play(SoundToPlay);
+            if(SoundToPlay!=null) AudioManager.GM_SFX_Play(SoundToPlay, PlayMode.force);
             FadeIn(5f);
         }
     }
@@ -47,11 +48,26 @@ public class TestComicsFrame : MonoBehaviour
 
     private void WaitForEnd()
     {
-        if (NextFrameToPlay != null) InvokeNext();
+        bool playNextFrame = false;
+        while (AudioManager.IsSourcePlaying(AudioSourceType.GameManager))
+        {
+            playNextFrame = false;
+            FrameLogicFinished = false;
+        }
+        playNextFrame = true;
+
+        if (playNextFrame == true)
+        {
+            if (NextFrameToPlay != null) InvokeNext();
+            else FrameLogicFinished = true;
+        }
+        
+            
     }
 
     private void InvokeNext()
     {
+        FrameLogicFinished = true;
         NextFrameToPlay.TestFadeIn = true;
     }
 }

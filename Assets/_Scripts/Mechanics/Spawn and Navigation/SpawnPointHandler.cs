@@ -9,8 +9,8 @@ public class SpawnPointHandler : MonoBehaviour
     [Header("Spawn Settings")]
     [SerializeField] private GameObject waypointPrefab;
     [SerializeField] private bool _instantiateOnStart;
-    [SerializeField, Range(0.5f, 15f)] private float waypointLeftOffset = 2f;
-    [SerializeField, Range(0.5f, 15f)] private float waypointRightOffset = 2f;
+    [SerializeField, Range(0.5f, 400f)] private float waypointLeftOffset = 2f;
+    [SerializeField, Range(0.5f, 400f)] private float waypointRightOffset = 2f;
     [SerializeField] LayerMask GroundMask;
 
     [Space]
