@@ -19,7 +19,7 @@ public class HealthBarUI : MonoBehaviour
         OnPlayerHeal.AddListener(DisplayHealing);
         OnHealthBarReset.AddListener(HealthBarReset);
 
-        HealthBarReset();
+        HealthBarReset(maxHealth);
     }
 
     public void DisplayTookDamage(float amount)
@@ -35,11 +35,13 @@ public class HealthBarUI : MonoBehaviour
         HealthHealingDisplay();
     }
 
-    public void HealthBarReset()
+    public void HealthBarReset(float currentHealth)
     {
-        _currentHealth = maxHealth;
-        _healthBarFillImage.fillAmount = 1f;
-        _healthBarTrailingFillImage.fillAmount = 1f;
+        float ratio = currentHealth / maxHealth;
+        _currentHealth = currentHealth;
+
+        _healthBarFillImage.fillAmount = ratio;
+        _healthBarTrailingFillImage.fillAmount = ratio;
     }
 
     private void HealthTakeDamageDisplay()

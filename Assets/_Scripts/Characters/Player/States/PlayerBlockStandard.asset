@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: PlayerBlockStandard
   m_EditorClassIdentifier: 
   _blockAnimationName: HeroKnight_BlockIdle
-  _blockHitEffectAnimationName: 
-  _blockHitNoEffectAnimationName: 
+  _blockHitEffectAnimationName: HeroKnight_Block
+  _blockHitNoEffectAnimationName: HeroKnight_BlockNoEffect

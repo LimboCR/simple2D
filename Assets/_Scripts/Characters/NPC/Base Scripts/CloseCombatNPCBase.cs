@@ -304,6 +304,7 @@ public abstract class CloseCombatNPCBase : NPCBase, IDamageble, INPCMovable
 
     public virtual void Die() // ++++
     {
+        SendEnemyRemove(gameObject, TypeOfNPC);
         StateMachine.ChangeState(DeadState);
         Debug.Log($"{gameObject.name} died horrible death. Pray!");
 
@@ -311,7 +312,6 @@ public abstract class CloseCombatNPCBase : NPCBase, IDamageble, INPCMovable
         gameObject.tag = "Dead";
 
         if(_isLootDropped == false) DropLootOnDeath();
-        SendEnemyRemove(gameObject, TypeOfNPC);
         Destroy(gameObject, 15f); // Cleanup
     }
 

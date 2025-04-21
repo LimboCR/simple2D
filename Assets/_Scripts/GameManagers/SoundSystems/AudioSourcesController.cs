@@ -26,7 +26,7 @@ public class AudioSourcesController : MonoBehaviour
         {
             if (Sources.TryGetValue(type, out var source))
             {
-                if (!source.IsPlaying)
+                if (!source.IsPlaying())
                 {
                     source.Source.clip = clip;
                     source.Source.Play();
@@ -39,7 +39,7 @@ public class AudioSourcesController : MonoBehaviour
     {
         if (Sources.TryGetValue(type, out var source))
         {
-            if (!source.IsPlaying)
+            if (!source.IsPlaying())
             {
                 int randomKey = Random.Range(0, clips.Length);
 
@@ -75,5 +75,16 @@ public class AudioSourcesController : MonoBehaviour
     public void ForceStopPlaying(AudioSourceType type)
     {
         if (Sources.TryGetValue(type, out var source)) source.Source.Stop();
+    }
+
+    public bool IsPlaying(AudioSourceType type)
+    {
+        if (Sources.TryGetValue(type, out var source))
+        {
+            return source.IsPlaying();
+        }
+
+        Debug.LogError($"No AudioSource of type {type} exists in AudioSourceController");
+        return false;
     }
 }

@@ -1984,7 +1984,7 @@ MonoBehaviour:
   _minutesText: {fileID: 3462613466169068530}
   NotificationPrefab: {fileID: 3038960952338474055, guid: 10e710a6319f54f439e0bd9736bde002, type: 3}
   NotificationsPanel: {fileID: 8537440931978239346}
-  DeathScreen: {fileID: 0}
+  DeathScreen: {fileID: 5973929066181826852}
 --- !u!114 &7089176038457148327
 MonoBehaviour:
   m_ObjectHideFlags: 0

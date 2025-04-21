@@ -39,6 +39,10 @@ public class PersistentPlayerData : ScriptableObject
     public PlayerHurtSOBase PlayerHurtBase;
     public PlayerDeadSOBase PlayerDeadBase;
 
+    [Space, Header("Time Manager")]
+    public int Hours;
+    public int Minutes;
+
     public void SaveFromPlayer(NewPlayerController player)
     {
         #region Common data
@@ -119,5 +123,18 @@ public class PersistentPlayerData : ScriptableObject
         player.PlayerHurtBase = PlayerHurtBase;
         player.PlayerDeadBase = PlayerDeadBase;
         #endregion
+    }
+
+    public void SaveFromTimeManager(TimeManager time)
+    {
+        Hours = time.hours;
+        Minutes = time.minutes;
+    }
+
+    public void LoadToTimeManager(TimeManager time)
+    {
+        time.SetHours = Hours;
+        time.SetMinutes = Minutes;
+        time.ChangeTime = true;
     }
 }

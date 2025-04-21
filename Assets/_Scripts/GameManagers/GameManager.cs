@@ -6,6 +6,8 @@ using MultiSaveSystem;
 using Limbo.CollectionUtils;
 using Unity.Cinemachine;
 using System;
+using UnityEngine.SceneManagement;
+using System.Collections;
 
 public class GameManager : MonoBehaviour
 {
@@ -35,6 +37,7 @@ public class GameManager : MonoBehaviour
     #endregion
 
     #region Scripts and objects references
+    public GameObject PlayerVisualObject;
     private static NewPlayerController _player;
     public static NewPlayerController Player
     {
@@ -62,6 +65,7 @@ public class GameManager : MonoBehaviour
     public List<GameObject> AllFriendlyAtScene = new();
     public List<GameObject> AllPeacfullAtScene = new();
     public List<GameObject> AllSpawnPointsAtScene = new();
+    public List<GameObject> AllTriggerZones = new();
 
     [Header("Sectorial reference")]
     public List<GameObject> EnemiesAtSector = new();
@@ -115,6 +119,8 @@ public class GameManager : MonoBehaviour
     public static string SaveFileName;
     public static string SaveFolderName;
     public static string SaveFilePath;
+
+    public static bool LoadingSaveFile;
     #endregion
 
     #region Inspector
@@ -131,42 +137,54 @@ public class GameManager : MonoBehaviour
     #region Scene Specific Variables
     [Space, Header("Current Scene Data")]
     public static GameObject InitialPlayerPosition;
+    public static string CurrentSceneName;
+    public static int CurrentSceneIndex;
+    public static string PastScene;
 
     [Space, Header("Cross Scene Data")]
     public PersistentPlayerData CrossSceneDataContainer;
     public static PersistentPlayerData s_CrossSceneDataContainer;
     public static bool PlayerLeavingScene;
     public static bool PlayerArrivedToScene;
+    public static bool SpawnPlayerAtInitial;
     #endregion
-
+    bool LoadSaveRef;
     //=======================\\
 
     ////     Logic     \\\\
     #region Awake, Start, Update, Fixed Update and etc
     private void Awake()
     {
+        if (instance != null && instance != this)
+        {
+            Destroy(this.gameObject);
+            return;
+        }
+
+        instance = this;
+        DontDestroyOnLoad(this.gameObject);
+
+        GlobalSettingsManager.Instance.GMHasAccess = true;
+
         InitialPlayerPosition = GameObject.Find("PlayerInitial_Position");
         s_CrossSceneDataContainer = CrossSceneDataContainer;
-        if (instance == null)
-        {
-            instance = this;
-            DontDestroyOnLoad(gameObject);
-        }
-        else Destroy(gameObject);
+
+        SceneManager.sceneLoaded += OnSceneLoaded;
 
         EventSubscriber();
         Sounds = SoundsList.ToDictionarySafe(sound => sound.Key, sound => sound.Sound);
-
-        Player = FindAnyObjectByType<NewPlayerController>();
     }
 
     private void Start()
     {
-        if (Player != null && !Player.AllSet) Player.ResetPlayer();
+
     }
 
     private void Update()
     {
+        if (Player == null)
+            Debug.Log($"[Update] GameManagerInstance {this.GetInstanceID()} still has null Player at runtime.");
+
         GameStateDisplay = currentGameState;
         SaveFileNameDispaly = SaveFileName;
         SaveFolderDispaly = SaveFolderName;
@@ -181,32 +199,138 @@ public class GameManager : MonoBehaviour
         }
         if (Keyboard.current.rightBracketKey.wasPressedThisFrame)
         {
+            GlobalSettingsManager.Command = EGMCommandType.LoadSave;
             PerformQuickLoad();
         }
+        
     }
 
-    private void OnLevelWasLoaded(int level)
+    private void OnDestroy()
     {
-        if (InitialPlayerPosition != null) InitialPlayerPosition = null;
+        if (instance == this)
+            SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    private void OnApplicationQuit()
+    {
+        if (instance == this)
+            SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        LoadSaveRef = GlobalSettingsManager.LoadFromSaveFile;
+        Debug.Log($"LoadSaveRef: {LoadSaveRef}");
+        PlayerArrivedToScene = true;
+
+        var currentScene = SceneManager.GetActiveScene();
+        CurrentSceneName = currentScene.name;
+        CurrentSceneIndex = currentScene.buildIndex;
+
+        s_CrossSceneDataContainer = CrossSceneDataContainer;
 
         InitialPlayerPosition = GameObject.Find("PlayerInitial_Position");
-        if (InitialPlayerPosition == null) Debug.LogWarning("No initial position for the player at this scene");
+        if (InitialPlayerPosition == null)
+            Debug.LogWarning($"[GameManager {this.GetInstanceID()}] [OnSceneLoaded] No initial position for the player at this scene");
 
-        Player.transform.position = InitialPlayerPosition.transform.position;
-        if (PlayerLeavingScene == true && PlayerArrivedToScene == true)
+        _player = null;
+
+        StartCoroutine(AwaitPlayer());
+    }
+
+    public IEnumerator AwaitPlayer(float timeout = 10f)
+    {
+        float timer = 0f;
+        while (Player == null && timer < timeout)
         {
-            if(CrossSceneDataContainer != null)
+            Player = FindAnyObjectByType<NewPlayerController>();
+            timer += Time.deltaTime;
+            yield return null;
+        }
+
+        if (Player == null)
+        {
+            Debug.LogWarning("[AwaitPlayer] Player not found in time.");
+            yield break;
+        }
+
+        PlayerVisualObject = Player.gameObject;
+
+        if(GlobalSettingsManager.Command == EGMCommandType.LoadSave)
+        {
+            TryLoad();
+
+            PlayerLeavingScene = false;
+            PlayerArrivedToScene = false;
+            SpawnPlayerAtInitial = false;
+
+            GlobalSettingsManager.Command = EGMCommandType.None;
+
+            yield break;
+        }
+        else if (GlobalSettingsManager.Command == EGMCommandType.NewGame)
+        {
+            SpawnPlayerAtInitial = true;
+        }
+
+        //Debug.LogWarning($"[AwaitPlayer] Before our bug value LoadFromSaveFile = {GlobalSettingsManager.LoadFromSaveFile}");
+        if (SpawnPlayerAtInitial)
+        {
+            if (InitialPlayerPosition != null)
             {
-                CrossSceneDataContainer.LoadToPlayer(Player);
-                Player.ResetPlayer();
+                Debug.LogWarning("Setting player position to his initial position.");
+                Player.transform.position = InitialPlayerPosition.transform.position;
+            }
+            else
+            {
+                Debug.LogWarning("InitialPlayerPosition is null, cannot set player position.");
             }
         }
+        else
+        {
+            Debug.Log("[AwaitPlayer] Skipping InitialPlayerPosition override due to LoadFromSaveFile");
+        }
+
+        // Always do this part regardless
+        if (PlayerLeavingScene && PlayerArrivedToScene)
+        {
+            if (CrossSceneDataContainer != null) MigratePlayerData();
+            else Debug.LogError("[AwaitPlayer] CrossSceneDataContainer Is Null");
+        }
+
+        Player.ResetPlayer();
+
+        PlayerLeavingScene = false;
+        PlayerArrivedToScene = false;
+        SpawnPlayerAtInitial = false;
+
+        yield break;
+    }
+
+    internal static void MigratePlayerData()
+    {
+        s_CrossSceneDataContainer.LoadToPlayer(Player);
+        s_CrossSceneDataContainer.LoadToTimeManager(FindAnyObjectByType<TimeManager>());
+
+        SendCoinsChanged(ECollectable.Golden, Player.GoldenCoins);
+        SendCoinsChanged(ECollectable.Silver, Player.SilverCoins);
+        SendCoinsChanged(ECollectable.Red, Player.RedCoins);
     }
 
     internal static void PlayerIntializedLeavingScene()
     {
         PlayerLeavingScene = true;
-        if(s_CrossSceneDataContainer != null) s_CrossSceneDataContainer.SaveFromPlayer(Player);
+        SpawnPlayerAtInitial = true;
+        if (s_CrossSceneDataContainer != null)
+        {
+            s_CrossSceneDataContainer.SaveFromPlayer(Player);
+            s_CrossSceneDataContainer.SaveFromTimeManager(FindAnyObjectByType<TimeManager>());
+        }
+    }
+
+    internal static void SetPlayerPosAtInitial()
+    {
+        SpawnPlayerAtInitial = true;
     }
     #endregion
 
@@ -271,11 +395,11 @@ public class GameManager : MonoBehaviour
     }
     private void RemoveNPCAtScene(GameObject npc, NPCType type)
     {
-        if (!AllEnemiesAtScene.Contains(npc) || !AllFriendlyAtScene.Contains(npc) || !AllPeacfullAtScene.Contains(npc))
-        {
-            Debug.LogWarning($"NPC: {npc.name} of type {type} isn't in any lists of the All NPCs at scene ");
-            return;
-        }
+        //if (!AllEnemiesAtScene.Contains(npc) || !AllFriendlyAtScene.Contains(npc) || !AllPeacfullAtScene.Contains(npc))
+        //{
+        //    Debug.LogWarning($"NPC: {npc.name} of type {type} isn't in any lists of the All NPCs at scene ");
+        //    return;
+        //}
 
         switch (type)
         {
@@ -357,34 +481,23 @@ public class GameManager : MonoBehaviour
         BroadcastActualGameState(currentGameState);
     }
 
-    public static void PerformSave(string saveFileName)
-    {
-        currentGameState = GameStates.QuickSave;
-        BroadcastActualGameState(currentGameState);
-
-        currentGameState = GameStates.Play;
-        BroadcastActualGameState(currentGameState);
-    }
-
     public static void PerformQuickLoad()
     {
 
         currentGameState = GameStates.Restart;
         BroadcastActualGameState(currentGameState);
+        
+        GlobalSettingsManager.LoadFromSaveFile = true;
 
         SaveFileName = "QuickSave";
         SaveFolderName = "QuickSaves";
         SaveFilePath = MSSPath.CombinePersistent(SaveFolderName, SaveFileName);
-        LoadPlayerData();
 
-        currentGameState = GameStates.Play;
-        BroadcastActualGameState(currentGameState);
-    }
-
-    public static void PerformLoading()
-    {
-        currentGameState = GameStates.Load;
-        BroadcastActualGameState(currentGameState);
+        if (MSS.SaveExists(SaveFileName, SaveFolderName, out string pathToFile))
+        {
+            LoadPlayerData(pathToFile);
+        }
+        else GlobalSettingsManager.LoadFromSaveFile = false;
 
         currentGameState = GameStates.Play;
         BroadcastActualGameState(currentGameState);
@@ -392,50 +505,87 @@ public class GameManager : MonoBehaviour
 
     public static void TryLoad()
     {
-        
+        ClearCombatNPCS();
+        ResetSpawnPoints();
+        GlobalEventsManager.ResetTriggerZones();
 
-        Debug.Log("Trying to load");
         SaveFileName = "QuickSave";
         SaveFolderName = "QuickSaves";
-        if (MSS.SaveExists(SaveFileName, SaveFolderName, out string pathToFile)){
-            Debug.Log("File exists");
+        if (MSS.SaveExists(SaveFileName, SaveFolderName, out string pathToFile))
+        {
+            GlobalSettingsManager.LoadFromSaveFile = true;
+
+            string saveFileScene = null;
+            MSS.LoadInto("sceneName", ref saveFileScene, pathToFile);
+
+            if(saveFileScene != null)
+            {
+                if(CurrentSceneName != saveFileScene)
+                {
+                    PastScene = CurrentSceneName;
+                    SceneManager.LoadScene(saveFileScene);
+                }
+            }
             LoadPlayerData(pathToFile);
         }
         else
         {
-            Debug.Log("File Does not existsm reseting to the beginning");
+            GlobalSettingsManager.LoadFromSaveFile = false;
+            Debug.Log("File Does not exists reseting to the beginning");
             if (InitialPlayerPosition != null)
             {
-                Debug.Log("Initial player position is found. Using it as leverage");
+                Debug.Log("Initial player position is found. Setting the position");
                 Player.transform.position = InitialPlayerPosition.transform.position;
                 Player.ResetPlayer();
             }
         }
     }
 
+    //////////////// Unused \\\\\\\\\\\\\\\\\\\\\
+    public static void PerformSave(string saveFileName)
+    {
+        //currentGameState = GameStates.QuickSave;
+        //BroadcastActualGameState(currentGameState);
+
+        //currentGameState = GameStates.Play;
+        //BroadcastActualGameState(currentGameState);
+    }
+    public static void PerformLoading()
+    {
+        //currentGameState = GameStates.Load;
+        //BroadcastActualGameState(currentGameState);
+
+        //currentGameState = GameStates.Play;
+        //BroadcastActualGameState(currentGameState);
+    }
     #endregion
 
     #region Save System Functions
-    public void TestSave(string path)
-    {
-        MSSTest.Save("playerPosition", Player.transform.position, path);
-        MSSTest.Save("playerGoldenCoins", Player.GoldenCoins, path);
-        MSSTest.Save("playerSilverCoins", Player.SilverCoins, path);
-        MSSTest.Save("playerRedCoins", Player.RedCoins, path);
-    }
+    //public void TestSave(string path)
+    //{
+    //    MSSTest.Save("playerPosition", Player.transform.position, path);
+    //    MSSTest.Save("playerGoldenCoins", Player.GoldenCoins, path);
+    //    MSSTest.Save("playerSilverCoins", Player.SilverCoins, path);
+    //    MSSTest.Save("playerRedCoins", Player.RedCoins, path);
+    //}
 
-    public void TestLoad(string path)
-    {
-        Player.gameObject.transform.position = MSSTest.Load("playerPosition", path, Vector3.zero);
-        Player.GoldenCoins = MSSTest.Load("playerGoldenCoins", path, 1);
-        Player.SilverCoins = MSSTest.Load("playerSilverCoins", path, 1);
-        Player.RedCoins = MSSTest.Load("playerRedCoins", path, 1);
-    }
+    //public void TestLoad(string path)
+    //{
+    //    Player.gameObject.transform.position = MSSTest.Load("playerPosition", path, Vector3.zero);
+    //    Player.GoldenCoins = MSSTest.Load("playerGoldenCoins", path, 1);
+    //    Player.SilverCoins = MSSTest.Load("playerSilverCoins", path, 1);
+    //    Player.RedCoins = MSSTest.Load("playerRedCoins", path, 1);
+    //}
 
     public static void SavePlayerData()
     {
         ShowNotification("Saving game..");
         #region Player Common
+        if(CurrentSceneName != null)
+        {
+            MSS.Save("sceneName", CurrentSceneName, SaveFolderName, SaveFileName);
+        }
+        
         MSS.Save("playerPosition", Player.transform.position, SaveFolderName, SaveFileName);
         #endregion
 
@@ -453,6 +603,9 @@ public class GameManager : MonoBehaviour
 
         #endregion
 
+        Player.CurrentHealth = Player.MaxHealth;
+        ResetHealthBar(Player.CurrentHealth);
+
         ShowNotification("Game Saved");
         if (Sounds.TryGetValue("Save", out AudioClip clip)) PlayGMSfx(clip);
     }
@@ -460,6 +613,22 @@ public class GameManager : MonoBehaviour
     public static void LoadPlayerData()
     {
         ShowNotification("Loading game..");
+        GlobalSettingsManager.LoadFromSaveFile = true;
+
+        #region Scene to load
+        string saveFileScene = null;
+        MSS.LoadInto("sceneName", ref saveFileScene, SaveFilePath);
+
+        if (saveFileScene != null)
+        {
+            if (CurrentSceneName != saveFileScene)
+            {
+                PastScene = CurrentSceneName;
+                SceneManager.LoadScene(saveFileScene);
+            }
+        }
+        #endregion
+
         #region Player Common
         Player.transform.position = MSS.Load("playerPosition", SaveFilePath, Vector3.zero);
         #endregion
@@ -483,6 +652,7 @@ public class GameManager : MonoBehaviour
         #endregion
 
         Player.ResetPlayer();
+        GlobalSettingsManager.LoadFromSaveFile = false;
 
         ShowNotification("Loading complete");
         if (Sounds.TryGetValue("Load", out AudioClip clip)) PlayGMSfx(clip);
@@ -491,6 +661,21 @@ public class GameManager : MonoBehaviour
     public static void LoadPlayerData(string pathToFile)
     {
         ShowNotification("Loading game..");
+        GlobalSettingsManager.LoadFromSaveFile = true;
+
+        #region Scene to load
+        string saveFileScene = null;
+        MSS.LoadInto("sceneName", ref saveFileScene, pathToFile);
+
+        if (saveFileScene != null)
+        {
+            if (CurrentSceneName != saveFileScene)
+            {
+                SceneManager.LoadScene(saveFileScene);
+            }
+        }
+        #endregion
+
         #region Player Common
         Player.transform.position = MSS.Load("playerPosition", pathToFile, Vector3.zero);
         #endregion
@@ -514,6 +699,7 @@ public class GameManager : MonoBehaviour
         #endregion
 
         Player.ResetPlayer();
+        GlobalSettingsManager.LoadFromSaveFile = false;
 
         ShowNotification("Loading complete");
         if (Sounds.TryGetValue("Load", out AudioClip clip)) PlayGMSfx(clip);
@@ -528,25 +714,45 @@ public class GameManager : MonoBehaviour
     #endregion
 
     #region Reset Functions
-    public void ClearCombatNPCS()
+    public static void ClearCombatNPCS()
     {
-        foreach(var npc in AllEnemiesAtScene)
+        foreach(var npc in instance.AllEnemiesAtScene)
         {
             if(npc.TryGetComponent<CloseCombatNPCBase>(out CloseCombatNPCBase npcBase))
             {
                 npcBase.DestroyOnRequest();
             }
         }
-        AllEnemiesAtScene.Clear();
+        instance.AllEnemiesAtScene.Clear();
 
-        foreach (var npc in AllFriendlyAtScene)
+        foreach (var npc in instance.AllFriendlyAtScene)
         {
             if (npc.TryGetComponent<CloseCombatNPCBase>(out CloseCombatNPCBase npcBase))
             {
                 npcBase.DestroyOnRequest();
             }
         }
-        AllFriendlyAtScene.Clear();
+        instance.AllFriendlyAtScene.Clear();
+    }
+
+    public static void ResetSpawnPoints()
+    {
+        foreach(var spawn in instance.AllSpawnPointsAtScene)
+        {
+            if(spawn.TryGetComponent<SpawnPointHandler>(out SpawnPointHandler sph))
+            {
+                sph.ResetSpawnPoint();
+            }
+        }
+    }
+
+    public static void ResetTriggerZones()
+    {
+        foreach(var trigger in instance.AllTriggerZones)
+        {
+            trigger.GetComponent<TriggerZone>().IsArmed = true;
+            trigger.SetActive(true);
+        }
     }
     #endregion
 

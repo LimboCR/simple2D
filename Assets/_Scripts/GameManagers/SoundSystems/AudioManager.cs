@@ -4,6 +4,8 @@ using UnityEngine;
 using UnityEngine.Audio;
 using static GlobalEventsManager;
 using Limbo.CustomEditorAttributes;
+using UnityEngine.SceneManagement;
+using System.Collections;
 
 public class AudioManager : MonoBehaviour
 {
@@ -43,29 +45,48 @@ public class AudioManager : MonoBehaviour
 
     private void Awake()
     {
-        if (instance == null)
+        if (instance != null && instance != this)
         {
-            instance = this;
-            DontDestroyOnLoad(gameObject);
+            Destroy(this.gameObject);
+            return;
         }
-        else Destroy(gameObject);
 
+        instance = this;
+        DontDestroyOnLoad(this.gameObject);
+
+        SceneManager.sceneLoaded += OnSceneLoaded;
+
+        if (MainCameraSource == null)
+        {
+            MainCameraSource = FindAnyObjectByType<AudioSourcesController>();
+        }
         s_MainCameraSource = MainCameraSource;
+
         AddEventsListeners();
 
         AudioPacks = AudioPacksList.ToDictionaryInstanced(pack => Instantiate(pack),
             inst => inst.PackType, inst => inst.Initialize(), pack => pack != null);
-
-        //if (AudioPacksList != null && AudioPacksList.Count > 0)
-        //{
-        //    foreach(var pack in AudioPacksList)
-        //    {
-        //        var packInstance = Instantiate(pack);
-        //        packInstance.Initialize();
-        //        AudioPacks.Add(packInstance.PackType, packInstance);
-        //    }
-        //}
     }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        s_MainCameraSource = null;
+
+        if (MainCameraSource == null)
+            StartCoroutine(AwaitForAudioSources());
+    }
+
+    private IEnumerator AwaitForAudioSources()
+    {
+        while (MainCameraSource == null)
+        {
+            MainCameraSource = FindAnyObjectByType<AudioSourcesController>();
+        }
+
+        s_MainCameraSource = MainCameraSource;
+        yield break;
+    }
+
     void Start()
     {
         if(PlayOnStart) MainCameraSource.PlayTrack(AudioPacks[EAudioPackType.Soundtracks].TracksDictionary[MusicToPlay], AudioSourceType.Music);
@@ -75,6 +96,18 @@ public class AudioManager : MonoBehaviour
     void Update()
     {
         
+    }
+
+    private void OnDestroy()
+    {
+        if (instance == this)
+            SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    private void OnApplicationQuit()
+    {
+        if (instance == this)
+            SceneManager.sceneLoaded -= OnSceneLoaded;
     }
 
     #region Add Listeners
@@ -95,6 +128,20 @@ public class AudioManager : MonoBehaviour
     #endregion
 
     #region Common functions
+    /// <summary>
+    /// Stops Playing all sources
+    /// </summary>
+    public static void IntakeStopPlaying()
+    {
+        MusicSourceForceStop();
+        GM_SFX_ForceStop();
+        PlayerInputSourceForceStop();
+    }
+
+    /// <summary>
+    /// Stops playing source of specific type
+    /// </summary>
+    /// <param name="type">Type of the source</param>
     public static void IntakeStopPlaying(AudioSourceType type)
     {
         switch (type)
@@ -115,11 +162,24 @@ public class AudioManager : MonoBehaviour
         }
     }
 
+    public static bool IsSourcePlaying(AudioSourceType type)
+    {
+        if (s_MainCameraSource == null)
+        {
+            Debug.LogError("MainCameraSource is null");
+            return false;
+        }
+
+        return s_MainCameraSource.IsPlaying(type);
+    }
+
     #endregion
 
     #region GameManager Sound Source Logic
     public static void GM_SFX_Play(AudioClip clip, PlayMode playMode = PlayMode.safe)
     {
+        if (s_MainCameraSource == null) return;
+
         if(playMode == PlayMode.safe)
             s_MainCameraSource.PlayTrack(clip, AudioSourceType.GameManager);
         else if(playMode == PlayMode.force)
@@ -128,6 +188,8 @@ public class AudioManager : MonoBehaviour
 
     public static void GM_SFX_PlayRandom(PlayMode playMode, params AudioClip[] clips)
     {
+        if (s_MainCameraSource == null) return;
+
         if (playMode == PlayMode.safe)
             s_MainCameraSource.PlayRandomTrack(AudioSourceType.GameManager, clips);
         else if (playMode == PlayMode.force)
@@ -136,6 +198,8 @@ public class AudioManager : MonoBehaviour
 
     public static void GM_SFX_ForceStop()
     {
+        if (s_MainCameraSource == null) return;
+
         s_MainCameraSource.ForceStopPlaying(AudioSourceType.GameManager);
     }
 
@@ -144,6 +208,8 @@ public class AudioManager : MonoBehaviour
     #region Music Sound Source Logic
     public static void MusicSourcePlay(AudioClip clip, PlayMode playMode = PlayMode.safe)
     {
+        if (s_MainCameraSource == null) return;
+
         if (playMode == PlayMode.safe)
             s_MainCameraSource.PlayTrack(clip, AudioSourceType.GameManager);
         else if (playMode == PlayMode.force)
@@ -152,6 +218,8 @@ public class AudioManager : MonoBehaviour
 
     public static void MusicSourcePlayRandom(PlayMode playMode, params AudioClip[] clips)
     {
+        if (s_MainCameraSource == null) return;
+
         if (playMode == PlayMode.safe)
             s_MainCameraSource.PlayRandomTrack(AudioSourceType.Music, clips);
         else if (playMode == PlayMode.force)
@@ -160,6 +228,8 @@ public class AudioManager : MonoBehaviour
 
     public static void MusicSourceForceStop()
     {
+        if (s_MainCameraSource == null) return;
+
         s_MainCameraSource.ForceStopPlaying(AudioSourceType.Music);
     }
 
@@ -168,6 +238,8 @@ public class AudioManager : MonoBehaviour
     #region Music Sound Source Logic
     public static void PlayerInterSourcePlay(AudioClip clip, PlayMode playMode = PlayMode.safe)
     {
+        if (s_MainCameraSource == null) return;
+
         if (playMode == PlayMode.safe)
             s_MainCameraSource.PlayTrack(clip, AudioSourceType.GameManager);
         else if (playMode == PlayMode.force)
@@ -176,6 +248,8 @@ public class AudioManager : MonoBehaviour
 
     public static void PlayerInterSourcePlayRandom(PlayMode playMode, params AudioClip[] clips)
     {
+        if (s_MainCameraSource == null) return;
+
         if (playMode == PlayMode.safe)
             s_MainCameraSource.PlayRandomTrack(AudioSourceType.PlayerConsumable, clips);
         else if (playMode == PlayMode.force)
@@ -184,6 +258,8 @@ public class AudioManager : MonoBehaviour
 
     public static void PlayerInputSourceForceStop()
     {
+        if (s_MainCameraSource == null) return;
+
         s_MainCameraSource.ForceStopPlaying(AudioSourceType.PlayerConsumable);
     }
 

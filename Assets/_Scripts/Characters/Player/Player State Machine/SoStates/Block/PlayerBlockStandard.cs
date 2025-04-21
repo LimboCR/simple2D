@@ -7,6 +7,11 @@ public class PlayerBlockStandard : PlayerBlockSOBase
     public override void DoAnimationTriggerEventLogic(NewPlayerController.PlayerAnimationTriggerType triggerType)
     {
         base.DoAnimationTriggerEventLogic(triggerType);
+        if (triggerType == NewPlayerController.PlayerAnimationTriggerType.BlockHitParry)
+        {
+            //Debug.Log($"[PlayerBlockStandard] [DoAnimationTriggerEventLogic] Block hit checks up, trigger type: {triggerType}");
+            PlayHitEffect();
+        }
     }
 
     public override void DoEnterLogic()
@@ -57,6 +62,15 @@ public class PlayerBlockStandard : PlayerBlockSOBase
                 player.StateMachine.ChangeState(player.FallState);
             }
         }
+
+        if (player.AnimationState.CurrentState == _blockHitEffectAnimationName || player.AnimationState.CurrentState == _blockHitNoEffectAnimationName)
+        {
+            if (player.AnimationState.IsAnimationFinished(player.AnimationState.CurrentState))
+            {
+                //Debug.Log("[PlayerBlockStandard] [DoFrameUpdateLogic] Block hit animation finished playing, switching to normal");
+                player.AnimationState.ChangeAnimationState(_blockAnimationName);
+            }
+        }
     }
 
     public override void DoPhysicsUpdateLogic()
@@ -72,5 +86,19 @@ public class PlayerBlockStandard : PlayerBlockSOBase
     public override void ResetValues()
     {
         base.ResetValues();
+    }
+
+    private void PlayHitEffect()
+    {
+        if(player.AnimationState.CurrentState != _blockHitEffectAnimationName)
+        {
+            //Debug.Log($"[PlayerBlockStandard] [PlayHitEffect] Current animation is {player.AnimationState.CurrentState}, which is not block hit, playing new animation.");
+            if (_blockHitEffectAnimationName != null)
+            {
+                //Debug.Log($"[PlayerBlockStandard] [PlayHitEffect] Block Hit Animation is set, playing block hit.");
+                player.AnimationState.ChangeAnimationState(_blockHitEffectAnimationName);
+            }
+                
+        }
     }
 }

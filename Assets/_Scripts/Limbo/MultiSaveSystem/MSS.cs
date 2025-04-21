@@ -299,6 +299,7 @@ namespace MultiSaveSystem
         public static bool SaveExists(string fileName, string folderName, out string pathToFile)
         {
             pathToFile = MSSPath.CombinePersistent(folderName, AutoFormat(fileName));
+            Debug.Log($"[MSS.SaveExists] Sending out path to file: {pathToFile}");
             if (DirectoryExist(folderName))
             {
                 string filePath = MSSPath.CombinePersistent(folderName, fileName, true);

@@ -582,6 +582,8 @@ MonoBehaviour:
   PlayerBlockBase: {fileID: 11400000, guid: d8aa6bcec2a8af64c87b62a494ca33e5, type: 2}
   PlayerHurtBase: {fileID: 11400000, guid: 055ffd70f65f07547871eb687be00e9c, type: 2}
   PlayerDeadBase: {fileID: 0}
+  Resetting: 0
+  AllSet: 0
 --- !u!114 &7556788210500148457
 MonoBehaviour:
   m_ObjectHideFlags: 0

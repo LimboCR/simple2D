@@ -5,6 +5,7 @@ using DG.Tweening;
 using System.Collections.Generic;
 using UnityEngine.InputSystem;
 using static GlobalEventsManager;
+using UnityEngine.SceneManagement;
 
 public class InGameUIManager : MonoBehaviour
 {
@@ -60,16 +61,21 @@ public class InGameUIManager : MonoBehaviour
 
     [Space, Header("Death screen")]
     public GameObject DeathScreen;
+    public Button DeathScreenButton;
     #endregion
 
     private void Awake()
     {
         if (Instance != null && Instance != this)
         {
-            Destroy(gameObject);
+            Destroy(this.gameObject);
             return;
         }
+
         Instance = this;
+        DontDestroyOnLoad(this.gameObject);
+
+        SceneManager.sceneLoaded += OnSceneLoaded;
 
         GettersAndFinders();
         EventSubscriber();
@@ -77,7 +83,27 @@ public class InGameUIManager : MonoBehaviour
 
         _initialSkillRefColor = _heavyAttackIcon.color;
     }
-    
+
+    private void OnDestroy()
+    {
+        if (Instance == this)
+            SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    private void OnApplicationQuit()
+    {
+        if (Instance == this)
+            SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        if(DeathScreenButton.onClick.GetPersistentEventCount() > 0)
+            DeathScreenButton.onClick.RemoveAllListeners();
+
+        DeathScreenButton.onClick.AddListener(GameManager.TryLoad);
+    }
+
     void Update()
     {
         if (IsHeavyAttackAtCooldown == true)

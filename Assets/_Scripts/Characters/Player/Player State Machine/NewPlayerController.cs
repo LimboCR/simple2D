@@ -271,14 +271,13 @@ public class NewPlayerController : MonoBehaviour, IDamageble
 
         StateMachineInitilizer();
 
-        CurrentHealth = MaxHealth;
+        if(CurrentHealth <= 0) CurrentHealth = MaxHealth;
         Alive = true;
         gameObject.tag = "Player";
 
         StateMachine.Initialize(IdleState);
 
-        GlobalEventsManager.ResetHealthBar();
-        //GlobalEventsManager.GameStateListener.AddListener(GameStateReactor);
+        GlobalEventsManager.ResetHealthBar(CurrentHealth);
 
         Resetting = false;
         AllSet = true;
@@ -413,7 +412,8 @@ public class NewPlayerController : MonoBehaviour, IDamageble
         SkillAction1,
         SkillAction2,
         SkillAction3,
-        SkillAction4
+        SkillAction4,
+        BlockHitParry
     }
 
     #endregion
@@ -518,6 +518,13 @@ public class NewPlayerController : MonoBehaviour, IDamageble
     #region Health Logic
     public void TakeDamage(float amount)
     {
+        if (IsBlocking)
+        {
+            AnimationTriggerEvent(PlayerAnimationTriggerType.BlockHitParry);
+            //Debug.Log("[NewPlayerController] Playig Block Hit Animation");
+            return;
+        }
+
         CurrentHealth -= amount;
         GlobalEventsManager.SendPlayerTookDamage(amount);
 

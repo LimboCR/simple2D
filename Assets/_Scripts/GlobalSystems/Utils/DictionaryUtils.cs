@@ -277,13 +277,25 @@ namespace Limbo.CollectionUtils
             }
         }
 
-        // Overload with instantiation and optional setup
+        /// <summary>
+        /// Overload with instantiation and optional setup
+        /// </summary>
+        /// <typeparam name="TItem"></typeparam>
+        /// <typeparam name="TKey"></typeparam>
+        /// <typeparam name="TValue"></typeparam>
+        /// <param name="source"></param>
+        /// <param name="instancer">Instantiate/clone function</param>
+        /// <param name="keySelector">After instancing, select key</param>
+        /// <param name="initializer">Optional initializer</param>
+        /// <param name="filter">Optional filter</param>
+        /// <param name="logDuplicates"></param>
+        /// <returns></returns>
         public static Dictionary<TKey, TValue> ToDictionaryInstanced<TItem, TKey, TValue>(
             this IEnumerable<TItem> source,
-            Func<TItem, TValue> instancer,                   // Instantiate/clone function
-            Func<TValue, TKey> keySelector,                  // After instancing, select key
-            Action<TValue> initializer = null,               // Optional initializer
-            Func<TItem, bool> filter = null,                 // Optional filter
+            Func<TItem, TValue> instancer,
+            Func<TValue, TKey> keySelector,
+            Action<TValue> initializer = null,
+            Func<TItem, bool> filter = null,
             bool logDuplicates = true)
             where TValue : UnityEngine.Object
         {

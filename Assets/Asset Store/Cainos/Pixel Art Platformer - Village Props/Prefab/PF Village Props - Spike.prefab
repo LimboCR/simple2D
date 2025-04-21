@@ -12,9 +12,9 @@ GameObject:
   - component: {fileID: 1049023302621363166}
   - component: {fileID: 6685585546327113114}
   - component: {fileID: 4410682582627079414}
-  m_Layer: 0
+  m_Layer: 17
   m_Name: PF Village Props - Spike
-  m_TagString: Untagged
+  m_TagString: DamageZone
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

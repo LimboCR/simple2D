@@ -1,9 +1,8 @@
 using Limbo.DialogSystem;
-using System;
 using UnityEngine;
 using UnityEngine.Events;
 
-public class GlobalEventsManager : MonoBehaviour
+public static class GlobalEventsManager
 {
     #region Sounds Events
     public static UnityEvent<AudioClip, PlayMode> OnGameManagerSFXPlay = new();
@@ -72,11 +71,17 @@ public class GlobalEventsManager : MonoBehaviour
     public static UnityEvent<GameObject> OnSpawnRemove = new();
     #endregion
 
+    #region Trigger Zones Events
+    public static UnityEvent OnResetTriggerZones = new();
+    #endregion
+
     #region UI Events
     public static UnityEvent<string> OnMessageSent = new();
     public static UnityEvent<bool> OnShowDeathScreen = new();
-    public static UnityEvent OnHealthBarReset = new();
+    public static UnityEvent<float> OnHealthBarReset = new();
     #endregion
+
+    //----------------------\\
 
     #region NPCs Events Logic
     public static void SendEnemySpawn(GameObject npc, NPCType type)
@@ -100,6 +105,13 @@ public class GlobalEventsManager : MonoBehaviour
     public static void RemoveSpawnPoint(GameObject spawnPoint)
     {
         OnSpawnRemove.Invoke(spawnPoint);
+    }
+    #endregion
+
+    #region Trigger Zones Events Logic
+    public static void ResetTriggerZones()
+    {
+        OnResetTriggerZones.Invoke();
     }
     #endregion
 
@@ -171,9 +183,9 @@ public class GlobalEventsManager : MonoBehaviour
         OnShowDeathScreen.Invoke(active);
     }
 
-    public static void ResetHealthBar()
+    public static void ResetHealthBar(float currentHealth)
     {
-        OnHealthBarReset.Invoke();
+        OnHealthBarReset.Invoke(currentHealth);
     }
     #endregion
 
