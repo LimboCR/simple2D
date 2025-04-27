@@ -306,7 +306,7 @@ public abstract class CloseCombatNPCBase : NPCBase, IDamageble, INPCMovable
     {
         SendEnemyRemove(gameObject, TypeOfNPC);
         StateMachine.ChangeState(DeadState);
-        Debug.Log($"{gameObject.name} died horrible death. Pray!");
+        //Debug.Log($"{gameObject.name} died horrible death. Pray!");
 
         gameObject.name = $"Dead {gameObject.name}";
         gameObject.tag = "Dead";

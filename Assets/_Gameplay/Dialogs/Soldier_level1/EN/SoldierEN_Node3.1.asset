@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a6d14db9e0085934eb6aa4e6eee8388c, type: 3}
+  m_Name: SoldierEN_Node3.1
+  m_EditorClassIdentifier: 
+  LineText: Indeed. We though it's over, but somehow we're still holding. Anyway,
+    how you've got here?
+  Options:
+  - OptionText: 1. I've passed a village right next to castle and had to deal with
+      6 of them myself. They've took some guy in hat as a hostage. What a bunch of
+      animals.
+    NextNode: {fileID: 11400000, guid: 18fd0eec6a846e34aa686b824fefb959, type: 2}
+    Result: {fileID: 0}
+  - OptionText: 2. It doesn't matter right now. What's the situation here, how can
+      I help?
+    NextNode: {fileID: 11400000, guid: 8b8de3e9947d22c40ab20218eed81532, type: 2}
+    Result: {fileID: 0}

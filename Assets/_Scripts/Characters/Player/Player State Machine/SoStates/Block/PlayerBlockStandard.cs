@@ -42,24 +42,27 @@ public class PlayerBlockStandard : PlayerBlockSOBase
             if (Mathf.Abs(player.Movement) == 0f)
                 player.StateMachine.ChangeState(player.IdleState);
 
-            if (Mathf.Abs(player.Movement) > 0f)
-                player.StateMachine.ChangeState(player.RunState);
-
-            if (Input.GetKeyDown(KeyCode.Z))
-                player.StateMachine.ChangeState(player.AttackState);
-
-            if (Input.GetKeyDown(KeyCode.X) && !player.IsHeavyAttackCooldown)
-                player.StateMachine.ChangeState(player.SkillAttackState);
-
-            if (Input.GetKeyDown(KeyCode.W) && player.IsGrounded)
-                player.StateMachine.ChangeState(player.JumpState);
-
-            if (Input.GetKeyDown(KeyCode.C) && !player.IsRolling)
-                player.StateMachine.ChangeState(player.RollState);
-
-            if (player.PlayerRb.linearVelocity.y < -1.5f)
+            if (!player.LockStateChange)
             {
-                player.StateMachine.ChangeState(player.FallState);
+                if (Mathf.Abs(player.Movement) > 0f)
+                    player.StateMachine.ChangeState(player.RunState);
+
+                if (Input.GetKeyDown(KeyCode.Z))
+                    player.StateMachine.ChangeState(player.AttackState);
+
+                if (Input.GetKeyDown(KeyCode.X) && !player.IsHeavyAttackCooldown)
+                    player.StateMachine.ChangeState(player.SkillAttackState);
+
+                if (Input.GetKeyDown(KeyCode.W) && player.IsGrounded)
+                    player.StateMachine.ChangeState(player.JumpState);
+
+                if (Input.GetKeyDown(KeyCode.C) && !player.IsRolling)
+                    player.StateMachine.ChangeState(player.RollState);
+
+                if (player.PlayerRb.linearVelocity.y < -1.5f)
+                {
+                    player.StateMachine.ChangeState(player.FallState);
+                }
             }
         }
 

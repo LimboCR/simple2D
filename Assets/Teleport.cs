@@ -19,6 +19,7 @@ public class Teleport : MonoBehaviour
         }
         else MoveToNewScene();
 
+        GlobalEventsManager.ForceStopPlaying(AudioSourceType.Music);
         GameManager.ClearCombatNPCS();
     }
 

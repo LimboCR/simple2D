@@ -45,6 +45,7 @@ public class InGameUIManager : MonoBehaviour
     [Space]
     [Header("Dev Tools")]
     public TMP_InputField CommandLine;
+    public GameObject InGameConsole;
 
     [Header("StatusEffect Display")]
     [SerializeField] private GameObject _statusEffectsPanel;
@@ -62,6 +63,9 @@ public class InGameUIManager : MonoBehaviour
     [Space, Header("Death screen")]
     public GameObject DeathScreen;
     public Button DeathScreenButton;
+
+    [Space, Header("InGameMenu")]
+    public GameObject InGameMenu;
     #endregion
 
     private void Awake()
@@ -121,6 +125,12 @@ public class InGameUIManager : MonoBehaviour
             _heavyAttackCooldown.fillAmount = 0;
             _heavyAttackIcon.color = _initialSkillRefColor;
             ResetHeavyAttackCooldown = false;
+        }
+
+        if (Input.GetKeyDown(KeyCode.Slash))
+        {
+            if (InGameConsole != null)
+                InGameConsole.SetActive(!InGameConsole.activeSelf);
         }
 
         if (Player != null)
@@ -200,6 +210,25 @@ public class InGameUIManager : MonoBehaviour
         OnPlayerHeavyAttackCooldown.AddListener(IsPlayerHeavyAttackAtCooldown);
         OnMessageSent.AddListener(ShowNotification);
         OnShowDeathScreen.AddListener(ShowDeathScreen);
+        OnInGameMenuShow.AddListener(ShowInGameMenu);
+    }
+
+    public static void ShowInGameMenu(bool show)
+    {
+        if (show && Instance.InGameMenu.activeSelf) return;
+        else if (!show && !Instance.InGameMenu.activeSelf) return;
+
+        if (show && !Instance.InGameMenu.activeSelf) Instance.InGameMenu.SetActive(true);
+        else if (!show && Instance.InGameMenu.activeSelf) Instance.InGameMenu.SetActive(false);
+    }
+
+    public static void HideInGameMenu()
+    {
+        if (Instance.InGameMenu.activeSelf) Instance.InGameMenu.SetActive(false);
+
+        GameManager.Player.LockMovement = false;
+        GameManager.Player.LockStateChange = false;
+        GameManager.Player.InMenu = false;
     }
 
     private void CoinsStatsDisplay(ECollectable type, int amount)

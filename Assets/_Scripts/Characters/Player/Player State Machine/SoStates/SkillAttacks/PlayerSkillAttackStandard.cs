@@ -10,9 +10,11 @@ public class PlayerSkillAttackStandard : PlayerSkillAttackSOBase
     public override void DoAnimationTriggerEventLogic(NewPlayerController.PlayerAnimationTriggerType triggerType)
     {
         base.DoAnimationTriggerEventLogic(triggerType);
-        if (triggerType == NewPlayerController.PlayerAnimationTriggerType.HeavyAttack) player.Attack(_heavyAttackDamage);
-        if (triggerType == NewPlayerController.PlayerAnimationTriggerType.SkillAction1) ActivateSkill();
-        
+        if (!player.LockStateChange)
+        {
+            if (triggerType == NewPlayerController.PlayerAnimationTriggerType.HeavyAttack) player.Attack(_heavyAttackDamage);
+            if (triggerType == NewPlayerController.PlayerAnimationTriggerType.SkillAction1) ActivateSkill();
+        }
     }
 
     public override void DoEnterLogic()
@@ -44,21 +46,24 @@ public class PlayerSkillAttackStandard : PlayerSkillAttackSOBase
             if (Mathf.Abs(player.Movement) == 0f)
                 player.StateMachine.ChangeState(player.IdleState);
 
-            if (Mathf.Abs(player.Movement) > 0f)
-                player.StateMachine.ChangeState(player.RunState);
-
-            if (Input.GetKeyDown(KeyCode.Z))
-                player.StateMachine.ChangeState(player.AttackState);
-
-            if (Input.GetKeyDown(KeyCode.W) && player.IsGrounded)
-                player.StateMachine.ChangeState(player.JumpState);
-
-            if (Input.GetKeyDown(KeyCode.C) && !player.IsRolling)
-                player.StateMachine.ChangeState(player.RollState);
-
-            if (player.PlayerRb.linearVelocity.y < -1.5f)
+            if (!player.LockStateChange)
             {
-                player.StateMachine.ChangeState(player.FallState);
+                if (Mathf.Abs(player.Movement) > 0f)
+                    player.StateMachine.ChangeState(player.RunState);
+
+                if (Input.GetKeyDown(KeyCode.Z))
+                    player.StateMachine.ChangeState(player.AttackState);
+
+                if (Input.GetKeyDown(KeyCode.W) && player.IsGrounded)
+                    player.StateMachine.ChangeState(player.JumpState);
+
+                if (Input.GetKeyDown(KeyCode.C) && !player.IsRolling)
+                    player.StateMachine.ChangeState(player.RollState);
+
+                if (player.PlayerRb.linearVelocity.y < -1.5f)
+                {
+                    player.StateMachine.ChangeState(player.FallState);
+                }
             }
         }
     }

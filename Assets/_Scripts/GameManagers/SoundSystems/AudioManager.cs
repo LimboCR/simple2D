@@ -60,8 +60,8 @@ public class AudioManager : MonoBehaviour
         if (MainCameraSource == null)
         {
             MainCameraSource = FindAnyObjectByType<AudioSourcesController>();
-        }
-        s_MainCameraSource = MainCameraSource;
+            s_MainCameraSource = MainCameraSource;
+        } else s_MainCameraSource = MainCameraSource;
 
         AddEventsListeners();
 
@@ -71,10 +71,10 @@ public class AudioManager : MonoBehaviour
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        s_MainCameraSource = null;
-
         if (MainCameraSource == null)
             StartCoroutine(AwaitForAudioSources());
+
+        if(scene.buildIndex == 0) MainCameraSource.PlayTrack(AudioPacks[EAudioPackType.Soundtracks].TracksDictionary["Sword_7"], AudioSourceType.Music, Loop);
     }
 
     private IEnumerator AwaitForAudioSources()
@@ -82,9 +82,8 @@ public class AudioManager : MonoBehaviour
         while (MainCameraSource == null)
         {
             MainCameraSource = FindAnyObjectByType<AudioSourcesController>();
+            s_MainCameraSource = MainCameraSource;
         }
-
-        s_MainCameraSource = MainCameraSource;
         yield break;
     }
 
@@ -212,9 +211,10 @@ public class AudioManager : MonoBehaviour
         if (s_MainCameraSource == null) return;
 
         if (playMode == PlayMode.safe)
-            s_MainCameraSource.PlayTrack(clip, AudioSourceType.GameManager, loop);
+            s_MainCameraSource.PlayTrack(clip, AudioSourceType.Music, loop);
+
         else if (playMode == PlayMode.force)
-            s_MainCameraSource.ForcePlayTrack(clip, AudioSourceType.GameManager, loop);
+            s_MainCameraSource.ForcePlayTrack(clip, AudioSourceType.Music, loop);
     }
 
     public static void MusicSourcePlayRandom(PlayMode playMode, bool loop = false, params AudioClip[] clips)
@@ -242,9 +242,9 @@ public class AudioManager : MonoBehaviour
         if (s_MainCameraSource == null) return;
 
         if (playMode == PlayMode.safe)
-            s_MainCameraSource.PlayTrack(clip, AudioSourceType.GameManager, false);
+            s_MainCameraSource.PlayTrack(clip, AudioSourceType.PlayerConsumable, false);
         else if (playMode == PlayMode.force)
-            s_MainCameraSource.ForcePlayTrack(clip, AudioSourceType.GameManager, false);
+            s_MainCameraSource.ForcePlayTrack(clip, AudioSourceType.PlayerConsumable, false);
     }
 
     public static void PlayerInterSourcePlayRandom(PlayMode playMode, params AudioClip[] clips)
@@ -269,6 +269,43 @@ public class AudioManager : MonoBehaviour
     public static AudioMixer GetMixer()
     {
         return Instance.Mixer;
+    }
+
+    public static IEnumerator Level0_Training()
+    {
+        if (s_MainCameraSource != null)
+            Instance.PlayStandardMusic("DarkAmbient4", true);
+
+        else
+        {
+            while (s_MainCameraSource == null)
+                yield return null;
+
+            Instance.PlayStandardMusic("DarkAmbient4", true);
+        }
+
+        yield break;
+    }
+
+    public static IEnumerator Level1_Training()
+    {
+        if (s_MainCameraSource != null)
+            Instance.PlayStandardMusic("DarkAmbient4", true);
+
+        else
+        {
+            while (s_MainCameraSource == null)
+                yield return null;
+
+            Instance.PlayStandardMusic("DarkAmbient4", true);
+        }
+
+        yield break;
+    }
+
+    public void PlayStandardMusic(string musicName, bool loop)
+    {
+        s_MainCameraSource.ForcePlayTrack(AudioPacks[EAudioPackType.Soundtracks].TracksDictionary[musicName], AudioSourceType.Music, loop);
     }
 }
 

@@ -28,7 +28,7 @@ public class SpawnPointHandler : MonoBehaviour
     public bool InstantiateWaypoints;
 
     [Header("In game reference")]
-    private GameObject _referenceCharacter;
+    public GameObject _referenceCharacter;
 
     [Space, Header("MovingDirection")]
     public GameObject WaypointToMoveTo;

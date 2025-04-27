@@ -39,6 +39,9 @@ public class NPCCombatNav : MonoBehaviour
     public GameObject CurrentTarget => _currentTarget;
     private GameObject _newTarget;
 
+    [Space, Header("Garbage collector")]
+    public List<GameObject> _garbageCollector = new();
+
     [Space]
     [Header("===Gizmos===")]
     [SerializeField] private bool _chaseZoneGizmosInEditor;
@@ -78,31 +81,7 @@ public class NPCCombatNav : MonoBehaviour
         {
             _hitTargets.RemoveAll(item => item == null);
             _hitTargets.RemoveAll(item => item.CompareTag("Dead"));
-
-            //foreach (Collider2D target in _hitTargets)
-            //{
-            //    if (target.CompareTag("Dead"))
-            //    {
-            //        _hitTargets.Remove(target);
-            //        break;
-            //    }
-            //}
         }
-
-        //if(_potentialTargets.Count > 0)
-        //{
-        //    _potentialTargets.RemoveAll(item => item == null);
-        //    _potentialTargets.RemoveAll(item => item.CompareTag("Dead"));
-
-        //    //foreach (Collider2D target in _potentialTargets)
-        //    //{
-        //    //    if (target.CompareTag("Dead"))
-        //    //    {
-        //    //        _potentialTargets.Remove(target);
-        //    //        break;
-        //    //    }
-        //    //}
-        //}
     }
 
     private void RemoveInvalidPotentialTargets()
@@ -322,7 +301,7 @@ public class NPCCombatNav : MonoBehaviour
 
     public void ModifyCombatLayers(LayerMask layersToExclude, LayerMask layersToInclude)
     {
-        Debug.Log($"Adding Layers {layersToInclude} to {gameObject.name}");
+        //Debug.Log($"Adding Layers {layersToInclude} to {gameObject.name}");
 
         _attackZoneCollider.includeLayers = layersToInclude;
         _attackZoneCollider.excludeLayers = layersToExclude;

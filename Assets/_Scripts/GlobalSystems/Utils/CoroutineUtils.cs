@@ -6,6 +6,19 @@ using UnityEngine;
 
 public static class CoroutineUtils
 {
+    #region Whatcher Coroutine
+    public static Coroutine StartAndTrack(IEnumerator routine, Action onComplete)
+    {
+        return MonoWrapper.Instance.StartCoroutine(Wrapper());
+
+        IEnumerator Wrapper()
+        {
+            yield return MonoWrapper.Instance.StartCoroutine(routine);
+            onComplete?.Invoke();
+        }
+    }
+    #endregion
+
     #region Standard Coroutines
     /// <summary>
     /// Waits a duration, then runs an action. Standard Time Based Actions
@@ -166,4 +179,9 @@ public static class CoroutineUtils
     }
 
     #endregion
+}
+
+public class MonoWrapper : MonoBehaviour
+{
+    public static MonoWrapper Instance = new();
 }

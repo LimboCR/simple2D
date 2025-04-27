@@ -66,7 +66,7 @@ public class NPCAttackStandard : NPCAttackSOBase
                 if (target.TryGetComponent<IDamageble>(out IDamageble npc))
                 {
                     npc.TakeDamage(_damageAmount);
-                    Debug.Log($"|AttackLog| {gameObject.name} inflicted {_damageAmount} damage to {target.name}");
+                    //Debug.Log($"|AttackLog| {gameObject.name} inflicted {_damageAmount} damage to {target.name}");
                 }
                     
             }

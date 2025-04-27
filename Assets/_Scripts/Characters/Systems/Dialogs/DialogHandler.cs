@@ -23,14 +23,19 @@ namespace Limbo.DialogSystem
 
         private void Awake()
         {
-            _player = GameManager.Instance.GetPlayerGameObject();
             GlobalEventsManager.OnTryStartDialog.AddListener(TryStartDialog);
+        }
+
+        private void Start()
+        {
+            _player = GameManager.Instance.GetPlayerGameObject();
         }
 
         public void TryStartDialog(DialogNode startingNode)
         {
             if (!IsPlayerAtDialog)
             {
+                _player.GetComponent<NewPlayerController>().LockMovement = true;
                 StartingDialog = startingNode;
                 StartDialog();
             }
@@ -76,6 +81,8 @@ namespace Limbo.DialogSystem
 
         void EndDialog()
         {
+            _player.GetComponent<NewPlayerController>().LockMovement = false;
+
             LineText.text = "";
             foreach (Transform child in OptionsParent)
                 Destroy(child.gameObject);

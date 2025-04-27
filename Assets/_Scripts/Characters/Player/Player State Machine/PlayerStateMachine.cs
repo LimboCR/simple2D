@@ -8,7 +8,7 @@ public class PlayerStateMachine
     {
         CurrentPlayerState = startingState;
         CurrentPlayerState.EnterState();
-        Debug.Log("State Machine Initialized");
+        //Debug.Log("State Machine Initialized");
     }
 
     public void ChangeState(PlayerState newState)

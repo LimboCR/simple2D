@@ -22,7 +22,7 @@ public class NPCIdleStandard : NPCIdleSOBase
         npc.ReturningWaypoint = npc.NeedToReturn();
 
         if (_idleCoroutine == null)
-            _idleCoroutine = npc.StartCoroutine(Idle()); // Start the idling coroutine
+            _idleCoroutine = npc.StartCoroutine(Idle());
     }
 
     public override void DoExitLogic()
@@ -52,14 +52,14 @@ public class NPCIdleStandard : NPCIdleSOBase
 
     protected override IEnumerator Idle()
     {
-        float idleTime = Random.Range(2f, 7f); // Adjust as needed
+        float idleTime = Random.Range(2f, 7f);
         float elapsedTime = 0f;
 
         while (elapsedTime < idleTime)
         {
-            if (npc.combatNav.CurrentTarget != null) // If an enemy is detected, stop idling
+            if (npc.combatNav.CurrentTarget != null)
             {
-                npc.StateMachine.ChangeState(npc.ChaseState); // Switch to chase mode
+                npc.StateMachine.ChangeState(npc.ChaseState);
                 yield break;
             }
 
@@ -83,7 +83,7 @@ public class NPCIdleStandard : NPCIdleSOBase
             npc.StateMachine.ChangeState(npc.ReturnState);
 
         if (!npc.IsAgrresive)
-            npc.StateMachine.ChangeState(npc.WalkState); // Resume patrolling after waiting
+            npc.StateMachine.ChangeState(npc.WalkState);
         else if (npc.IsAgrresive)
             npc.StateMachine.ChangeState(npc.RunState);
     }

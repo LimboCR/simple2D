@@ -30,8 +30,11 @@ public class PlayerJumpStandard : PlayerJumpSOBase
     {
         base.DoFrameUpdateLogic();
 
-        if (Input.GetKeyDown(KeyCode.C) && !player.IsRolling)
-            player.StateMachine.ChangeState(player.RollState);
+        if (!player.LockStateChange)
+        {
+            if (Input.GetKeyDown(KeyCode.C) && !player.IsRolling)
+                player.StateMachine.ChangeState(player.RollState);
+        }
     }
 
     public override void DoPhysicsUpdateLogic()

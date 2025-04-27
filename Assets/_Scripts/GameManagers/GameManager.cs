@@ -8,6 +8,7 @@ using Unity.Cinemachine;
 using System;
 using UnityEngine.SceneManagement;
 using System.Collections;
+using System.Threading.Tasks;
 
 public class GameManager : MonoBehaviour
 {
@@ -19,7 +20,7 @@ public class GameManager : MonoBehaviour
         get
         {
 #if UNITY_EDITOR
-            if(!Application.isPlaying) return null;
+            if (!Application.isPlaying) return null;
 
             if (instance == null)
                 Instantiate(Resources.Load<GameManager>("GameManager"));
@@ -149,6 +150,13 @@ public class GameManager : MonoBehaviour
     public static bool SpawnPlayerAtInitial;
     #endregion
     bool LoadSaveRef;
+
+    #region Unplanned GM Commands
+    //public List<UnplannedGMCommandsBase> UnplannedCommands = new();
+    private Dictionary<string, UnplannedGMCommandsBase> UnplannedCommandsDict = new();
+    private bool UCDIsInUse;
+    private List<string> UCDGarbageCollector = new();
+    #endregion
     //=======================\\
 
     ////     Logic     \\\\
@@ -164,8 +172,6 @@ public class GameManager : MonoBehaviour
         instance = this;
         DontDestroyOnLoad(this.gameObject);
 
-        GlobalSettingsManager.Instance.GMHasAccess = true;
-
         InitialPlayerPosition = GameObject.Find("PlayerInitial_Position");
         s_CrossSceneDataContainer = CrossSceneDataContainer;
 
@@ -173,11 +179,6 @@ public class GameManager : MonoBehaviour
 
         EventSubscriber();
         Sounds = SoundsList.ToDictionarySafe(sound => sound.Key, sound => sound.Sound);
-    }
-
-    private void Start()
-    {
-
     }
 
     private void Update()
@@ -202,7 +203,17 @@ public class GameManager : MonoBehaviour
             GlobalSettingsManager.Command = EGMCommandType.LoadSave;
             PerformQuickLoad();
         }
-        
+
+        if(UCDGarbageCollector!=null && UCDGarbageCollector.Count > 0)
+        {
+            if (!UCDIsInUse)
+            {
+                foreach(var key in UCDGarbageCollector)
+                {
+                    UnplannedCommandsDict.Remove(key);
+                }
+            }
+        }
     }
 
     private void OnDestroy()
@@ -219,6 +230,13 @@ public class GameManager : MonoBehaviour
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
+        if(scene.buildIndex == 0)
+        {
+            Destroy(InGameUIManager.Instance.gameObject);
+            Destroy(this.gameObject);
+            return;
+        }
+
         LoadSaveRef = GlobalSettingsManager.LoadFromSaveFile;
         Debug.Log($"LoadSaveRef: {LoadSaveRef}");
         PlayerArrivedToScene = true;
@@ -235,6 +253,10 @@ public class GameManager : MonoBehaviour
 
         _player = null;
 
+        if (scene.buildIndex == 1) StartCoroutine(AudioManager.Level0_Training());
+        else if (scene.buildIndex == 2) StartCoroutine(AudioManager.Level1_Training());
+
+        FindAnyObjectByType<GraphicsSettingsManager>().TrySetupCamera();
         StartCoroutine(AwaitPlayer());
     }
 
@@ -256,7 +278,7 @@ public class GameManager : MonoBehaviour
 
         PlayerVisualObject = Player.gameObject;
 
-        if(GlobalSettingsManager.Command == EGMCommandType.LoadSave)
+        if (GlobalSettingsManager.Command == EGMCommandType.LoadSave)
         {
             TryLoad();
 
@@ -278,7 +300,7 @@ public class GameManager : MonoBehaviour
         {
             if (InitialPlayerPosition != null)
             {
-                Debug.LogWarning("Setting player position to his initial position.");
+                //Debug.LogWarning("Setting player position to his initial position.");
                 Player.transform.position = InitialPlayerPosition.transform.position;
             }
             else
@@ -294,7 +316,11 @@ public class GameManager : MonoBehaviour
         // Always do this part regardless
         if (PlayerLeavingScene && PlayerArrivedToScene)
         {
-            if (CrossSceneDataContainer != null) MigratePlayerData();
+            if (CrossSceneDataContainer != null)
+            {
+                StartCoroutine(WaitForTimeManager());
+                MigratePlayerData();
+            }
             else Debug.LogError("[AwaitPlayer] CrossSceneDataContainer Is Null");
         }
 
@@ -304,7 +330,7 @@ public class GameManager : MonoBehaviour
         PlayerArrivedToScene = false;
         SpawnPlayerAtInitial = false;
 
-        AudioManager.MusicSourcePlay(AudioManager.Instance.AudioPacks[EAudioPackType.Soundtracks].TracksDictionary["DarkAmbient4"], PlayMode.force, true);
+        //AudioManager.MusicSourcePlay(AudioManager.Instance.AudioPacks[EAudioPackType.Soundtracks].TracksDictionary["DarkAmbient4"], PlayMode.force, true);
 
         yield break;
     }
@@ -312,11 +338,24 @@ public class GameManager : MonoBehaviour
     internal static void MigratePlayerData()
     {
         s_CrossSceneDataContainer.LoadToPlayer(Player);
-        s_CrossSceneDataContainer.LoadToTimeManager(FindAnyObjectByType<TimeManager>());
 
         SendCoinsChanged(ECollectable.Golden, Player.GoldenCoins);
         SendCoinsChanged(ECollectable.Silver, Player.SilverCoins);
         SendCoinsChanged(ECollectable.Red, Player.RedCoins);
+        
+    }
+
+    public IEnumerator WaitForTimeManager()
+    {
+        var tm = FindAnyObjectByType<TimeManager>();
+        while (tm == null)
+        {
+            tm = FindAnyObjectByType<TimeManager>();
+            yield return null;
+        }
+
+        s_CrossSceneDataContainer.LoadToTimeManager(tm);
+        yield break;
     }
 
     internal static void PlayerIntializedLeavingScene()
@@ -353,6 +392,12 @@ public class GameManager : MonoBehaviour
     private void ChangeGameState(GameStates state)
     {
         currentGameState = state;
+    }
+
+    public static void ReturnToMainMenu()
+    {
+        AudioManager.IntakeStopPlaying();
+        SceneManager.LoadScene("MainMenu");
     }
     #endregion
 
@@ -406,7 +451,7 @@ public class GameManager : MonoBehaviour
         switch (type)
         {
             case NPCType.CloseCombat:
-                if(npc.TryGetComponent<IMultiCharacterData>(out IMultiCharacterData data))
+                if (npc.TryGetComponent<IMultiCharacterData>(out IMultiCharacterData data))
                 {
                     if (data.CharacterTeam == 0)
                     {
@@ -488,7 +533,7 @@ public class GameManager : MonoBehaviour
 
         currentGameState = GameStates.Restart;
         BroadcastActualGameState(currentGameState);
-        
+
         GlobalSettingsManager.LoadFromSaveFile = true;
 
         SaveFileName = "QuickSave";
@@ -520,9 +565,9 @@ public class GameManager : MonoBehaviour
             string saveFileScene = null;
             MSS.LoadInto("sceneName", ref saveFileScene, pathToFile);
 
-            if(saveFileScene != null)
+            if (saveFileScene != null)
             {
-                if(CurrentSceneName != saveFileScene)
+                if (CurrentSceneName != saveFileScene)
                 {
                     PastScene = CurrentSceneName;
                     SceneManager.LoadScene(saveFileScene);
@@ -583,11 +628,11 @@ public class GameManager : MonoBehaviour
     {
         ShowNotification("Saving game..");
         #region Player Common
-        if(CurrentSceneName != null)
+        if (CurrentSceneName != null)
         {
             MSS.Save("sceneName", CurrentSceneName, SaveFolderName, SaveFileName);
         }
-        
+
         MSS.Save("playerPosition", Player.transform.position, SaveFolderName, SaveFileName);
         #endregion
 
@@ -718,9 +763,9 @@ public class GameManager : MonoBehaviour
     #region Reset Functions
     public static void ClearCombatNPCS()
     {
-        foreach(var npc in instance.AllEnemiesAtScene)
+        foreach (var npc in instance.AllEnemiesAtScene)
         {
-            if(npc.TryGetComponent<CloseCombatNPCBase>(out CloseCombatNPCBase npcBase))
+            if (npc.TryGetComponent<CloseCombatNPCBase>(out CloseCombatNPCBase npcBase))
             {
                 npcBase.DestroyOnRequest();
             }
@@ -739,9 +784,10 @@ public class GameManager : MonoBehaviour
 
     public static void ResetSpawnPoints()
     {
-        foreach(var spawn in instance.AllSpawnPointsAtScene)
+        ResetOtherSpawns();
+        foreach (var spawn in instance.AllSpawnPointsAtScene)
         {
-            if(spawn.TryGetComponent<SpawnPointHandler>(out SpawnPointHandler sph))
+            if (spawn.TryGetComponent<SpawnPointHandler>(out SpawnPointHandler sph))
             {
                 sph.ResetSpawnPoint();
             }
@@ -750,11 +796,24 @@ public class GameManager : MonoBehaviour
 
     public static void ResetTriggerZones()
     {
-        foreach(var trigger in instance.AllTriggerZones)
+        foreach (var trigger in instance.AllTriggerZones)
         {
             trigger.GetComponent<TriggerZone>().IsArmed = true;
             trigger.SetActive(true);
         }
+    }
+    #endregion
+
+    #region Unplanned GM Commands Attachment
+    public void AddUnplannedGMCommand(UnplannedGMCommandsBase commandToAdd, string key)
+    {
+        UnplannedCommandsDict.Add(key, commandToAdd);
+    }
+
+    public void RemoveUnplannedGMCommand(string key)
+    {
+        if (!UCDIsInUse) UnplannedCommandsDict.Remove(key);
+        else UCDGarbageCollector.Add(key);
     }
     #endregion
 

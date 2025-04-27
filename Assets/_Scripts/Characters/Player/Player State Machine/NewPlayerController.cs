@@ -8,6 +8,7 @@ using MultiSaveSystem;
 [RequireComponent (typeof(PlayerZones), typeof(AudioSource), typeof(CharacterSoundsManager))]
 public class NewPlayerController : MonoBehaviour, IDamageble
 {
+    public static NewPlayerController Instance;
     [HideInInspector] public CharacterSoundsManager soundManager;
 
     [HideInInspector] public AnimationStateHandler AnimationState;
@@ -163,13 +164,18 @@ public class NewPlayerController : MonoBehaviour, IDamageble
 
     #endregion
 
-    [Header("Reset Player")]
+    [Space, Header("Reset Player")]
     public bool Resetting, AllSet;
+
+    [Space, Header("Checks")]
+    public bool InMenu = false;
+    public bool InDialog = false;
 
     #region Awake, Start, Update...
     private void Awake()
     {
         AllSet = false;
+        Instance = this;
     }
     private void Start()
     {
@@ -312,10 +318,19 @@ public class NewPlayerController : MonoBehaviour, IDamageble
                     GlobalEventsManager.BroadcastActualGameState(GameStates.Restart);
                 }
 
-                if (Input.GetKeyDown(Buttons.InGameMenu))
+                if (Input.GetKeyDown(KeyCode.Escape))
                 {
-                    GlobalEventsManager.ShowNotification("Currently unavilable");
-                    if (GameManager.Instance.GetGMSounds.TryGetValue("Save", out AudioClip clip)) GlobalEventsManager.PlayGMSfx(clip);
+                    ShowInGameMenu();
+                }
+
+                if (Input.GetKeyDown(Buttons.Skill1))
+                {
+                    ActiveSkill1.Execute(this.gameObject);
+                }
+
+                if (Input.GetKeyDown(Buttons.Skill2))
+                {
+                    ActiveSkill2.Execute(this.gameObject);
                 }
             }
         }        
@@ -335,7 +350,7 @@ public class NewPlayerController : MonoBehaviour, IDamageble
 
     private void HandleLogic()
     {
-        if (Alive)
+        if (Alive && !LockMovement)
         {
             Movement = Input.GetAxis("Horizontal");
 
@@ -350,7 +365,7 @@ public class NewPlayerController : MonoBehaviour, IDamageble
                 sideForRight = Vector2.left;
             }
 
-            if (Input.GetKey(KeyCode.Space) && !IsBlocking && !IsRolling && !IsJumping && IsGrounded)
+            if (Input.GetKey(KeyCode.Space) && !IsBlocking && !IsRolling && !IsJumping && IsGrounded && !LockStateChange)
             {
                 IsBlocking = true;
                 StateMachine.ChangeState(BlockState);
@@ -389,6 +404,28 @@ public class NewPlayerController : MonoBehaviour, IDamageble
             case GameStates.Exit:
                 break;
         }
+    }
+
+    public void ShowInGameMenu()
+    {
+        InMenu = !InMenu;
+        if (InMenu)
+        {
+            LockMovement = true;
+            LockStateChange = true;
+        }
+        else
+        {
+            LockMovement = false;
+            LockStateChange = false;
+        }
+
+        GlobalEventsManager.ShowInGameMenu(InMenu);
+    }
+
+    public static void s_ShowInGameMenu()
+    {
+        Instance.ShowInGameMenu();
     }
     #endregion
 
@@ -555,7 +592,26 @@ public class NewPlayerController : MonoBehaviour, IDamageble
         AnimationState.ChangeAnimationState("HeroKnight_Death");
         AllSet = false;
         Alive = false;
-        StartCoroutine(CoroutineUtils.WaitThenDo(3f, () => GlobalEventsManager.ShowDeathScreen(true)));
+
+        if (GameManager.CurrentSceneIndex != 2) StartCoroutine(CoroutineUtils.WaitThenDo(3f, () => GlobalEventsManager.ShowDeathScreen(true)));
+        else PlayCutScene();
+    }
+
+    public void PlayCutScene()
+    {
+        CutSceneHandler cutScene = FindAnyObjectByType<CutSceneHandler>(FindObjectsInactive.Include);
+
+        if (cutScene != null)
+        {
+            cutScene.gameObject.SetActive(true);
+            cutScene.StartingFrame.TestFadeIn = true;
+        }
+        else Debug.LogError("Required Cut Scene Wasn't found");
+
+        AudioManager.IntakeStopPlaying();
+        AudioManager.MusicSourcePlay(AudioManager.Instance.AudioPacks[EAudioPackType.Soundtracks].TracksDictionary["Sword_4"], PlayMode.force, true);
+        GameManager.ClearCombatNPCS();
+        GameManager.ResetSpawnPoints();
     }
 
     public void SetInitialIDamageble(SafeInstantiation.HealthStats? healthStats)

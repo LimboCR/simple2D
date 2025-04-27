@@ -69,6 +69,8 @@ public static class GlobalEventsManager
     #region Spawn Points Events
     public static UnityEvent<GameObject> OnSpawnAdd = new();
     public static UnityEvent<GameObject> OnSpawnRemove = new();
+
+    public static UnityEvent OnResetOtherSpawns = new();
     #endregion
 
     #region Trigger Zones Events
@@ -79,6 +81,7 @@ public static class GlobalEventsManager
     public static UnityEvent<string> OnMessageSent = new();
     public static UnityEvent<bool> OnShowDeathScreen = new();
     public static UnityEvent<float> OnHealthBarReset = new();
+    public static UnityEvent<bool> OnInGameMenuShow = new();
     #endregion
 
     //----------------------\\
@@ -105,6 +108,11 @@ public static class GlobalEventsManager
     public static void RemoveSpawnPoint(GameObject spawnPoint)
     {
         OnSpawnRemove.Invoke(spawnPoint);
+    }
+
+    public static void ResetOtherSpawns()
+    {
+        OnResetOtherSpawns.Invoke();
     }
     #endregion
 
@@ -186,6 +194,11 @@ public static class GlobalEventsManager
     public static void ResetHealthBar(float currentHealth)
     {
         OnHealthBarReset.Invoke(currentHealth);
+    }
+
+    public static void ShowInGameMenu(bool show)
+    {
+        OnInGameMenuShow.Invoke(show);
     }
     #endregion
 

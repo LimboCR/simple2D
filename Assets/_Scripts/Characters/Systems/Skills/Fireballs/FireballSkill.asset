@@ -16,3 +16,6 @@ MonoBehaviour:
   appliableEffect: {fileID: 11400000, guid: feb1b5c244fd7844ebab01a640f639bb, type: 2}
   fireballPrefab: {fileID: 868893278554268942, guid: 4bf094d9dc6a7fb4eaa274b2d458335f, type: 3}
   fireballSpeed: 10
+  _fireBallSFX: {fileID: 8300000, guid: a652877b012108e41871f867ada9f176, type: 3}
+  ResetTime: 8
+  SkillAtCooldown: 0

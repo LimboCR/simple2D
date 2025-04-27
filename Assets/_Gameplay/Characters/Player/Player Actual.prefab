@@ -526,8 +526,8 @@ MonoBehaviour:
     Sound: {fileID: 8300000, guid: b7b5a6156961bac44a67504d42ce6fcf, type: 3}
   - Key: Die
     Sound: {fileID: 0}
-  ActiveSkill1: {fileID: 0}
-  ActiveSkill2: {fileID: 0}
+  ActiveSkill1: {fileID: 11400000, guid: 6721ce3df5611f246b2ce8bd35754919, type: 2}
+  ActiveSkill2: {fileID: 11400000, guid: f4e7de961ae704f45a7a90a924563289, type: 2}
   PassiveSkill1: {fileID: 0}
   PassiveSkill2: {fileID: 0}
   GoldenCoins: 0
@@ -584,6 +584,8 @@ MonoBehaviour:
   PlayerDeadBase: {fileID: 0}
   Resetting: 0
   AllSet: 0
+  InMenu: 0
+  InDialog: 0
 --- !u!114 &7556788210500148457
 MonoBehaviour:
   m_ObjectHideFlags: 0

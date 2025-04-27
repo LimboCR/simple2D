@@ -221,6 +221,7 @@ MonoBehaviour:
   _charInAttackRange: 0
   _currentTarget: {fileID: 0}
   _ableToAttack: 0
+  _garbageCollector: []
   _chaseZoneGizmosInEditor: 0
   _chaseZoneGizmosAtRuntime: 0
   _attackZoneGizmosInEditor: 0
@@ -257,7 +258,7 @@ MonoBehaviour:
   <CharacterTeam>k__BackingField: 0
   combatNav: {fileID: 0}
   AnimationState: {fileID: 0}
-  <MaxHealth>k__BackingField: 100
+  <MaxHealth>k__BackingField: 35
   <CurrentHealth>k__BackingField: 0
   <RegenDelay>k__BackingField: 3
   <RegenRate>k__BackingField: 1
