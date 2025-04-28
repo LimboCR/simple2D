@@ -1,13 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem;
-using MultiSaveSystem;
 
 [RequireComponent(typeof(AnimationStateHandler), typeof(StatusEffectHandler), typeof(Rigidbody2D))]
 [RequireComponent (typeof(PlayerZones), typeof(AudioSource), typeof(CharacterSoundsManager))]
 public class NewPlayerController : MonoBehaviour, IDamageble
 {
+    #region Variables
+
+    #region Necessary References
     public static NewPlayerController Instance;
     [HideInInspector] public CharacterSoundsManager soundManager;
 
@@ -17,6 +18,7 @@ public class NewPlayerController : MonoBehaviour, IDamageble
     [HideInInspector] public PlayerZones Zones { get; private set;}
 
     public ButtonBindingsSO Buttons;
+    #endregion
 
     #region SFX
     [Header("Audio Staff")]
@@ -109,6 +111,8 @@ public class NewPlayerController : MonoBehaviour, IDamageble
     public bool IsHeavyAttackCooldown;
     public bool IsBlocking;
 
+    public int BlockAttacksLimit = 5;
+    public int BlockAttacksCounter;
     public float HeavyAttackCooldownTimer = 5f;
     public float SkillCooldownElapsedTime = 0f;
     //[SerializeField] private float elapsedTime = 0f;
@@ -164,12 +168,18 @@ public class NewPlayerController : MonoBehaviour, IDamageble
 
     #endregion
 
+    #region Checks & Reset vars
     [Space, Header("Reset Player")]
     public bool Resetting, AllSet;
 
     [Space, Header("Checks")]
     public bool InMenu = false;
     public bool InDialog = false;
+    #endregion
+
+    #endregion
+
+    #region Logics
 
     #region Awake, Start, Update...
     private void Awake()
@@ -306,32 +316,20 @@ public class NewPlayerController : MonoBehaviour, IDamageble
                 FlipSidesHandler();
 
                 if (Input.GetKeyDown(Buttons.Interaction))
-                {
                     Zones.TryInteract();
-                }
                 if (Input.GetKeyDown(Buttons.Quicksave))
-                {
                     GlobalEventsManager.BroadcastActualGameState(GameStates.QuickSave);
-                }
                 if (Input.GetKeyDown(Buttons.Quickload))
-                {
                     GlobalEventsManager.BroadcastActualGameState(GameStates.Restart);
-                }
 
                 if (Input.GetKeyDown(KeyCode.Escape))
-                {
                     ShowInGameMenu();
-                }
 
                 if (Input.GetKeyDown(Buttons.Skill1))
-                {
                     ActiveSkill1.Execute(this.gameObject);
-                }
 
                 if (Input.GetKeyDown(Buttons.Skill2))
-                {
                     ActiveSkill2.Execute(this.gameObject);
-                }
             }
         }        
     }
@@ -557,18 +555,23 @@ public class NewPlayerController : MonoBehaviour, IDamageble
     {
         if (IsBlocking)
         {
-            AnimationTriggerEvent(PlayerAnimationTriggerType.BlockHitParry);
-            //Debug.Log("[NewPlayerController] Playig Block Hit Animation");
-            return;
+            BlockAttacksCounter++;
+
+            if (BlockAttacksCounter < BlockAttacksLimit)
+            {
+                AnimationTriggerEvent(PlayerAnimationTriggerType.BlockHitParry);
+                return;
+            }
+            else
+            {
+                Debug.Log("Exited Block attacks limit, taking damage");
+            }
         }
 
         CurrentHealth -= amount;
         GlobalEventsManager.SendPlayerTookDamage(amount);
 
-        if (Random.Range(0, 10) > ProbabilityToGetHurtAnimation)
-        {
-            StateMachine.ChangeState(HurtState);
-        }
+        if (Random.Range(0, 10) > ProbabilityToGetHurtAnimation) StateMachine.ChangeState(HurtState);
         if (CurrentHealth <= 0)
         {
             Alive = false;
@@ -702,4 +705,6 @@ public class NewPlayerController : MonoBehaviour, IDamageble
         }
         #endregion
     }
+
+    #endregion
 }

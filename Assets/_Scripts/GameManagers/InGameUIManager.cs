@@ -68,6 +68,7 @@ public class InGameUIManager : MonoBehaviour
     public GameObject InGameMenu;
     #endregion
 
+    #region Awake, Update and etc...
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -100,14 +101,6 @@ public class InGameUIManager : MonoBehaviour
             SceneManager.sceneLoaded -= OnSceneLoaded;
     }
 
-    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
-    {
-        if(DeathScreenButton.onClick.GetPersistentEventCount() > 0)
-            DeathScreenButton.onClick.RemoveAllListeners();
-
-        DeathScreenButton.onClick.AddListener(GameManager.TryLoad);
-    }
-
     void Update()
     {
         if (IsHeavyAttackAtCooldown == true)
@@ -133,62 +126,7 @@ public class InGameUIManager : MonoBehaviour
                 InGameConsole.SetActive(!InGameConsole.activeSelf);
         }
 
-        if (Player != null)
-        {
-            if (Keyboard.current.digit1Key.wasPressedThisFrame)
-            {
-                if (inventorySlots[0].TryGetComponent<ItemSlotStorage>(out ItemSlotStorage slotStorage))
-                {
-                    if (slotStorage.ItemInstance != null)
-                        slotStorage.UseItem(Player.gameObject);
-                }
-            }
-
-            if (Keyboard.current.digit2Key.wasPressedThisFrame)
-            {
-                if (inventorySlots[1].TryGetComponent<ItemSlotStorage>(out ItemSlotStorage slotStorage))
-                {
-                    if (slotStorage.ItemInstance != null)
-                        slotStorage.UseItem(Player.gameObject);
-                }
-            }
-
-            if (Keyboard.current.digit3Key.wasPressedThisFrame)
-            {
-                if (inventorySlots[2].TryGetComponent<ItemSlotStorage>(out ItemSlotStorage slotStorage))
-                {
-                    if (slotStorage.ItemInstance != null)
-                        slotStorage.UseItem(Player.gameObject);
-                }
-            }
-
-            if (Keyboard.current.digit4Key.wasPressedThisFrame)
-            {
-                if (inventorySlots[3].TryGetComponent<ItemSlotStorage>(out ItemSlotStorage slotStorage))
-                {
-                    if (slotStorage.ItemInstance != null)
-                        slotStorage.UseItem(Player.gameObject);
-                }
-            }
-
-            if (Keyboard.current.digit5Key.wasPressedThisFrame)
-            {
-                if (inventorySlots[4].TryGetComponent<ItemSlotStorage>(out ItemSlotStorage slotStorage))
-                {
-                    if (slotStorage.ItemInstance != null)
-                        slotStorage.UseItem(Player.gameObject);
-                }
-            }
-
-            if (Keyboard.current.digit6Key.wasPressedThisFrame)
-            {
-                if (inventorySlots[5].TryGetComponent<ItemSlotStorage>(out ItemSlotStorage slotStorage))
-                {
-                    if (slotStorage.ItemInstance != null)
-                        slotStorage.UseItem(Player.gameObject);
-                }
-            }
-        }
+        if (Player != null) PlayerInteractionKeys();
     }
 
     private void FixedUpdate()
@@ -196,13 +134,16 @@ public class InGameUIManager : MonoBehaviour
         TimeDisplay();
     }
 
-    private void GettersAndFinders()
-    {
-        if (FindAnyObjectByType<NewPlayerController>())
-           Player = FindAnyObjectByType<NewPlayerController>();
-    }
+    #endregion
 
-    #region Events Based Actions
+    #region General functions
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        if (DeathScreenButton.onClick.GetPersistentEventCount() > 0)
+            DeathScreenButton.onClick.RemoveAllListeners();
+
+        DeathScreenButton.onClick.AddListener(GameManager.TryLoad);
+    }
 
     private void EventSubscriber()
     {
@@ -213,6 +154,72 @@ public class InGameUIManager : MonoBehaviour
         OnInGameMenuShow.AddListener(ShowInGameMenu);
     }
 
+    private void GettersAndFinders()
+    {
+        if (FindAnyObjectByType<NewPlayerController>())
+           Player = FindAnyObjectByType<NewPlayerController>();
+    }
+
+    private void PlayerInteractionKeys()
+    {
+        if (Keyboard.current.digit1Key.wasPressedThisFrame)
+        {
+            if (inventorySlots[0].TryGetComponent<ItemSlotStorage>(out ItemSlotStorage slotStorage))
+            {
+                if (slotStorage.ItemInstance != null)
+                    slotStorage.UseItem(Player.gameObject);
+            }
+        }
+
+        if (Keyboard.current.digit2Key.wasPressedThisFrame)
+        {
+            if (inventorySlots[1].TryGetComponent<ItemSlotStorage>(out ItemSlotStorage slotStorage))
+            {
+                if (slotStorage.ItemInstance != null)
+                    slotStorage.UseItem(Player.gameObject);
+            }
+        }
+
+        if (Keyboard.current.digit3Key.wasPressedThisFrame)
+        {
+            if (inventorySlots[2].TryGetComponent<ItemSlotStorage>(out ItemSlotStorage slotStorage))
+            {
+                if (slotStorage.ItemInstance != null)
+                    slotStorage.UseItem(Player.gameObject);
+            }
+        }
+
+        if (Keyboard.current.digit4Key.wasPressedThisFrame)
+        {
+            if (inventorySlots[3].TryGetComponent<ItemSlotStorage>(out ItemSlotStorage slotStorage))
+            {
+                if (slotStorage.ItemInstance != null)
+                    slotStorage.UseItem(Player.gameObject);
+            }
+        }
+
+        if (Keyboard.current.digit5Key.wasPressedThisFrame)
+        {
+            if (inventorySlots[4].TryGetComponent<ItemSlotStorage>(out ItemSlotStorage slotStorage))
+            {
+                if (slotStorage.ItemInstance != null)
+                    slotStorage.UseItem(Player.gameObject);
+            }
+        }
+
+        if (Keyboard.current.digit6Key.wasPressedThisFrame)
+        {
+            if (inventorySlots[5].TryGetComponent<ItemSlotStorage>(out ItemSlotStorage slotStorage))
+            {
+                if (slotStorage.ItemInstance != null)
+                    slotStorage.UseItem(Player.gameObject);
+            }
+        }
+    }
+
+    #endregion
+
+    #region Events Based Actions
     public static void ShowInGameMenu(bool show)
     {
         if (show && Instance.InGameMenu.activeSelf) return;
@@ -252,6 +259,26 @@ public class InGameUIManager : MonoBehaviour
         }
     }
 
+    private void IsPlayerHeavyAttackAtCooldown(bool info, float timer)
+    {
+        HeavyAttackCooldownTimer = 0f;
+        HeavyAttackCooldownTimer = timer;
+        IsHeavyAttackAtCooldown = info;
+    }
+
+    private void ShowDeathScreen(bool active)
+    {
+        if (DeathScreen != null) DeathScreen.SetActive(active);
+    }
+
+    #region Notifications
+    private void ShowNotification(string messageText)
+    {
+        var msgRef = Instantiate(NotificationPrefab, NotificationsPanel.transform);
+        if (msgRef.TryGetComponent<Notification>(out Notification script)) script.SetText(messageText);
+    }
+    #endregion
+
     #endregion
 
     #region TimeDisplay
@@ -283,13 +310,6 @@ public class InGameUIManager : MonoBehaviour
         sequence.Play();
     }
 
-    private void IsPlayerHeavyAttackAtCooldown(bool info, float timer)
-    {
-        HeavyAttackCooldownTimer = 0f;
-        HeavyAttackCooldownTimer = timer;
-        IsHeavyAttackAtCooldown = info;
-    }
-
     public GameObject DisplayStatusEffect(StatusEffectDescription effectDescription)
     {
         GameObject newStatusEffect = Instantiate(_statusEffectImagePrefab, _statusEffectsPanel.transform);
@@ -310,19 +330,6 @@ public class InGameUIManager : MonoBehaviour
         }
     }
 
-    private void ShowDeathScreen(bool active)
-    {
-        if(DeathScreen!=null) DeathScreen.SetActive(active);
-    }
-
-    #endregion
-
-    #region Notifications
-    private void ShowNotification(string messageText)
-    {
-        var msgRef = Instantiate(NotificationPrefab, NotificationsPanel.transform);
-        if(msgRef.TryGetComponent<Notification>(out Notification script)) script.SetText(messageText);
-    }
     #endregion
 
     #region Command Line Logic
@@ -342,10 +349,7 @@ public class InGameUIManager : MonoBehaviour
 
                 AddItemToInventory(itemKey, amount, slotNumber);
             }
-            else
-            {
-                Debug.LogWarning("Invalid command format! Use: give_item <item_name> [amount]");
-            }
+            else Debug.LogWarning("Invalid command format! Use: give_item <item_name> [amount]");
         }
     }
 

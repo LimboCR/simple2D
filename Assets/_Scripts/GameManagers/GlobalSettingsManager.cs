@@ -7,6 +7,7 @@ using UnityEngine.UI;
 
 public class GlobalSettingsManager : MonoBehaviour
 {
+    #region Instance
     private static GlobalSettingsManager instance;
     public static GlobalSettingsManager Instance
     {
@@ -22,6 +23,9 @@ public class GlobalSettingsManager : MonoBehaviour
         }
     }
 
+    #endregion
+
+    #region Data Containers
     public ButtonBindingsSO PlayerButtonBindings;
     public static ButtonBindingsSO s_PlayerButtonBindings;
 
@@ -31,8 +35,9 @@ public class GlobalSettingsManager : MonoBehaviour
     public GraphicsSettingsSO GraphicsSettings;
     public static GraphicsSettingsSO s_GraphicsSettings;
 
-    //public GameManagerCommands GameManagerCommands;
-    //public static GameManagerCommands s_GameManagerCommands;
+    #endregion
+
+    #region Settings Menu Tab
     [Space, Header("Settings Menu")]
     public GameObject SettingsMenu;
     public GameObject GraphicSettingsTab;
@@ -88,6 +93,9 @@ public class GlobalSettingsManager : MonoBehaviour
 
     #endregion
 
+    #endregion
+
+    #region Remake/remove later - GM Commands
     [Space, Header("GameManager Commands")]
     public static EGMCommandType Command;
     public static bool LoadFromSaveFile;
@@ -96,13 +104,20 @@ public class GlobalSettingsManager : MonoBehaviour
 
     public bool UseGameManagerCommandsData = false;
 
+    #endregion
+
+    #region Temp Save Data
     [Space, Header("Save files details")]
     public static string SaveFileName = "QuickSave";
     public static string SaveFolderName = "QuickSaves";
 
+    #endregion
 
+    #region Uncategorized
     private GameObject LoadButton;
     private bool InSettings = false;
+
+    #endregion
 
     #region Awake, Start and staff
     private void Awake()
@@ -135,6 +150,7 @@ public class GlobalSettingsManager : MonoBehaviour
         }
     }
 
+    #region Helpers
     private void StaticAppliers()
     {
         s_GlobalMixer = GlobalMixer;
@@ -187,6 +203,8 @@ public class GlobalSettingsManager : MonoBehaviour
     {
         Application.Quit();
     }
+
+    #endregion
 
     #endregion
 

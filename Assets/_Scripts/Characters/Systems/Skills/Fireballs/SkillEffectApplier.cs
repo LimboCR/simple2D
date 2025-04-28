@@ -13,13 +13,9 @@ public class SkillEffectApplier : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D other)
     {
         if(effectToApply != null)
-        {
             if (other.TryGetComponent<StatusEffectHandler>(out StatusEffectHandler handler))
-            {
                 handler.ApplyEffectSO(effectToApply);
-            }
-        }
 
-        Destroy(gameObject); // Optional: destroy fireball on impact
+        Destroy(gameObject);
     }
 }

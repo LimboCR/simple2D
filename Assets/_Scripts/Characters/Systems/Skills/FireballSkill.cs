@@ -1,6 +1,4 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu(fileName ="FireballSkill", menuName = "Skills/Skill Tree/Fire Ball")]

@@ -4,11 +4,8 @@ using UnityEngine.InputSystem;
 using static GlobalEventsManager;
 using MultiSaveSystem;
 using Limbo.CollectionUtils;
-using Unity.Cinemachine;
-using System;
 using UnityEngine.SceneManagement;
 using System.Collections;
-using System.Threading.Tasks;
 
 public class GameManager : MonoBehaviour
 {
@@ -228,6 +225,7 @@ public class GameManager : MonoBehaviour
             SceneManager.sceneLoaded -= OnSceneLoaded;
     }
 
+    #region OnSceneLoaded and  helpers
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         if(scene.buildIndex == 0)
@@ -290,30 +288,15 @@ public class GameManager : MonoBehaviour
 
             yield break;
         }
-        else if (GlobalSettingsManager.Command == EGMCommandType.NewGame)
-        {
-            SpawnPlayerAtInitial = true;
-        }
+        else if (GlobalSettingsManager.Command == EGMCommandType.NewGame) SpawnPlayerAtInitial = true;
 
-        //Debug.LogWarning($"[AwaitPlayer] Before our bug value LoadFromSaveFile = {GlobalSettingsManager.LoadFromSaveFile}");
         if (SpawnPlayerAtInitial)
         {
-            if (InitialPlayerPosition != null)
-            {
-                //Debug.LogWarning("Setting player position to his initial position.");
-                Player.transform.position = InitialPlayerPosition.transform.position;
-            }
-            else
-            {
-                Debug.LogWarning("InitialPlayerPosition is null, cannot set player position.");
-            }
+            if (InitialPlayerPosition != null) Player.transform.position = InitialPlayerPosition.transform.position;
+            else Debug.LogWarning("InitialPlayerPosition is null, cannot set player position.");
         }
-        else
-        {
-            Debug.Log("[AwaitPlayer] Skipping InitialPlayerPosition override due to LoadFromSaveFile");
-        }
+        else Debug.Log("[AwaitPlayer] Skipping InitialPlayerPosition override due to LoadFromSaveFile");
 
-        // Always do this part regardless
         if (PlayerLeavingScene && PlayerArrivedToScene)
         {
             if (CrossSceneDataContainer != null)
@@ -329,8 +312,6 @@ public class GameManager : MonoBehaviour
         PlayerLeavingScene = false;
         PlayerArrivedToScene = false;
         SpawnPlayerAtInitial = false;
-
-        //AudioManager.MusicSourcePlay(AudioManager.Instance.AudioPacks[EAudioPackType.Soundtracks].TracksDictionary["DarkAmbient4"], PlayMode.force, true);
 
         yield break;
     }
@@ -373,6 +354,8 @@ public class GameManager : MonoBehaviour
     {
         SpawnPlayerAtInitial = true;
     }
+
+    #endregion
     #endregion
 
     #region General
